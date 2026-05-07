@@ -1,0 +1,107 @@
+@extends('layouts.fournisseur')
+
+@section('content')
+<div class="space-y-4">
+    <form method="GET" action="{{ url('/fournisseur/commandes') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div>
+            <select name="statut"
+                    class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]">
+                <option value="">Tous statuts</option>
+                @foreach($statuts as $s)
+                    <option value="{{ $s }}" @selected((string)$selected_statut === (string)$s)>{{ $s }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <select name="client"
+                    class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]">
+                <option value="">Tous clients</option>
+                @foreach($clients as $c)
+                    <option value="{{ $c->id }}" @selected((string)$selected_client === (string)$c->id)>{{ $c->prenom }} {{ $c->nom }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <input type="date"
+                   name="from"
+                   value="{{ $from }}"
+                   class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]">
+        </div>
+
+        <div>
+            <input type="date"
+                   name="to"
+                   value="{{ $to }}"
+                   class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]">
+        </div>
+
+        <button class="rounded-2xl px-4 py-3 font-bold text-white"
+                style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+            Filtrer
+        </button>
+    </form>
+
+    @if(session('success'))
+        <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-200">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="text-white/60">
+                    <tr>
+                        <th class="text-left py-3 px-4 font-semibold">N°</th>
+                        <th class="text-left py-3 px-4 font-semibold">Client</th>
+                        <th class="text-left py-3 px-4 font-semibold">Date</th>
+                        <th class="text-right py-3 px-4 font-semibold">Montant</th>
+                        <th class="text-left py-3 px-4 font-semibold">Statut</th>
+                        <th class="text-left py-3 px-4 font-semibold">Synced PME</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                    @forelse($commandes as $c)
+                        @php
+                            $statut = $c->statut;
+                            $badge = match($statut) {
+                                'en_attente' => 'bg-amber-500/15 text-amber-300 border border-amber-400/20',
+                                'confirmee' => 'bg-sky-500/15 text-sky-300 border border-sky-400/20',
+                                'expediee' => 'bg-indigo-500/15 text-indigo-300 border border-indigo-400/20',
+                                'livree' => 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20',
+                                'annulee' => 'bg-red-500/15 text-red-300 border border-red-400/20',
+                                default => 'bg-white/10 text-white/70 border border-white/10'
+                            };
+                        @endphp
+                        <tr class="hover:bg-white/5 cursor-pointer" onclick="window.location='{{ url('/fournisseur/commandes/'.$c->id) }}'">
+                            <td class="py-3 px-4 font-semibold">#{{ $c->id }}</td>
+                            <td class="py-3 px-4 text-white/80">{{ trim(($c->client_prenom ?? '').' '.($c->client_nom ?? '')) }}</td>
+                            <td class="py-3 px-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="py-3 px-4 text-right font-extrabold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$c->synced_pme === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-amber-500/15 text-amber-300 border border-amber-400/20' }}">
+                                    {{ (int)$c->synced_pme === 1 ? 'Synchronisé' : 'En attente' }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-10 text-center text-white/60">Aucune commande</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        {{ $commandes->links() }}
+    </div>
+</div>
+@endsection
+

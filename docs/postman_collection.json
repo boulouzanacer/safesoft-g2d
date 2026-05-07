@@ -1,0 +1,229 @@
+{
+  "info": {
+    "_postman_id": "7f8c8b9f-5f42-4b7d-9b9b-4c9f1a9c2d11",
+    "name": "SafeSoft G2D API v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+    { "key": "clientToken", "value": "" },
+    { "key": "pmeToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth Client",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"prenom\": \"Client\",\n  \"email\": \"client@test.com\",\n  \"password\": \"Password@123\",\n  \"telephone\": \"0550000000\",\n  \"type_client\": \"simple\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"client@test.com\",\n  \"password\": \"Password@123\"\n}" }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "me"] }
+          }
+        },
+        {
+          "name": "Update Profil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/profil", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "profil"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Test\",\n  \"prenom\": \"Client\",\n  \"telephone\": \"0550000000\",\n  \"adresse\": \"Adresse\",\n  \"id_wilaya\": 16,\n  \"id_commune\": 535\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Géographie",
+      "item": [
+        {
+          "name": "Wilayas",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/wilayas", "host": ["{{baseUrl}}"], "path": ["api", "v1", "wilayas"] }
+          }
+        },
+        {
+          "name": "Communes by Wilaya",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/communes/16", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communes", "16"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Boutiques",
+      "item": [
+        {
+          "name": "Liste boutiques",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/boutiques", "host": ["{{baseUrl}}"], "path": ["api", "v1", "boutiques"] }
+          }
+        },
+        {
+          "name": "Détail boutique",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/boutiques/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "boutiques", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Produits",
+      "item": [
+        {
+          "name": "Liste produits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/produits?frs_id=1&page=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "produits"],
+              "query": [
+                { "key": "frs_id", "value": "1" },
+                { "key": "page", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Produit détail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/produits/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produits", "1"] }
+          }
+        },
+        {
+          "name": "Catégories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/produits/categories?frs_id=1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produits", "categories"], "query": [{ "key": "frs_id", "value": "1" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Commandes (Client)",
+      "item": [
+        {
+          "name": "Créer commande",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{clientToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/commandes", "host": ["{{baseUrl}}"], "path": ["api", "v1", "commandes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_frs\": 1,\n  \"adresse_livraison\": \"Adresse\",\n  \"id_wilaya\": 16,\n  \"id_commune\": 535,\n  \"notes\": \"\",\n  \"panier\": [\n    { \"id_produit\": 1, \"quantite\": 1 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Mes commandes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/commandes", "host": ["{{baseUrl}}"], "path": ["api", "v1", "commandes"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications (Client)",
+      "item": [
+        {
+          "name": "Lister",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/notifications", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notifications"] }
+          }
+        },
+        {
+          "name": "Tout lire",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{clientToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/notifications/tout-lire", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notifications", "tout-lire"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PME Pro",
+      "item": [
+        {
+          "name": "Sync clients",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{pmeToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/pme/sync-clients", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pme", "sync-clients"] },
+            "body": { "mode": "raw", "raw": "{\n  \"clients\": []\n}" }
+          }
+        },
+        {
+          "name": "Sync produits",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{pmeToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/pme/sync-produits", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pme", "sync-produits"] },
+            "body": { "mode": "raw", "raw": "{\n  \"produits\": []\n}" }
+          }
+        },
+        {
+          "name": "Commandes à synchroniser",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{pmeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/pme/commandes?synced=0", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pme", "commandes"], "query": [{ "key": "synced", "value": "0" }] }
+          }
+        }
+      ]
+    }
+  ]
+}

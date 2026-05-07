@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      x-data="frsTheme()"
+      x-init="init()"
+      :class="{ 'dark': dark }">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ $title ?? 'Espace Fournisseur' }} - {{ config('app.name') }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            darkMode: 'class',
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root{
+            --frs-primary:#1E6FD9;
+            --frs-bg:#1A1A2E;
+            --frs-card:#252543;
+        }
+        html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+    </style>
+
+    <script>
+        function frsTheme() {
+            return {
+                dark: true,
+                profileOpen: false,
+                init() {
+                    const stored = localStorage.getItem('frs_theme');
+                    if (stored === 'light') this.dark = false;
+                    if (stored === 'dark') this.dark = true;
+                    if (!stored) this.dark = true;
+                },
+                toggleTheme() {
+                    this.dark = !this.dark;
+                    localStorage.setItem('frs_theme', this.dark ? 'dark' : 'light');
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen text-slate-100"
+      :class="dark ? 'bg-[var(--frs-bg)]' : 'bg-slate-100 text-slate-900'">
+@php($frs = \App\Models\Fournisseur::find(session('frs_id')))
+<div class="flex min-h-screen">
+    <aside class="fixed inset-y-0 left-0 w-[240px] border-r border-white/10 bg-[var(--frs-bg)]">
+        <div class="h-16 px-5 flex items-center gap-3 border-b border-white/10">
+            <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
+                 style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                G2D
+            </div>
+            <div class="leading-tight">
+                <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
+                <div class="text-xs text-white/60">Espace Fournisseur</div>
+            </div>
+        </div>
+
+        <nav class="px-3 py-4 space-y-1 text-sm">
+            <a href="{{ url('/fournisseur/dashboard') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/dashboard') ? 'bg-white/10' : '' }}">
+                <i class="fa-solid fa-chart-line w-5 text-[var(--frs-primary)]"></i>
+                <span>Mon Dashboard</span>
+            </a>
+
+            <a href="{{ url('/fournisseur/produits') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/produits*') ? 'bg-white/10' : '' }}">
+                <i class="fa-solid fa-boxes-stacked w-5 text-[var(--frs-primary)]"></i>
+                <span>Mes Produits</span>
+            </a>
+
+            <a href="{{ url('/fournisseur/clients') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/clients*') ? 'bg-white/10' : '' }}">
+                <i class="fa-solid fa-users w-5 text-[var(--frs-primary)]"></i>
+                <span>Mes Clients</span>
+            </a>
+
+            <a href="{{ url('/fournisseur/commandes') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/commandes*') ? 'bg-white/10' : '' }}">
+                <i class="fa-solid fa-cart-shopping w-5 text-[var(--frs-primary)]"></i>
+                <span>Mes Commandes</span>
+            </a>
+
+            <a href="{{ url('/fournisseur/token') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/token') ? 'bg-white/10' : '' }}">
+                <i class="fa-solid fa-key w-5 text-[var(--frs-primary)]"></i>
+                <span>Mon Token PME</span>
+            </a>
+
+            <a href="{{ url('/fournisseur/profil') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/profil*') ? 'bg-white/10' : '' }}">
+                <i class="fa-solid fa-user w-5 text-[var(--frs-primary)]"></i>
+                <span>Mon Profil</span>
+            </a>
+
+            <form method="POST" action="{{ url('/fournisseur/logout') }}" class="pt-2">
+                @csrf
+                <button type="submit"
+                        class="w-full flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 text-left">
+                    <i class="fa-solid fa-right-from-bracket w-5 text-red-300"></i>
+                    <span>Déconnexion</span>
+                </button>
+            </form>
+        </nav>
+    </aside>
+
+    <div class="flex-1 ml-[240px]">
+        <header class="sticky top-0 z-40 h-16 flex items-center justify-between px-6 border-b border-white/10 backdrop-blur"
+                :class="dark ? 'bg-[color:rgba(26,26,46,0.85)]' : 'bg-white/80 border-slate-200'">
+            <div class="font-extrabold tracking-wide text-lg">
+                {{ $title ?? 'Espace Fournisseur' }}
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button type="button"
+                        class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-white/10 hover:bg-white/10"
+                        :class="dark ? 'text-white' : 'border-slate-200 hover:bg-slate-100'"
+                        @click="toggleTheme()">
+                    <i class="fa-solid" :class="dark ? 'fa-sun' : 'fa-moon'"></i>
+                    <span x-text="dark ? 'Clair' : 'Sombre'"></span>
+                </button>
+
+                <div class="relative" @click.outside="profileOpen = false">
+                    <button type="button"
+                            class="flex items-center gap-3 rounded-xl px-3 py-2 border border-white/10 hover:bg-white/10"
+                            :class="dark ? '' : 'border-slate-200 hover:bg-slate-100'"
+                            @click="profileOpen = !profileOpen">
+                        <div class="h-9 w-9 rounded-full flex items-center justify-center font-bold"
+                             style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                            {{ strtoupper(substr($frs?->nom_frs ?? 'F', 0, 1)) }}
+                        </div>
+                        <div class="text-left leading-tight hidden sm:block max-w-[180px]">
+                            <div class="text-sm font-bold truncate">{{ $frs?->nom_frs ?? 'Fournisseur' }}</div>
+                            <div class="text-xs opacity-70 truncate">{{ $frs?->email }}</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-xs opacity-70"></i>
+                    </button>
+
+                    <div x-show="profileOpen"
+                         x-transition
+                         class="absolute right-0 mt-2 w-52 rounded-xl border border-white/10 shadow-2xl overflow-hidden"
+                         :class="dark ? 'bg-[var(--frs-card)]' : 'bg-white border-slate-200'">
+                        <a href="{{ url('/fournisseur/profil') }}"
+                           class="block px-4 py-3 text-sm hover:bg-white/10"
+                           :class="dark ? '' : 'hover:bg-slate-100'">
+                            Mon profil
+                        </a>
+                        <a href="{{ url('/fournisseur/token') }}"
+                           class="block px-4 py-3 text-sm hover:bg-white/10"
+                           :class="dark ? '' : 'hover:bg-slate-100'">
+                            Mon token PME
+                        </a>
+                        <form method="POST" action="{{ url('/fournisseur/logout') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="w-full text-left px-4 py-3 text-sm hover:bg-white/10"
+                                    :class="dark ? '' : 'hover:bg-slate-100'">
+                                Déconnexion
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-6">
+            @yield('content')
+        </main>
+    </div>
+</div>
+</body>
+</html>
