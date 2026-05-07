@@ -26,6 +26,20 @@ class StoreController extends Controller
         return Client::query()->find((int) session('client_id'));
     }
 
+    private function tarifForClient(?Client $client): int
+    {
+        if (! $client || (string) $client->type_client !== 'abonne') {
+            return 1;
+        }
+
+        $t = (int) ($client->tarif ?? 1);
+        if ($t < 1 || $t > 3) {
+            $t = 1;
+        }
+
+        return $t;
+    }
+
     private function resolveUrl(?string $raw): string
     {
         $v = trim((string) $raw);
@@ -76,6 +90,7 @@ class StoreController extends Controller
 
     private function cartSummary(): array
     {
+        $client = $this->currentClient();
         $cart = $this->cart();
         $ids = array_keys($cart);
         $ids = array_map('intval', $ids);
@@ -88,8 +103,9 @@ class StoreController extends Controller
         $products = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
+            ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
             ->whereIn('id', $ids)
-            ->with(['fournisseur:id,nom_frs,actif,deleted_at'])
+            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
             ->get()
             ->keyBy('id');
 
@@ -98,7 +114,7 @@ class StoreController extends Controller
 
         foreach ($ids as $id) {
             $p = $products->get($id);
-            if (! $p || ! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || $p->fournisseur->deleted_at) {
+            if (! $p || ! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
                 unset($cart[$id]);
                 continue;
             }
@@ -117,13 +133,15 @@ class StoreController extends Controller
 
             $cart[$id] = $qty;
 
-            $line = (float) $p->prix * $qty;
+            $prixUnitaire = (float) $p->prixPourClient($client);
+            $line = $prixUnitaire * $qty;
             $total += $line;
 
             $items[] = [
                 'produit' => $p,
                 'qty' => $qty,
                 'line_total' => $line,
+                'prix_unitaire' => $prixUnitaire,
                 'image' => $this->resolveUrl($p->image_principale),
             ];
         }
@@ -134,6 +152,7 @@ class StoreController extends Controller
             $frs = Fournisseur::query()
                 ->where('id', $frsId)
                 ->where('actif', 1)
+                ->where('is_visible', 1)
                 ->whereNull('deleted_at')
                 ->first(['id', 'nom_frs', 'logo_path', 'adresse', 'telephone', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
         }
@@ -159,6 +178,7 @@ class StoreController extends Controller
 
         $boutiques = Fournisseur::query()
             ->where('actif', 1)
+            ->where('is_visible', 1)
             ->whereNull('deleted_at')
             ->when($fournisseurId, fn ($q) => $q->where('id', $fournisseurId))
             ->orderBy('nom_frs')
@@ -167,9 +187,10 @@ class StoreController extends Controller
         $produitsQuery = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
-            ->with(['fournisseur:id,nom_frs,actif,deleted_at'])
+            ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
+            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
+            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'))
             ->when($fournisseurId, fn ($q) => $q->where('id_frs', $fournisseurId))
-            ->when(! $fournisseurId, fn ($q) => $q->whereHas('fournisseur', fn ($sub) => $sub->where('actif', 1)->whereNull('deleted_at')))
             ->when($categorie !== '', fn ($q2) => $q2->where('categorie', $categorie))
             ->when($q !== '', function ($q2) use ($q) {
                 $q2->where(function ($sub) use ($q) {
@@ -182,8 +203,9 @@ class StoreController extends Controller
         $catsQuery = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
+            ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
+            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'))
             ->when($fournisseurId, fn ($q2) => $q2->where('id_frs', $fournisseurId))
-            ->when(! $fournisseurId, fn ($q2) => $q2->whereHas('fournisseur', fn ($sub) => $sub->where('actif', 1)->whereNull('deleted_at')))
             ->distinct()
             ->orderBy('categorie')
             ->pluck('categorie')
@@ -222,6 +244,7 @@ class StoreController extends Controller
         $boutique = Fournisseur::query()
             ->where('id', $id)
             ->where('actif', 1)
+            ->where('is_visible', 1)
             ->whereNull('deleted_at')
             ->firstOrFail();
 
@@ -232,6 +255,7 @@ class StoreController extends Controller
             ->whereNull('deleted_at')
             ->where('actif', 1)
             ->where('id_frs', $id)
+            ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q2) => $q2->where('abonne_only', 0))
             ->distinct()
             ->orderBy('categorie')
             ->pluck('categorie')
@@ -242,6 +266,7 @@ class StoreController extends Controller
             ->whereNull('deleted_at')
             ->where('actif', 1)
             ->where('id_frs', $id)
+            ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q2) => $q2->where('abonne_only', 0))
             ->when($categorie !== '', fn ($q2) => $q2->where('categorie', $categorie))
             ->when($q !== '', function ($q2) use ($q) {
                 $q2->where(function ($sub) use ($q) {
@@ -276,15 +301,21 @@ class StoreController extends Controller
         $p = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
-            ->with(['images' => fn ($q) => $q->orderBy('ordre'), 'fournisseur:id,nom_frs,actif,deleted_at'])
+            ->with(['images' => fn ($q) => $q->orderBy('ordre'), 'fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
             ->findOrFail($id);
 
-        if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || $p->fournisseur->deleted_at) {
+        if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
             abort(404);
         }
 
         if ($client && $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== (int) $p->id_frs) {
             abort(403);
+        }
+
+        if (! $client || (string) $client->type_client !== 'abonne') {
+            if ((int) ($p->abonne_only ?? 0) === 1) {
+                abort(404);
+            }
         }
 
         $images = [];
@@ -328,6 +359,7 @@ class StoreController extends Controller
 
     public function panierAdd(Request $request): RedirectResponse
     {
+        $client = $this->currentClient();
         $data = $request->validate([
             'produit_id' => ['required', 'integer', 'min:1'],
             'qty' => ['nullable', 'integer', 'min:1'],
@@ -338,11 +370,17 @@ class StoreController extends Controller
         $p = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
-            ->with(['fournisseur:id,actif,deleted_at'])
+            ->with(['fournisseur:id,actif,is_visible,deleted_at'])
             ->findOrFail((int) $data['produit_id']);
 
-        if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || $p->fournisseur->deleted_at) {
+        if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
             return back()->with('error', 'Produit indisponible.');
+        }
+
+        if (! $client || (string) $client->type_client !== 'abonne') {
+            if ((int) ($p->abonne_only ?? 0) === 1) {
+                return back()->with('error', 'Produit réservé aux abonnés.');
+            }
         }
 
         if ((int) $p->stock <= 0) {
@@ -511,6 +549,7 @@ class StoreController extends Controller
             $frs = Fournisseur::query()
                 ->where('id', $frsId)
                 ->where('actif', 1)
+                ->where('is_visible', 1)
                 ->whereNull('deleted_at')
                 ->first();
 
@@ -538,17 +577,22 @@ class StoreController extends Controller
                     throw new \RuntimeException("Produit {$p->id} introuvable.");
                 }
 
+                if ((string) $client->type_client !== 'abonne' && (int) ($pdb->abonne_only ?? 0) === 1) {
+                    throw new \RuntimeException("Produit {$pdb->id} réservé aux abonnés.");
+                }
+
                 if ((int) $pdb->stock < $qty) {
                     throw new \RuntimeException("Stock insuffisant pour {$pdb->designation}.");
                 }
 
-                $lineTotal = (float) $pdb->prix * $qty;
+                $prixUnitaire = (float) $pdb->prixPourClient($client);
+                $lineTotal = $prixUnitaire * $qty;
                 $montantTotal += $lineTotal;
 
                 $lines[] = [
                     'id_produit' => (int) $pdb->id,
                     'quantite' => $qty,
-                    'prix_unitaire' => (float) $pdb->prix,
+                    'prix_unitaire' => $prixUnitaire,
                     'sous_total' => $lineTotal,
                 ];
 

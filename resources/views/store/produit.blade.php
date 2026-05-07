@@ -40,7 +40,7 @@
             <div class="mt-1 text-sm text-slate-600">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
 
             <div class="mt-4 flex items-center justify-between gap-3">
-                <div class="text-2xl font-extrabold">{{ number_format((float)$produit->prix, 2, '.', ' ') }} DA</div>
+                <div class="text-2xl font-extrabold">{{ number_format((float)$produit->prixPourClient($client ?? null), 2, '.', ' ') }} DA</div>
                 <span class="text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
                     {{ $produit->categorie ?: '—' }}
                 </span>

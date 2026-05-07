@@ -55,7 +55,7 @@ class DashboardController extends Controller
             ->where('stock', '<', 5)
             ->orderBy('stock')
             ->limit(5)
-            ->get(['id', 'reference', 'designation', 'stock', 'prix', 'actif', 'image_principale']);
+            ->get(['id', 'reference', 'designation', 'stock', 'pv_1', 'actif', 'image_principale']);
 
         return view('fournisseur.dashboard', [
             'title' => 'Mon Dashboard',
@@ -68,4 +68,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-

@@ -104,6 +104,17 @@
                     @endif
                 </div>
 
+                <div class="md:col-span-2">
+                    <label class="flex items-center gap-3 cursor-pointer select-none">
+                        <input type="checkbox"
+                               name="is_visible"
+                               value="1"
+                               class="h-5 w-5 rounded border-white/20 bg-black/20"
+                               @checked((int)old('is_visible', $frs->is_visible ?? 1) === 1)>
+                        <span class="text-sm font-semibold text-white/70">Visible sur le site et l’app mobile</span>
+                    </label>
+                </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-white/70 mb-1">Wilaya</label>
                     <select name="id_wilaya"

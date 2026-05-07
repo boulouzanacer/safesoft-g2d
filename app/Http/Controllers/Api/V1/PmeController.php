@@ -136,6 +136,7 @@ class PmeController extends Controller
                     'id_wilaya' => (int) $item['id_wilaya'],
                     'id_commune' => (int) $item['id_commune'],
                     'type_client' => 'abonne',
+                    'tarif' => (int) ($item['tarif'] ?? 1),
                     'id_frs' => $frs->id,
                     'actif' => 1,
                 ];
@@ -184,9 +185,12 @@ class PmeController extends Controller
                     'reference' => $item['reference'],
                     'designation' => $item['designation'],
                     'description' => $existing?->description ?? '',
-                    'prix' => $item['prix'],
+                    'pv_1' => $item['pv_1'] ?? ($item['prix'] ?? 0),
+                    'pv_2' => $item['pv_2'] ?? ($item['pv_1'] ?? ($item['prix'] ?? 0)),
+                    'pv_3' => $item['pv_3'] ?? ($item['pv_1'] ?? ($item['prix'] ?? 0)),
                     'stock' => (int) $item['stock'],
                     'categorie' => $item['categorie'],
+                    'abonne_only' => (int) ($item['abonne_only'] ?? 0) === 1 ? 1 : 0,
                     'actif' => 1,
                 ];
 
@@ -220,12 +224,17 @@ class PmeController extends Controller
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'remove_logo' => ['nullable', 'boolean'],
+            'is_visible' => ['nullable', 'boolean'],
         ]);
 
         $payload = [];
-        foreach (['nom_frs', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude'] as $key) {
+        foreach (['nom_frs', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude', 'is_visible'] as $key) {
             if (array_key_exists($key, $data)) {
-                $payload[$key] = $data[$key];
+                if ($key === 'is_visible') {
+                    $payload[$key] = (int) $data[$key] === 1 ? 1 : 0;
+                } else {
+                    $payload[$key] = $data[$key];
+                }
             }
         }
 
@@ -268,6 +277,7 @@ class PmeController extends Controller
             'latitude' => $frs->latitude,
             'longitude' => $frs->longitude,
             'logo_url' => $frs->logo_url,
+            'is_visible' => (int) ($frs->is_visible ?? 1),
         ], 'Sync fournisseur terminé');
     }
 

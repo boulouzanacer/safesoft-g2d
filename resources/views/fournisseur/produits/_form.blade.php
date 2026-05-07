@@ -42,11 +42,31 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Prix</label>
-        <input name="prix"
+        <label class="block text-sm font-semibold text-white/70 mb-1">PV 1</label>
+        <input name="pv_1"
                type="number"
                step="0.01"
-               value="{{ old('prix', $produit->prix ?? '') }}"
+               value="{{ old('pv_1', $produit->pv_1 ?? '') }}"
+               class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
+               required>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-white/70 mb-1">PV 2</label>
+        <input name="pv_2"
+               type="number"
+               step="0.01"
+               value="{{ old('pv_2', $produit->pv_2 ?? '') }}"
+               class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
+               required>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-white/70 mb-1">PV 3</label>
+        <input name="pv_3"
+               type="number"
+               step="0.01"
+               value="{{ old('pv_3', $produit->pv_3 ?? '') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
                required>
     </div>
@@ -79,6 +99,17 @@
             <span class="text-sm font-semibold text-white/70">Actif</span>
         </label>
         <div class="text-xs text-white/50">Max 5 images • WebP généré automatiquement</div>
+    </div>
+
+    <div class="md:col-span-2">
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+            <input type="checkbox"
+                   name="abonne_only"
+                   value="1"
+                   class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                   @checked((int)old('abonne_only', $produit->abonne_only ?? 0) === 1)>
+            <span class="text-sm font-semibold text-white/70">Visible uniquement pour abonnés</span>
+        </label>
     </div>
 </div>
 
@@ -246,4 +277,3 @@
         if (initialPrimary) window.__setPrimary(initialPrimary);
     })();
 </script>
-

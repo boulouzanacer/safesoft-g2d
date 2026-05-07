@@ -58,7 +58,7 @@
                                         {{ $p->designation }}
                                     </a>
                                     <div class="mt-1 text-sm text-slate-600">Ref: {{ $p->reference }}</div>
-                                    <div class="mt-1 text-xs text-slate-500">{{ number_format((float)$p->prix, 2, '.', ' ') }} DA</div>
+                                    <div class="mt-1 text-xs text-slate-500">{{ number_format((float)$p->prixPourClient($client ?? null), 2, '.', ' ') }} DA</div>
                                 </div>
                                 <div class="text-right">
                                     <div class="font-extrabold">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>

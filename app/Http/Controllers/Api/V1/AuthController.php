@@ -55,6 +55,7 @@ class AuthController extends Controller
                 'email' => $client->email,
                 'telephone' => $client->telephone,
                 'type_client' => $client->type_client,
+                'tarif' => (int) ($client->tarif ?? 1),
                 'id_frs' => $client->id_frs,
             ],
         ], 'Inscription réussie');
@@ -99,6 +100,7 @@ class AuthController extends Controller
                 'id_wilaya' => $client->id_wilaya,
                 'id_commune' => $client->id_commune,
                 'type_client' => $client->type_client,
+                'tarif' => (int) ($client->tarif ?? 1),
                 'id_frs' => $client->id_frs,
                 'fournisseur' => $fournisseur,
             ],
@@ -145,6 +147,7 @@ class AuthController extends Controller
             'id_wilaya' => $client->id_wilaya,
             'id_commune' => $client->id_commune,
             'type_client' => $client->type_client,
+            'tarif' => (int) ($client->tarif ?? 1),
             'id_frs' => $client->id_frs,
             'fournisseur' => $fournisseur,
         ], 'Profil');

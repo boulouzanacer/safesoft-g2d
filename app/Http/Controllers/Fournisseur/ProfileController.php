@@ -48,6 +48,7 @@ class ProfileController extends Controller
             'id_commune' => ['required', 'integer', 'exists:commune,ID_COMMUNE'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'is_visible' => ['nullable', 'boolean'],
         ]);
 
         $payload = [
@@ -58,6 +59,7 @@ class ProfileController extends Controller
             'id_commune' => (int) $data['id_commune'],
             'latitude' => array_key_exists('latitude', $data) ? (float) $data['latitude'] : null,
             'longitude' => array_key_exists('longitude', $data) ? (float) $data['longitude'] : null,
+            'is_visible' => (int) ($data['is_visible'] ?? 0) === 1 ? 1 : 0,
         ];
 
         if ((int) ($data['remove_logo'] ?? 0) === 1) {

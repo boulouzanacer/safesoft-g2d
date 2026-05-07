@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ProduitCategoriesRequest;
 use App\Http\Requests\Api\V1\ProduitIndexRequest;
+use App\Models\Client;
 use App\Models\Produit;
 use App\Traits\ApiResponseTrait;
 
@@ -14,22 +15,26 @@ class ProduitController extends Controller
 
     public function index(ProduitIndexRequest $request)
     {
-        $frsId = $request->query('frs_id');
+        $client = $request->user();
+        $isAbonne = $client instanceof Client && (string) $client->type_client === 'abonne';
+
+        $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
+        $frsId = $forcedFrsId ?: $request->query('frs_id');
         $categorie = trim((string) $request->query('categorie', ''));
         $search = trim((string) $request->query('search', ''));
 
         $query = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
+            ->when(! $isAbonne, fn ($q) => $q->where('abonne_only', 0))
             ->with([
                 'images' => fn ($q) => $q->orderBy('ordre'),
-                'fournisseur:id,nom_frs,actif,deleted_at',
-            ]);
+                'fournisseur:id,nom_frs,actif,is_visible,deleted_at',
+            ])
+            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'));
 
         if ($frsId) {
             $query->where('id_frs', $frsId);
-        } else {
-            $query->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->whereNull('deleted_at'));
         }
 
         if ($categorie !== '') {
@@ -45,7 +50,7 @@ class ProduitController extends Controller
 
         $paginator = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
 
-        $items = $paginator->getCollection()->map(function (Produit $p) {
+        $items = $paginator->getCollection()->map(function (Produit $p) use ($client) {
             return [
                 'id' => $p->id,
                 'id_frs' => $p->id_frs,
@@ -53,10 +58,14 @@ class ProduitController extends Controller
                 'reference' => $p->reference,
                 'designation' => $p->designation,
                 'description' => $p->description,
-                'prix' => (float) $p->prix,
+                'pv_1' => (float) $p->pv_1,
+                'pv_2' => (float) $p->pv_2,
+                'pv_3' => (float) $p->pv_3,
+                'prix' => (float) $p->prixPourClient($client instanceof Client ? $client : null),
                 'stock' => (int) $p->stock,
                 'image_principale' => $p->image_principale,
                 'categorie' => $p->categorie,
+                'abonne_only' => (int) ($p->abonne_only ?? 0),
                 'actif' => (int) $p->actif,
                 'images' => $p->images->map(fn ($img) => [
                     'id' => $img->id,
@@ -81,16 +90,22 @@ class ProduitController extends Controller
 
     public function show(int $id)
     {
+        $client = request()->user();
+        $isAbonne = $client instanceof Client && (string) $client->type_client === 'abonne';
+
         $p = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
+            ->when(! $isAbonne, fn ($q) => $q->where('abonne_only', 0))
+            ->when($isAbonne && $client->id_frs, fn ($q) => $q->where('id_frs', (int) $client->id_frs))
             ->with([
                 'images' => fn ($q) => $q->orderBy('ordre'),
-                'fournisseur:id,nom_frs,actif,deleted_at',
+                'fournisseur:id,nom_frs,actif,is_visible,deleted_at',
             ])
+            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'))
             ->find($id);
 
-        if (! $p || ! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || $p->fournisseur->deleted_at) {
+        if (! $p || ! $p->fournisseur) {
             return $this->notFound();
         }
 
@@ -101,10 +116,14 @@ class ProduitController extends Controller
             'reference' => $p->reference,
             'designation' => $p->designation,
             'description' => $p->description,
-            'prix' => (float) $p->prix,
+            'pv_1' => (float) $p->pv_1,
+            'pv_2' => (float) $p->pv_2,
+            'pv_3' => (float) $p->pv_3,
+            'prix' => (float) $p->prixPourClient($client instanceof Client ? $client : null),
             'stock' => (int) $p->stock,
             'image_principale' => $p->image_principale,
             'categorie' => $p->categorie,
+            'abonne_only' => (int) ($p->abonne_only ?? 0),
             'actif' => (int) $p->actif,
             'images' => $p->images->map(fn ($img) => [
                 'id' => $img->id,
@@ -118,14 +137,20 @@ class ProduitController extends Controller
 
     public function categories(ProduitCategoriesRequest $request)
     {
+        $client = $request->user();
+        $isAbonne = $client instanceof Client && (string) $client->type_client === 'abonne';
         $frsId = $request->query('frs_id');
 
         $q = Produit::query()
             ->whereNull('deleted_at')
-            ->where('actif', 1);
+            ->where('actif', 1)
+            ->when(! $isAbonne, fn ($q2) => $q2->where('abonne_only', 0))
+            ->whereHas('fournisseur', fn ($q2) => $q2->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'));
 
         if ($frsId) {
             $q->where('id_frs', $frsId);
+        } elseif ($isAbonne && $client->id_frs) {
+            $q->where('id_frs', (int) $client->id_frs);
         }
 
         $cats = $q->distinct()

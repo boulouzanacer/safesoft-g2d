@@ -31,6 +31,7 @@ class Fournisseur extends Authenticatable
         'longitude',
         'token',
         'actif',
+        'is_visible',
     ];
 
     protected $appends = [

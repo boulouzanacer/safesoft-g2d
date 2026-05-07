@@ -161,7 +161,7 @@
                                 <div class="mt-1 text-xs text-slate-500 hidden sm:block">Boutique: {{ $p->fournisseur?->nom_frs ?? '—' }}</div>
                             </div>
                             <div class="text-right">
-                                <div class="font-extrabold text-xs sm:text-sm">{{ number_format((float)$p->prix, 2, '.', ' ') }} DA</div>
+                                <div class="font-extrabold text-xs sm:text-sm">{{ number_format((float)$p->prixPourClient($client ?? null), 2, '.', ' ') }} DA</div>
                                 <div class="hidden sm:block text-[11px] {{ (int)$p->stock > 0 ? 'text-emerald-700' : 'text-red-600' }}">
                                     {{ (int)$p->stock > 0 ? ('Stock: '.(int)$p->stock) : 'Rupture' }}
                                 </div>

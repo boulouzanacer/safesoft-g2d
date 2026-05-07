@@ -33,12 +33,14 @@ Route::prefix('v1')->group(function () {
             Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
         });
 
-        Route::get('/boutiques', [BoutiqueController::class, 'index']);
-        Route::get('/boutiques/{id}', [BoutiqueController::class, 'show']);
+        Route::middleware(['auth.optional'])->group(function () {
+            Route::get('/boutiques', [BoutiqueController::class, 'index']);
+            Route::get('/boutiques/{id}', [BoutiqueController::class, 'show']);
 
-        Route::get('/produits', [ProduitController::class, 'index']);
-        Route::get('/produits/categories', [ProduitController::class, 'categories']);
-        Route::get('/produits/{id}', [ProduitController::class, 'show']);
+            Route::get('/produits', [ProduitController::class, 'index']);
+            Route::get('/produits/categories', [ProduitController::class, 'categories']);
+            Route::get('/produits/{id}', [ProduitController::class, 'show']);
+        });
 
         Route::get('/wilayas', [GeoController::class, 'wilayas']);
         Route::get('/communes/{wilaya}', [GeoController::class, 'communes']);

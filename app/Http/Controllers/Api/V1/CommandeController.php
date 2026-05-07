@@ -23,7 +23,7 @@ class CommandeController extends Controller
         $client = $request->user();
         $frsId = (int) $data['id_frs'];
 
-        $frs = Fournisseur::query()->where('id', $frsId)->where('actif', 1)->whereNull('deleted_at')->first();
+        $frs = Fournisseur::query()->where('id', $frsId)->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at')->first();
         if (! $frs) {
             return $this->error('Fournisseur introuvable ou inactif', null, 404);
         }
@@ -50,12 +50,16 @@ class CommandeController extends Controller
                         throw new \RuntimeException("Produit {$idProduit} introuvable");
                     }
 
+                    if ((string) $client->type_client !== 'abonne' && (int) ($produit->abonne_only ?? 0) === 1) {
+                        throw new \RuntimeException("Produit {$idProduit} réservé aux abonnés");
+                    }
+
                     $qte = (int) $item['quantite'];
                     if ((int) $produit->stock < $qte) {
                         throw new \RuntimeException("Stock insuffisant pour le produit {$produit->id}");
                     }
 
-                    $prix = (float) $produit->prix;
+                    $prix = (float) $produit->prixPourClient($client);
                     $sousTotal = $prix * $qte;
                     $montantTotal += $sousTotal;
 

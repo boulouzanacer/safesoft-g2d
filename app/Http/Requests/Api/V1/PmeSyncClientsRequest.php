@@ -23,7 +23,7 @@ class PmeSyncClientsRequest extends FormRequest
             'clients.*.telephone' => ['nullable', 'string', 'max:255'],
             'clients.*.id_wilaya' => ['required', 'integer', 'exists:wilaya,ID_WILAYA'],
             'clients.*.id_commune' => ['required', 'integer', 'exists:commune,ID_COMMUNE'],
+            'clients.*.tarif' => ['nullable', 'integer', 'in:1,2,3'],
         ];
     }
 }
-

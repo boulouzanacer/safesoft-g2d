@@ -37,7 +37,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Désignation</th>
                         <th class="text-left py-3 px-4 font-semibold">Catégorie</th>
                         <th class="text-left py-3 px-4 font-semibold">Fournisseur</th>
-                        <th class="text-right py-3 px-4 font-semibold">Prix</th>
+                        <th class="text-right py-3 px-4 font-semibold">PV 1</th>
                         <th class="text-right py-3 px-4 font-semibold">Stock</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
                     </tr>
@@ -49,7 +49,7 @@
                             <td class="py-3 px-4 text-white/80">{{ $p->designation }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $p->categorie }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $p->frs_nom }}</td>
-                            <td class="py-3 px-4 text-right font-bold">{{ number_format((float)$p->prix, 2, '.', ' ') }}</td>
+                            <td class="py-3 px-4 text-right font-bold">{{ number_format((float)$p->pv_1, 2, '.', ' ') }}</td>
                             <td class="py-3 px-4 text-right font-bold">{{ (int)$p->stock }}</td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$p->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">

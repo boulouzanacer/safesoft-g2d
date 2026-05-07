@@ -86,7 +86,7 @@
                     <div class="mt-4 flex items-center justify-between">
                         <div>
                             <div class="text-xs text-white/60">Prix</div>
-                            <div class="font-extrabold">{{ number_format((float)$p->prix, 2, '.', ' ') }}</div>
+                            <div class="font-extrabold">{{ number_format((float)$p->pv_1, 2, '.', ' ') }}</div>
                         </div>
                         <div class="text-right">
                             <div class="text-xs text-white/60">Stock</div>
@@ -134,4 +134,3 @@
     </div>
 </div>
 @endsection
-

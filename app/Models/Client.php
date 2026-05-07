@@ -29,6 +29,7 @@ class Client extends Authenticatable
         'id_wilaya',
         'id_commune',
         'type_client',
+        'tarif',
         'id_frs',
         'actif',
     ];
