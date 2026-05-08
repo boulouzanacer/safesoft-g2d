@@ -335,6 +335,266 @@
                             </div>
                         </div>
                     </details>
+
+                    <details class="group rounded-2xl border border-white/10 bg-black/20 p-5">
+                        <summary class="cursor-pointer list-none flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex items-center rounded-lg bg-teal-500/15 border border-teal-400/20 px-2.5 py-1 text-xs font-extrabold text-teal-200">PME</span>
+                                <span class="font-bold">PME API (integration)</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180"></i>
+                        </summary>
+
+                        <div class="mt-4 space-y-4 text-sm text-white/80">
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">Base</div>
+                                <div class="mt-2 font-mono text-xs leading-relaxed overflow-x-auto">
+                                    Base URL: {{ url('/api/v1/pme') }}<br>
+                                    Header: Authorization: Bearer &lt;fournisseur_token&gt;<br>
+                                    Accept: application/json
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /pme/sync-clients</div>
+                                <div class="mt-2 text-xs text-white/70">Synchroniser des clients abonnés (tarif 1|2|3).</div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                                    { "clients": [ { "code_client": "C001", "nom": "A", "prenom": "B", "email": "abonne@example.com", "password": "Pass@12345", "id_wilaya": 16, "id_commune": 1601, "tarif": 2 } ] }
+                                </div>
+
+                                <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">Python</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">import requests
+
+url = "{{ url('/api/v1/pme/sync-clients') }}"
+headers = {"Accept":"application/json","Authorization":"Bearer YOUR_FOURNISSEUR_TOKEN","Content-Type":"application/json"}
+payload = {"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}
+res = requests.post(url, headers=headers, json=payload)
+print(res.status_code, res.json())</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">JavaScript (Node.js)</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">const url = "{{ url('/api/v1/pme/sync-clients') }}";
+const payload = { clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] };
+
+const res = await fetch(url, {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    Authorization: "Bearer YOUR_FOURNISSEUR_TOKEN",
+  },
+  body: JSON.stringify(payload),
+});
+console.log(res.status, await res.json());</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">PHP (cURL)</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">$url = "{{ url('/api/v1/pme/sync-clients') }}";
+$payload = json_encode([
+  "clients" =&gt; [[
+    "code_client" =&gt; "C001","nom" =&gt; "A","prenom" =&gt; "B","email" =&gt; "abonne@example.com",
+    "password" =&gt; "Pass@12345","id_wilaya" =&gt; 16,"id_commune" =&gt; 1601,"tarif" =&gt; 2
+  ]]
+]);
+
+$ch = curl_init($url);
+curl_setopt_array($ch, [
+  CURLOPT_RETURNTRANSFER =&gt; true,
+  CURLOPT_POST =&gt; true,
+  CURLOPT_HTTPHEADER =&gt; [
+    "Accept: application/json",
+    "Content-Type: application/json",
+    "Authorization: Bearer YOUR_FOURNISSEUR_TOKEN",
+  ],
+  CURLOPT_POSTFIELDS =&gt; $payload,
+]);
+$out = curl_exec($ch);
+$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+echo $code . PHP_EOL . $out;</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">C# (.NET)</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+
+var url = "{{ url('/api/v1/pme/sync-clients') }}";
+using var http = new HttpClient();
+http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer","YOUR_FOURNISSEUR_TOKEN");
+
+var payload = new {
+  clients = new[] { new { code_client="C001", nom="A", prenom="B", email="abonne@example.com", password="Pass@12345", id_wilaya=16, id_commune=1601, tarif=2 } }
+};
+var json = JsonSerializer.Serialize(payload);
+var res = await http.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+Console.WriteLine((int)res.StatusCode);
+Console.WriteLine(await res.Content.ReadAsStringAsync());</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">Ruby</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">require "net/http"
+require "json"
+require "uri"
+
+uri = URI("{{ url('/api/v1/pme/sync-clients') }}")
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = (uri.scheme == "https")
+
+req = Net::HTTP::Post.new(uri)
+req["Accept"] = "application/json"
+req["Content-Type"] = "application/json"
+req["Authorization"] = "Bearer YOUR_FOURNISSEUR_TOKEN"
+req.body = JSON.generate({ clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] })
+
+res = http.request(req)
+puts res.code
+puts res.body</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">Go (Golang)</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">package main
+
+import (
+  "bytes"
+  "fmt"
+  "net/http"
+)
+
+func main() {
+  url := "{{ url('/api/v1/pme/sync-clients') }}"
+  body := []byte(`{"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}`)
+  req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
+  req.Header.Set("Accept", "application/json")
+  req.Header.Set("Content-Type", "application/json")
+  req.Header.Set("Authorization", "Bearer YOUR_FOURNISSEUR_TOKEN")
+
+  res, err := http.DefaultClient.Do(req)
+  if err != nil { panic(err) }
+  defer res.Body.Close()
+  fmt.Println(res.StatusCode)
+}</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">Kotlin</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+
+val url = "{{ url('/api/v1/pme/sync-clients') }}"
+val json = """{"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}"""
+val client = OkHttpClient()
+val req = Request.Builder()
+  .url(url)
+  .addHeader("Accept","application/json")
+  .addHeader("Authorization","Bearer YOUR_FOURNISSEUR_TOKEN")
+  .post(json.toRequestBody("application/json".toMediaType()))
+  .build()
+client.newCall(req).execute().use { res -&gt;
+  println(res.code)
+  println(res.body?.string())
+}</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <div class="text-xs font-bold mb-2">Dart</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">import "dart:convert";
+import "package:http/http.dart" as http;
+
+final url = Uri.parse("{{ url('/api/v1/pme/sync-clients') }}");
+final payload = {
+  "clients": [
+    {"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}
+  ]
+};
+
+final res = await http.post(
+  url,
+  headers: {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_FOURNISSEUR_TOKEN",
+  },
+  body: jsonEncode(payload),
+);
+print(res.statusCode);
+print(res.body);</pre>
+                                    </div>
+                                    <div class="rounded-xl border border-white/10 bg-black/20 p-4 lg:col-span-2">
+                                        <div class="text-xs font-bold mb-2">Delphi</div>
+                                        <pre class="font-mono text-[11px] leading-relaxed overflow-x-auto">uses
+  System.SysUtils, System.Net.HttpClient, System.Net.URLClient, System.JSON;
+
+var
+  Http: THTTPClient;
+  ReqBody: TStringStream;
+  Resp: IHTTPResponse;
+  Url: string;
+  Json: string;
+begin
+  Url := '{{ url('/api/v1/pme/sync-clients') }}';
+  Json := '{"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}';
+
+  Http := THTTPClient.Create;
+  try
+    Http.CustomHeaders['Accept'] := 'application/json';
+    Http.CustomHeaders['Authorization'] := 'Bearer YOUR_FOURNISSEUR_TOKEN';
+    ReqBody := TStringStream.Create(Json, TEncoding.UTF8);
+    try
+      Resp := Http.Post(Url, ReqBody, nil, [TNameValuePair.Create('Content-Type','application/json')]);
+      Writeln(Resp.StatusCode);
+      Writeln(Resp.ContentAsString(TEncoding.UTF8));
+    finally
+      ReqBody.Free;
+    end;
+  finally
+    Http.Free;
+  end;
+end;</pre>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /pme/sync-produits</div>
+                                <div class="mt-2 text-xs text-white/70">Synchroniser produits (pv_1/pv_2/pv_3 + abonne_only). Compatible: envoyer prix au lieu de pv_1.</div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                                    { "produits": [ { "reference": "R1", "designation": "Prod 1", "pv_1": 100.0, "pv_2": 95.0, "pv_3": 90.0, "stock": 10, "categorie": "Cat", "abonne_only": true } ] }
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /pme/sync-fournisseur</div>
+                                <div class="mt-2 text-xs text-white/70">
+                                    Mise à jour fournisseur. Pour logo: <span class="font-mono">multipart/form-data</span>. Champs: nom_frs, telephone, adresse, id_wilaya, id_commune, latitude, longitude, is_visible, remove_logo.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                                    JSON (sans logo): { "telephone": "0550...", "is_visible": 1 }
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">GET /pme/commandes?synced=0|1</div>
+                                <div class="mt-2 text-xs text-white/70">Lister commandes à synchroniser.</div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">{{ url('/api/v1/pme/commandes?synced=0') }}</div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">GET /pme/commandes/export-csv?synced=0|1</div>
+                                <div class="mt-2 text-xs text-white/70">Télécharger CSV.</div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">{{ url('/api/v1/pme/commandes/export-csv?synced=0') }}</div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">PUT /pme/commandes/{id}/sync</div>
+                                <div class="mt-2 text-xs text-white/70">Marquer commande synchronisée.</div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">{{ url('/api/v1/pme/commandes/1/sync') }}</div>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </div>
 
@@ -371,48 +631,6 @@
 
         <div class="space-y-4">
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
-                <div class="text-lg font-extrabold tracking-wide">PME API (integration)</div>
-                <div class="mt-2 text-sm text-white/70">
-                    Prefix: <span class="font-mono text-white">/api/v1/pme</span> • Authentication: <span class="font-mono text-white">Bearer &lt;fournisseur_token&gt;</span>
-                </div>
-
-                <div class="mt-4 space-y-3 text-sm text-white/80">
-                    <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                        <div class="font-bold">POST /pme/sync-clients</div>
-                        <div class="mt-2 font-mono text-xs leading-relaxed overflow-x-auto">
-                            { "clients": [ { "code_client": "...", "nom": "...", "prenom": "...", "email": "...", "password": "...", "id_wilaya": 1, "id_commune": 1, "tarif": 1 } ] }
-                        </div>
-                        <div class="mt-2 text-xs text-white/60">Creates/updates abonnee clients linked to fournisseur. Tarif: 1|2|3 (default 1).</div>
-                    </div>
-                    <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                        <div class="font-bold">POST /pme/sync-produits</div>
-                        <div class="mt-2 font-mono text-xs leading-relaxed overflow-x-auto">
-                            { "produits": [ { "reference": "...", "designation": "...", "pv_1": 100.0, "pv_2": 95.0, "pv_3": 90.0, "stock": 5, "categorie": "...", "abonne_only": true } ] }
-                        </div>
-                        <div class="mt-2 text-xs text-white/60">Backward compatible: you can still send <span class="font-mono">prix</span> instead of <span class="font-mono">pv_1</span> (it will fill pv_1/pv_2/pv_3).</div>
-                    </div>
-                    <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                        <div class="font-bold">POST /pme/sync-fournisseur</div>
-                        <div class="mt-2 text-xs text-white/70">
-                            Multipart/form-data supported (logo upload). Fields: nom_frs, telephone, adresse, id_wilaya, id_commune, latitude, longitude, is_visible, remove_logo.
-                        </div>
-                    </div>
-                    <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                        <div class="font-bold">GET /pme/commandes</div>
-                        <div class="mt-1 text-xs text-white/70">Query: synced=0|1 (optional)</div>
-                    </div>
-                    <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                        <div class="font-bold">GET /pme/commandes/export-csv</div>
-                        <div class="mt-1 text-xs text-white/70">Downloads CSV (UTF-8 BOM)</div>
-                    </div>
-                    <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                        <div class="font-bold">PUT /pme/commandes/{id}/sync</div>
-                        <div class="mt-1 text-xs text-white/70">Marks order as synced</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
                 <div class="text-lg font-extrabold tracking-wide">Common errors</div>
                 <div class="mt-3 space-y-3 text-sm text-white/80">
                     <div class="rounded-xl border border-white/10 bg-black/30 p-4">
@@ -426,267 +644,6 @@
                     <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                         <div class="font-bold text-sky-200">404 Ressource introuvable</div>
                         <div class="mt-1 text-xs text-white/70">Invalid id or inactive/deleted resource</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
-                <div class="text-lg font-extrabold tracking-wide">Code examples (Delphi / Python / JavaScript / Ruby)</div>
-                <div class="mt-2 text-sm text-white/70">
-                    Base URL: <span class="font-mono text-white">{{ url('/api/v1') }}</span>
-                </div>
-
-                <div class="mt-4 space-y-3">
-                    <details class="group rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <summary class="cursor-pointer list-none flex items-center justify-between">
-                            <div class="font-bold">Python (requests)</div>
-                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180"></i>
-                        </summary>
-                        <pre class="mt-4 rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-[11px] leading-relaxed overflow-x-auto">import requests
-
-BASE_URL = "{{ url('/api/v1') }}"
-TOKEN = "YOUR_CLIENT_TOKEN"
-PME_TOKEN = "YOUR_FOURNISSEUR_TOKEN"
-
-def api_request(method, path, token=None, body=None):
-    headers = {"Accept": "application/json"}
-    if body is not None:
-        headers["Content-Type"] = "application/json"
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    res = requests.request(method, BASE_URL + path, headers=headers, json=body)
-    return res.status_code, res.json()
-
-# AUTH
-api_request("POST", "/auth/register", body={"nom":"Test","prenom":"User","email":"test@example.com","password":"Pass@12345"})
-api_request("POST", "/auth/login", body={"email":"test@example.com","password":"Pass@12345"})
-api_request("GET", "/auth/me", token=TOKEN)
-api_request("POST", "/auth/logout", token=TOKEN)
-
-# CATALOG (token optional)
-api_request("GET", "/boutiques", token=TOKEN)
-api_request("GET", "/boutiques/1", token=TOKEN)
-api_request("GET", "/produits?frs_id=1&amp;page=1", token=TOKEN)
-api_request("GET", "/produits/categories?frs_id=1", token=TOKEN)
-api_request("GET", "/produits/10", token=TOKEN)
-
-# GEO
-api_request("GET", "/wilayas")
-api_request("GET", "/communes/16")
-
-# ORDERS (client token required)
-api_request("POST", "/commandes", token=TOKEN, body={
-    "id_frs": 1,
-    "adresse_livraison": "Adresse ...",
-    "id_wilaya": 16,
-    "id_commune": 1601,
-    "notes": "Note ...",
-    "panier": [{"id_produit": 10, "quantite": 2}]
-})
-api_request("GET", "/commandes", token=TOKEN)
-api_request("GET", "/commandes/1", token=TOKEN)
-
-# NOTIFICATIONS (client token required)
-api_request("GET", "/notifications", token=TOKEN)
-api_request("PUT", "/notifications/1/lu", token=TOKEN)
-api_request("PUT", "/notifications/tout-lire", token=TOKEN)
-api_request("DELETE", "/notifications/1", token=TOKEN)
-api_request("POST", "/fcm/token", token=TOKEN, body={"token":"FCM_TOKEN","device_type":"android"})
-
-# PME API
-PME_BASE = "{{ url('/api/v1/pme') }}"
-def pme_request(method, path, body=None):
-    headers = {"Accept": "application/json", "Authorization": f"Bearer {PME_TOKEN}"}
-    if body is not None:
-        headers["Content-Type"] = "application/json"
-    res = requests.request(method, PME_BASE + path, headers=headers, json=body)
-    return res.status_code, res.json()
-
-pme_request("POST", "/sync-clients", body={"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]})
-pme_request("POST", "/sync-produits", body={"produits":[{"reference":"R1","designation":"Prod 1","pv_1":100.0,"pv_2":95.0,"pv_3":90.0,"stock":10,"categorie":"Cat","abonne_only":True}]})
-pme_request("POST", "/sync-fournisseur", body={"telephone":"0550...","is_visible":1,"adresse":"...","id_wilaya":16,"id_commune":1601})
-pme_request("GET", "/commandes?synced=0")
-pme_request("GET", "/commandes/export-csv?synced=0")
-pme_request("PUT", "/commandes/1/sync")</pre>
-                    </details>
-
-                    <details class="group rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <summary class="cursor-pointer list-none flex items-center justify-between">
-                            <div class="font-bold">JavaScript (fetch)</div>
-                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180"></i>
-                        </summary>
-                        <pre class="mt-4 rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-[11px] leading-relaxed overflow-x-auto">const BASE_URL = "{{ url('/api/v1') }}";
-const TOKEN = "YOUR_CLIENT_TOKEN";
-const PME_TOKEN = "YOUR_FOURNISSEUR_TOKEN";
-
-async function apiRequest(method, path, token = null, body = null) {
-  const headers = { Accept: "application/json" };
-  if (body !== null) headers["Content-Type"] = "application/json";
-  if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(BASE_URL + path, {
-    method,
-    headers,
-    body: body !== null ? JSON.stringify(body) : undefined,
-  });
-  return { status: res.status, json: await res.json() };
-}
-
-await apiRequest("POST", "/auth/login", null, { email: "test@example.com", password: "Pass@12345" });
-await apiRequest("GET", "/boutiques", TOKEN);
-await apiRequest("GET", "/produits?frs_id=1&amp;page=1", TOKEN);
-await apiRequest("POST", "/commandes", TOKEN, {
-  id_frs: 1,
-  adresse_livraison: "Adresse ...",
-  id_wilaya: 16,
-  id_commune: 1601,
-  notes: "Note ...",
-  panier: [{ id_produit: 10, quantite: 2 }],
-});
-
-const PME_BASE = "{{ url('/api/v1/pme') }}";
-async function pmeRequest(method, path, body = null) {
-  const headers = { Accept: "application/json", Authorization: `Bearer ${PME_TOKEN}` };
-  if (body !== null) headers["Content-Type"] = "application/json";
-  const res = await fetch(PME_BASE + path, {
-    method,
-    headers,
-    body: body !== null ? JSON.stringify(body) : undefined,
-  });
-  return { status: res.status, json: await res.json() };
-}
-
-await pmeRequest("POST", "/sync-produits", {
-  produits: [{ reference: "R1", designation: "Prod 1", pv_1: 100, pv_2: 95, pv_3: 90, stock: 10, categorie: "Cat", abonne_only: true }],
-});</pre>
-                    </details>
-
-                    <details class="group rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <summary class="cursor-pointer list-none flex items-center justify-between">
-                            <div class="font-bold">Ruby (net/http)</div>
-                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180"></i>
-                        </summary>
-                        <pre class="mt-4 rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-[11px] leading-relaxed overflow-x-auto">require "net/http"
-require "json"
-require "uri"
-
-BASE_URL = "{{ url('/api/v1') }}"
-TOKEN = "YOUR_CLIENT_TOKEN"
-PME_TOKEN = "YOUR_FOURNISSEUR_TOKEN"
-
-def api_request(method, path, token: nil, body: nil)
-  uri = URI.parse(BASE_URL + path)
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = (uri.scheme == "https")
-
-  req_class = {
-    "GET" =&gt; Net::HTTP::Get,
-    "POST" =&gt; Net::HTTP::Post,
-    "PUT" =&gt; Net::HTTP::Put,
-    "DELETE" =&gt; Net::HTTP::Delete
-  }[method]
-
-  req = req_class.new(uri.request_uri)
-  req["Accept"] = "application/json"
-  req["Authorization"] = "Bearer #{token}" if token
-  if body
-    req["Content-Type"] = "application/json"
-    req.body = JSON.generate(body)
-  end
-
-  res = http.request(req)
-  [res.code.to_i, JSON.parse(res.body)]
-end
-
-api_request("POST", "/auth/login", body: { email: "test@example.com", password: "Pass@12345" })
-api_request("GET", "/produits?frs_id=1&amp;page=1", token: TOKEN)
-api_request("POST", "/commandes", token: TOKEN, body: { id_frs: 1, adresse_livraison: "Adresse ...", id_wilaya: 16, id_commune: 1601, panier: [{ id_produit: 10, quantite: 2 }] })
-
-PME_BASE = "{{ url('/api/v1/pme') }}"
-def pme_request(method, path, body: nil)
-  uri = URI.parse(PME_BASE + path)
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = (uri.scheme == "https")
-  req = (method == "POST" ? Net::HTTP::Post : Net::HTTP::Get).new(uri.request_uri)
-  req["Accept"] = "application/json"
-  req["Authorization"] = "Bearer #{PME_TOKEN}"
-  if body
-    req["Content-Type"] = "application/json"
-    req.body = JSON.generate(body)
-  end
-  res = http.request(req)
-  [res.code.to_i, JSON.parse(res.body)]
-end
-
-pme_request("POST", "/sync-clients", body: { clients: [{ code_client: "C001", nom: "A", prenom: "B", email: "abonne@example.com", password: "Pass@12345", id_wilaya: 16, id_commune: 1601, tarif: 2 }] })</pre>
-                    </details>
-
-                    <details class="group rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <summary class="cursor-pointer list-none flex items-center justify-between">
-                            <div class="font-bold">Delphi (System.Net.HttpClient)</div>
-                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180"></i>
-                        </summary>
-                        <pre class="mt-4 rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-[11px] leading-relaxed overflow-x-auto">uses
-  System.SysUtils,
-  System.Net.URLClient,
-  System.Net.HttpClient,
-  System.Net.HttpClientComponent,
-  System.JSON;
-
-function ApiRequest(const Method, Url, Token: string; Body: TJSONObject): string;
-var
-  Http: THTTPClient;
-  Req: IHTTPRequest;
-  Resp: IHTTPResponse;
-  Content: TStringStream;
-begin
-  Http := THTTPClient.Create;
-  try
-    Req := Http.GetRequest(Method, Url);
-    Req.AddHeader("Accept", "application/json");
-    if Token &lt;&gt; "" then
-      Req.AddHeader("Authorization", "Bearer " + Token);
-
-    if Assigned(Body) then
-    begin
-      Req.AddHeader("Content-Type", "application/json");
-      Content := TStringStream.Create(Body.ToJSON, TEncoding.UTF8);
-      try
-        Resp := Req.Send(Content);
-      finally
-        Content.Free;
-      end;
-    end
-    else
-      Resp := Req.Send(nil);
-
-    Result := Resp.ContentAsString(TEncoding.UTF8);
-  finally
-    Http.Free;
-  end;
-end;
-
-procedure Examples;
-var
-  BaseUrl, Json: string;
-  Body: TJSONObject;
-begin
-  BaseUrl := "{{ url('/api/v1') }}";
-
-  Body := TJSONObject.Create;
-  try
-    Body.AddPair("email", "test@example.com");
-    Body.AddPair("password", "Pass@12345");
-    Json := ApiRequest("POST", BaseUrl + "/auth/login", "", Body);
-  finally
-    Body.Free;
-  end;
-
-  Json := ApiRequest("GET", BaseUrl + "/produits?frs_id=1&amp;page=1", "YOUR_CLIENT_TOKEN", nil);
-end;</pre>
-                    </details>
-
-                    <div class="text-xs text-white/60">
-                        For <span class="font-mono text-white/80">/pme/sync-fournisseur</span> with logo upload, send <span class="font-mono text-white/80">multipart/form-data</span> (logo file + fields). The JSON examples above work if you only update text fields.
                     </div>
                 </div>
             </div>
