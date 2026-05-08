@@ -28,6 +28,25 @@
             --frs-bg:#1A1A2E;
             --frs-card:#252543;
         }
+        html:not(.dark){
+            --frs-bg:#F8FAFC;
+            --frs-card:#FFFFFF;
+        }
+        html:not(.dark) .text-white\/80{color:rgb(30 41 59 / 1);}
+        html:not(.dark) .text-white\/70{color:rgb(71 85 105 / 1);}
+        html:not(.dark) .text-white\/60{color:rgb(100 116 139 / 1);}
+        html:not(.dark) .text-white\/50{color:rgb(100 116 139 / 1);}
+        html:not(.dark) .border-white\/10{border-color:rgb(226 232 240 / 1);}
+        html:not(.dark) .divide-white\/10 > :not([hidden]) ~ :not([hidden]){border-color:rgb(226 232 240 / 1);}
+        html:not(.dark) .bg-black\/20{background-color:rgb(248 250 252 / 1);}
+        html:not(.dark) .bg-black\/30{background-color:rgb(241 245 249 / 1);}
+        html:not(.dark) .bg-white\/10{background-color:rgb(241 245 249 / 1);}
+        html:not(.dark) .hover\:bg-white\/10:hover{background-color:rgb(241 245 249 / 1);}
+        html:not(.dark) .text-red-200{color:rgb(185 28 28 / 1);}
+        html:not(.dark) .text-emerald-200{color:rgb(4 120 87 / 1);}
+        html:not(.dark) .text-amber-200{color:rgb(180 83 9 / 1);}
+        html:not(.dark) .text-sky-200{color:rgb(3 105 161 / 1);}
+        html:not(.dark) .text-violet-200{color:rgb(109 40 217 / 1);}
         html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
     </style>
 
@@ -54,51 +73,59 @@
       :class="dark ? 'bg-[var(--frs-bg)]' : 'bg-slate-100 text-slate-900'">
 @php($frs = \App\Models\Fournisseur::find(session('frs_id')))
 <div class="flex min-h-screen">
-    <aside class="fixed inset-y-0 left-0 w-[240px] border-r border-white/10 bg-[var(--frs-bg)]">
-        <div class="h-16 px-5 flex items-center gap-3 border-b border-white/10">
+    <aside class="fixed inset-y-0 left-0 w-[240px] border-r bg-[var(--frs-bg)]"
+           :class="dark ? 'border-white/10' : 'border-slate-200'">
+        <div class="h-16 px-5 flex items-center gap-3 border-b"
+             :class="dark ? 'border-white/10' : 'border-slate-200'">
             <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
                  style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
                 G2D
             </div>
             <div class="leading-tight">
                 <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
-                <div class="text-xs text-white/60">Espace Fournisseur</div>
+                <div class="text-xs" :class="dark ? 'text-white/60' : 'text-slate-500'">Espace Fournisseur</div>
             </div>
         </div>
 
-        <nav class="px-3 py-4 space-y-1 text-sm">
+        <nav class="px-3 py-4 space-y-1 text-sm" :class="dark ? 'text-slate-100' : 'text-slate-900'">
             <a href="{{ url('/fournisseur/dashboard') }}"
-               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/dashboard') ? 'bg-white/10' : '' }}">
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/dashboard') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
                 <i class="fa-solid fa-chart-line w-5 text-[var(--frs-primary)]"></i>
                 <span>Mon Dashboard</span>
             </a>
 
             <a href="{{ url('/fournisseur/produits') }}"
-               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/produits*') ? 'bg-white/10' : '' }}">
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/produits*') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
                 <i class="fa-solid fa-boxes-stacked w-5 text-[var(--frs-primary)]"></i>
                 <span>Mes Produits</span>
             </a>
 
             <a href="{{ url('/fournisseur/clients') }}"
-               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/clients*') ? 'bg-white/10' : '' }}">
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/clients*') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
                 <i class="fa-solid fa-users w-5 text-[var(--frs-primary)]"></i>
                 <span>Mes Clients</span>
             </a>
 
             <a href="{{ url('/fournisseur/commandes') }}"
-               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/commandes*') ? 'bg-white/10' : '' }}">
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/commandes*') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
                 <i class="fa-solid fa-cart-shopping w-5 text-[var(--frs-primary)]"></i>
                 <span>Mes Commandes</span>
             </a>
 
             <a href="{{ url('/fournisseur/token') }}"
-               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/token') ? 'bg-white/10' : '' }}">
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/token') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
                 <i class="fa-solid fa-key w-5 text-[var(--frs-primary)]"></i>
                 <span>Mon Token PME</span>
             </a>
 
             <a href="{{ url('/fournisseur/profil') }}"
-               class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10 {{ request()->is('fournisseur/profil*') ? 'bg-white/10' : '' }}">
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/profil') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
                 <i class="fa-solid fa-user w-5 text-[var(--frs-primary)]"></i>
                 <span>Mon Profil</span>
             </a>

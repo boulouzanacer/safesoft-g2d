@@ -2,74 +2,74 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <div class="rounded-2xl border border-white/10 bg-[var(--store-card)] p-6">
+    <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6">
         <div class="text-2xl font-extrabold tracking-wide">Créer un compte</div>
-        <div class="mt-1 text-sm text-white/60">Compte client simple (abonnement géré par l'administration).</div>
+        <div class="mt-1 text-sm text-slate-600">Compte client simple (abonnement géré par l'administration).</div>
 
         <form method="POST" action="{{ url('/register') }}" class="mt-6 space-y-4">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Nom</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nom</label>
                     <input name="nom"
                            value="{{ old('nom') }}"
-                           class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
                            required>
                     @error('nom')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Prénom</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Prénom</label>
                     <input name="prenom"
                            value="{{ old('prenom') }}"
-                           class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
                            required>
                     @error('prenom')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Email</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
                     <input name="email"
                            type="email"
                            value="{{ old('email') }}"
-                           class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
                            required>
                     @error('email')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Téléphone (optionnel)</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Téléphone (optionnel)</label>
                     <input name="telephone"
                            value="{{ old('telephone') }}"
-                           class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]">
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]">
                     @error('telephone')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-white/70 mb-1">Adresse (optionnel)</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Adresse (optionnel)</label>
                 <input name="adresse"
                        value="{{ old('adresse') }}"
-                       class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]">
+                       class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]">
                 @error('adresse')
-                    <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                    <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Wilaya</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Wilaya</label>
                     <select id="wilayaSelect"
                             name="id_wilaya"
-                            class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]">
+                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]">
                         @foreach($wilayas as $w)
                             <option value="{{ $w->ID_WILAYA }}"
                                     @selected((int)old('id_wilaya', $default_wilaya) === (int)$w->ID_WILAYA)>
@@ -78,14 +78,14 @@
                         @endforeach
                     </select>
                     @error('id_wilaya')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Commune</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Commune</label>
                     <select id="communeSelect"
                             name="id_commune"
-                            class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]">
+                            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]">
                         @foreach($communes as $c)
                             <option value="{{ $c->ID_COMMUNE }}"
                                     @selected((int)old('id_commune') === (int)$c->ID_COMMUNE)>
@@ -94,27 +94,27 @@
                         @endforeach
                     </select>
                     @error('id_commune')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Mot de passe</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Mot de passe</label>
                     <input name="password"
                            type="password"
-                           class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
                            required>
                     @error('password')
-                        <div class="mt-1 text-xs text-red-200">{{ $message }}</div>
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Confirmer</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Confirmer</label>
                     <input name="password_confirmation"
                            type="password"
-                           class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
                            required>
                 </div>
             </div>
@@ -127,7 +127,7 @@
             </button>
         </form>
 
-        <div class="mt-4 text-sm text-white/60">
+        <div class="mt-4 text-sm text-slate-600">
             Déjà un compte ?
             <a href="{{ url('/login') }}" class="text-[var(--store-primary)] font-bold hover:underline">Se connecter</a>
         </div>
@@ -169,4 +169,3 @@
 })();
 </script>
 @endsection
-

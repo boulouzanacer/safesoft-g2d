@@ -32,6 +32,21 @@
             --admin-bg:#F8FAFC;
             --admin-card:#FFFFFF;
         }
+        html:not(.dark) .text-white\/80{color:rgb(30 41 59 / 1);}
+        html:not(.dark) .text-white\/70{color:rgb(71 85 105 / 1);}
+        html:not(.dark) .text-white\/60{color:rgb(100 116 139 / 1);}
+        html:not(.dark) .text-white\/50{color:rgb(100 116 139 / 1);}
+        html:not(.dark) .border-white\/10{border-color:rgb(226 232 240 / 1);}
+        html:not(.dark) .divide-white\/10 > :not([hidden]) ~ :not([hidden]){border-color:rgb(226 232 240 / 1);}
+        html:not(.dark) .bg-black\/20{background-color:rgb(248 250 252 / 1);}
+        html:not(.dark) .bg-black\/30{background-color:rgb(241 245 249 / 1);}
+        html:not(.dark) .bg-white\/10{background-color:rgb(241 245 249 / 1);}
+        html:not(.dark) .hover\:bg-white\/10:hover{background-color:rgb(241 245 249 / 1);}
+        html:not(.dark) .text-red-200{color:rgb(185 28 28 / 1);}
+        html:not(.dark) .text-emerald-200{color:rgb(4 120 87 / 1);}
+        html:not(.dark) .text-amber-200{color:rgb(180 83 9 / 1);}
+        html:not(.dark) .text-sky-200{color:rgb(3 105 161 / 1);}
+        html:not(.dark) .text-violet-200{color:rgb(109 40 217 / 1);}
         html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
     </style>
 
