@@ -23,7 +23,14 @@ class CommandeController extends Controller
         $client = $request->user();
         $frsId = (int) $data['id_frs'];
 
-        $frs = Fournisseur::query()->where('id', $frsId)->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at')->first();
+        $allowInvisible = (string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === $frsId;
+
+        $frs = Fournisseur::query()
+            ->where('id', $frsId)
+            ->where('actif', 1)
+            ->when(! $allowInvisible, fn ($q) => $q->where('is_visible', 1))
+            ->whereNull('deleted_at')
+            ->first();
         if (! $frs) {
             return $this->error('Fournisseur introuvable ou inactif', null, 404);
         }

@@ -91,6 +91,9 @@ class StoreController extends Controller
     private function cartSummary(): array
     {
         $client = $this->currentClient();
+        $canSeeInvisibleFournisseurId = ($client && (string) $client->type_client === 'abonne' && $client->id_frs)
+            ? (int) $client->id_frs
+            : null;
         $cart = $this->cart();
         $ids = array_keys($cart);
         $ids = array_map('intval', $ids);
@@ -114,7 +117,13 @@ class StoreController extends Controller
 
         foreach ($ids as $id) {
             $p = $products->get($id);
-            if (! $p || ! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
+            if (! $p || ! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || $p->fournisseur->deleted_at) {
+                unset($cart[$id]);
+                continue;
+            }
+
+            $isVisible = (int) ($p->fournisseur->is_visible ?? 1) === 1;
+            if (! $isVisible && (! $canSeeInvisibleFournisseurId || (int) $p->fournisseur->id !== $canSeeInvisibleFournisseurId)) {
                 unset($cart[$id]);
                 continue;
             }
@@ -152,7 +161,7 @@ class StoreController extends Controller
             $frs = Fournisseur::query()
                 ->where('id', $frsId)
                 ->where('actif', 1)
-                ->where('is_visible', 1)
+                ->when(! $canSeeInvisibleFournisseurId || (int) $canSeeInvisibleFournisseurId !== (int) $frsId, fn ($q) => $q->where('is_visible', 1))
                 ->whereNull('deleted_at')
                 ->first(['id', 'nom_frs', 'logo_path', 'adresse', 'telephone', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
         }
@@ -178,7 +187,7 @@ class StoreController extends Controller
 
         $boutiques = Fournisseur::query()
             ->where('actif', 1)
-            ->where('is_visible', 1)
+            ->when(! $forcedFournisseurId, fn ($q) => $q->where('is_visible', 1))
             ->whereNull('deleted_at')
             ->when($fournisseurId, fn ($q) => $q->where('id', $fournisseurId))
             ->orderBy('nom_frs')
@@ -189,7 +198,16 @@ class StoreController extends Controller
             ->where('actif', 1)
             ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
             ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
-            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'))
+            ->whereHas('fournisseur', function ($q) use ($forcedFournisseurId) {
+                $q->where('actif', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function ($sub) use ($forcedFournisseurId) {
+                        $sub->where('is_visible', 1);
+                        if ($forcedFournisseurId) {
+                            $sub->orWhere('id', $forcedFournisseurId);
+                        }
+                    });
+            })
             ->when($fournisseurId, fn ($q) => $q->where('id_frs', $fournisseurId))
             ->when($categorie !== '', fn ($q2) => $q2->where('categorie', $categorie))
             ->when($q !== '', function ($q2) use ($q) {
@@ -204,7 +222,16 @@ class StoreController extends Controller
             ->whereNull('deleted_at')
             ->where('actif', 1)
             ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
-            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'))
+            ->whereHas('fournisseur', function ($q) use ($forcedFournisseurId) {
+                $q->where('actif', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function ($sub) use ($forcedFournisseurId) {
+                        $sub->where('is_visible', 1);
+                        if ($forcedFournisseurId) {
+                            $sub->orWhere('id', $forcedFournisseurId);
+                        }
+                    });
+            })
             ->when($fournisseurId, fn ($q2) => $q2->where('id_frs', $fournisseurId))
             ->distinct()
             ->orderBy('categorie')
@@ -244,7 +271,7 @@ class StoreController extends Controller
         $boutique = Fournisseur::query()
             ->where('id', $id)
             ->where('actif', 1)
-            ->where('is_visible', 1)
+            ->when(! ($client && $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === $id), fn ($q) => $q->where('is_visible', 1))
             ->whereNull('deleted_at')
             ->firstOrFail();
 
@@ -305,7 +332,10 @@ class StoreController extends Controller
             ->findOrFail($id);
 
         if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
-            abort(404);
+            $allowed = $client && (string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === (int) $p->id_frs;
+            if (! $allowed) {
+                abort(404);
+            }
         }
 
         if ($client && $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== (int) $p->id_frs) {
@@ -373,7 +403,12 @@ class StoreController extends Controller
             ->with(['fournisseur:id,actif,is_visible,deleted_at'])
             ->findOrFail((int) $data['produit_id']);
 
-        if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
+        if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || $p->fournisseur->deleted_at) {
+            return back()->with('error', 'Produit indisponible.');
+        }
+
+        $allowedInvisible = $client && (string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === (int) $p->id_frs;
+        if ((int) ($p->fournisseur->is_visible ?? 1) !== 1 && ! $allowedInvisible) {
             return back()->with('error', 'Produit indisponible.');
         }
 
@@ -549,7 +584,7 @@ class StoreController extends Controller
             $frs = Fournisseur::query()
                 ->where('id', $frsId)
                 ->where('actif', 1)
-                ->where('is_visible', 1)
+                ->when(! ((string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === (int) $frsId), fn ($q) => $q->where('is_visible', 1))
                 ->whereNull('deleted_at')
                 ->first();
 

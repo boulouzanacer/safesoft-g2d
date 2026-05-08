@@ -13,7 +13,7 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
             <div class="text-sm text-white/60">Code client</div>
             <div class="font-extrabold mt-1">{{ $client->code_client ?? '-' }}</div>
@@ -25,6 +25,10 @@
         <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
             <div class="text-sm text-white/60">Type</div>
             <div class="font-extrabold mt-1">{{ $client->type_client }}</div>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
+            <div class="text-sm text-white/60">Tarif</div>
+            <div class="font-extrabold mt-1">{{ (int)($client->tarif ?? 1) }}</div>
         </div>
     </div>
 
@@ -93,4 +97,3 @@
     </div>
 </div>
 @endsection
-

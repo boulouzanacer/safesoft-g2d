@@ -31,7 +31,16 @@ class ProduitController extends Controller
                 'images' => fn ($q) => $q->orderBy('ordre'),
                 'fournisseur:id,nom_frs,actif,is_visible,deleted_at',
             ])
-            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'));
+            ->whereHas('fournisseur', function ($q) use ($forcedFrsId) {
+                $q->where('actif', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function ($sub) use ($forcedFrsId) {
+                        $sub->where('is_visible', 1);
+                        if ($forcedFrsId) {
+                            $sub->orWhere('id', $forcedFrsId);
+                        }
+                    });
+            });
 
         if ($frsId) {
             $query->where('id_frs', $frsId);
@@ -102,7 +111,17 @@ class ProduitController extends Controller
                 'images' => fn ($q) => $q->orderBy('ordre'),
                 'fournisseur:id,nom_frs,actif,is_visible,deleted_at',
             ])
-            ->whereHas('fournisseur', fn ($q) => $q->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'))
+            ->whereHas('fournisseur', function ($q) use ($isAbonne, $client) {
+                $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
+                $q->where('actif', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function ($sub) use ($forcedFrsId) {
+                        $sub->where('is_visible', 1);
+                        if ($forcedFrsId) {
+                            $sub->orWhere('id', $forcedFrsId);
+                        }
+                    });
+            })
             ->find($id);
 
         if (! $p || ! $p->fournisseur) {
@@ -145,7 +164,17 @@ class ProduitController extends Controller
             ->whereNull('deleted_at')
             ->where('actif', 1)
             ->when(! $isAbonne, fn ($q2) => $q2->where('abonne_only', 0))
-            ->whereHas('fournisseur', fn ($q2) => $q2->where('actif', 1)->where('is_visible', 1)->whereNull('deleted_at'));
+            ->whereHas('fournisseur', function ($q2) use ($isAbonne, $client) {
+                $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
+                $q2->where('actif', 1)
+                    ->whereNull('deleted_at')
+                    ->where(function ($sub) use ($forcedFrsId) {
+                        $sub->where('is_visible', 1);
+                        if ($forcedFrsId) {
+                            $sub->orWhere('id', $forcedFrsId);
+                        }
+                    });
+            });
 
         if ($frsId) {
             $q->where('id_frs', $frsId);
