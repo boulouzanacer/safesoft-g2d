@@ -203,7 +203,7 @@
             </div>
         </header>
 
-        <main class="p-6">
+        <main class="p-6 overflow-x-hidden">
             @yield('content')
         </main>
     </div>
