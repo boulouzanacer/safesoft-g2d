@@ -30,7 +30,7 @@
         <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
                 <div class="font-extrabold tracking-wide">Headers</div>
-                <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed overflow-x-auto">
+                <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                     Accept: application/json<br>
                     Content-Type: application/json<br>
                     Authorization: Bearer &lt;TOKEN&gt; (required for protected endpoints)<br>
@@ -39,7 +39,7 @@
             </div>
             <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
                 <div class="font-extrabold tracking-wide">Response format</div>
-                <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed overflow-x-auto">
+                <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                     {<br>
                     &nbsp;&nbsp;"success": true|false,<br>
                     &nbsp;&nbsp;"data": ... | null,<br>
@@ -182,7 +182,7 @@
                                     <span class="font-bold">GET /produits</span>
                                     <span class="text-xs text-white/60">Public (token optional)</span>
                                 </div>
-                                <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                                     Query params: frs_id (optional), categorie (optional), search (optional), page (optional)<br>
                                     Returns: data.items[] + data.pagination<br>
                                     Each item fields: pv_1, pv_2, pv_3, prix (computed), abonne_only, stock, images[]
@@ -251,7 +251,7 @@
                                         <span class="font-bold">POST /commandes</span>
                                         <span class="text-xs text-white/60">Bearer required</span>
                                     </div>
-                                    <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                                    <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                                         {<br>
                                         &nbsp;&nbsp;"id_frs": 1,<br>
                                         &nbsp;&nbsp;"adresse_livraison": "...",<br>
@@ -347,7 +347,7 @@
                 <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
                         <div class="font-bold">1) Configure base URL</div>
-                        <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed overflow-x-auto">
+                        <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                             DEV: API_BASE_URL = http://&lt;IP&gt;:8000/api/v1<br>
                             PROD: API_BASE_URL = https://g2d-dz.com/api/v1
                         </div>
@@ -358,7 +358,7 @@
 
                     <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
                         <div class="font-bold">2) Handle auth token</div>
-                        <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed overflow-x-auto">
+                        <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                             Authorization: Bearer &lt;token_from_login&gt;
                         </div>
                         <div class="mt-2 text-xs text-white/60">
@@ -376,7 +376,7 @@
 
                 <div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
                     <div class="font-bold">Authentication</div>
-                    <div class="mt-2 font-mono text-xs leading-relaxed overflow-x-auto break-all">
+                    <div class="mt-2 font-mono text-xs leading-relaxed break-all">
                         Base URL: {{ url('/api/v1/pme') }}<br>
                         Authorization: Bearer &lt;fournisseur_token&gt;<br>
                         Accept: application/json
@@ -387,7 +387,7 @@
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">
                         <div class="font-bold">POST /pme/sync-clients</div>
                         <div class="mt-2 text-xs text-white/70">Synchroniser des clients abonnés (tarif 1|2|3).</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                             { "clients": [ { "code_client": "C001", "nom": "A", "prenom": "B", "email": "abonne@example.com", "password": "Pass@12345", "id_wilaya": 16, "id_commune": 1601, "tarif": 2 } ] }
                         </div>
 
@@ -422,7 +422,7 @@
                                         :class="lang==='dart' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Dart</button>
                             </div>
 
-                            <pre x-show="lang==='python'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import requests
+                            <pre x-show="lang==='python'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">import requests
 
 url = "{{ url('/api/v1/pme/sync-clients') }}"
 headers = {"Accept":"application/json","Authorization":"Bearer YOUR_FOURNISSEUR_TOKEN","Content-Type":"application/json"}
@@ -430,7 +430,7 @@ payload = {"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abon
 res = requests.post(url, headers=headers, json=payload)
 print(res.status_code, res.json())</pre>
 
-                            <pre x-show="lang==='node'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">const url = "{{ url('/api/v1/pme/sync-clients') }}";
+                            <pre x-show="lang==='node'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">const url = "{{ url('/api/v1/pme/sync-clients') }}";
 const payload = { clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] };
 
 const res = await fetch(url, {
@@ -444,7 +444,7 @@ const res = await fetch(url, {
 });
 console.log(res.status, await res.json());</pre>
 
-                            <pre x-show="lang==='php'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">$url = "{{ url('/api/v1/pme/sync-clients') }}";
+                            <pre x-show="lang==='php'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">$url = "{{ url('/api/v1/pme/sync-clients') }}";
 $payload = json_encode([
   "clients" =&gt; [[
     "code_client" =&gt; "C001","nom" =&gt; "A","prenom" =&gt; "B","email" =&gt; "abonne@example.com",
@@ -468,7 +468,7 @@ $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 echo $code . PHP_EOL . $out;</pre>
 
-                            <pre x-show="lang==='dotnet'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">using System.Net.Http.Headers;
+                            <pre x-show="lang==='dotnet'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -485,7 +485,7 @@ var res = await http.PostAsync(url, new StringContent(json, Encoding.UTF8, "appl
 Console.WriteLine((int)res.StatusCode);
 Console.WriteLine(await res.Content.ReadAsStringAsync());</pre>
 
-                            <pre x-show="lang==='ruby'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">require "net/http"
+                            <pre x-show="lang==='ruby'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">require "net/http"
 require "json"
 require "uri"
 
@@ -503,7 +503,7 @@ res = http.request(req)
 puts res.code
 puts res.body</pre>
 
-                            <pre x-show="lang==='go'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">package main
+                            <pre x-show="lang==='go'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">package main
 
 import (
   "bytes"
@@ -525,7 +525,7 @@ func main() {
   fmt.Println(res.StatusCode)
 }</pre>
 
-                            <pre x-show="lang==='kotlin'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import okhttp3.MediaType.Companion.toMediaType
+                            <pre x-show="lang==='kotlin'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -544,7 +544,7 @@ client.newCall(req).execute().use { res -&gt;
   println(res.body?.string())
 }</pre>
 
-                            <pre x-show="lang==='dart'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import "dart:convert";
+                            <pre x-show="lang==='dart'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">import "dart:convert";
 import "package:http/http.dart" as http;
 
 final url = Uri.parse("{{ url('/api/v1/pme/sync-clients') }}");
@@ -566,7 +566,7 @@ final res = await http.post(
 print(res.statusCode);
 print(res.body);</pre>
 
-                            <pre x-show="lang==='delphi'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">uses
+                            <pre x-show="lang==='delphi'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">uses
   System.SysUtils, System.Net.HttpClient, System.Net.URLClient, System.JSON;
 
 var
@@ -601,7 +601,7 @@ end;</pre>
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">
                         <div class="font-bold">POST /pme/sync-produits</div>
                         <div class="mt-2 text-xs text-white/70">Synchroniser produits (pv_1/pv_2/pv_3 + abonne_only). Compatible: envoyer prix au lieu de pv_1.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                             { "produits": [ { "reference": "R1", "designation": "Prod 1", "pv_1": 100.0, "pv_2": 95.0, "pv_3": 90.0, "stock": 10, "categorie": "Cat", "abonne_only": true } ] }
                         </div>
                     </div>
@@ -611,7 +611,7 @@ end;</pre>
                         <div class="mt-2 text-xs text-white/70">
                             Mise à jour fournisseur. Pour logo: <span class="font-mono">multipart/form-data</span>. Champs: nom_frs, telephone, adresse, id_wilaya, id_commune, latitude, longitude, is_visible, remove_logo.
                         </div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto">
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                             JSON (sans logo): { "telephone": "0550...", "is_visible": 1 }
                         </div>
                     </div>
@@ -619,19 +619,19 @@ end;</pre>
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">
                         <div class="font-bold">GET /pme/commandes?synced=0|1</div>
                         <div class="mt-2 text-xs text-white/70">Lister commandes à synchroniser.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto break-all">{{ url('/api/v1/pme/commandes?synced=0') }}</div>
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes?synced=0') }}</div>
                     </div>
 
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">
                         <div class="font-bold">GET /pme/commandes/export-csv?synced=0|1</div>
                         <div class="mt-2 text-xs text-white/70">Télécharger CSV.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto break-all">{{ url('/api/v1/pme/commandes/export-csv?synced=0') }}</div>
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/export-csv?synced=0') }}</div>
                     </div>
 
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">
                         <div class="font-bold">PUT /pme/commandes/{id}/sync</div>
                         <div class="mt-2 text-xs text-white/70">Marquer commande synchronisée.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed overflow-x-auto break-all">{{ url('/api/v1/pme/commandes/1/sync') }}</div>
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/1/sync') }}</div>
                     </div>
                 </div>
             </div>
