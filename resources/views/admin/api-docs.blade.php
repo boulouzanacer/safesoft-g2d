@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4">
+<div class="space-y-4 max-w-full overflow-x-hidden">
     <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
@@ -422,7 +422,7 @@
                                         :class="lang==='dart' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Dart</button>
                             </div>
 
-                            <pre x-show="lang==='python'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import requests
+                            <pre x-show="lang==='python'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import requests
 
 url = "{{ url('/api/v1/pme/sync-clients') }}"
 headers = {"Accept":"application/json","Authorization":"Bearer YOUR_FOURNISSEUR_TOKEN","Content-Type":"application/json"}
@@ -430,7 +430,7 @@ payload = {"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abon
 res = requests.post(url, headers=headers, json=payload)
 print(res.status_code, res.json())</pre>
 
-                            <pre x-show="lang==='node'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">const url = "{{ url('/api/v1/pme/sync-clients') }}";
+                            <pre x-show="lang==='node'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">const url = "{{ url('/api/v1/pme/sync-clients') }}";
 const payload = { clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] };
 
 const res = await fetch(url, {
@@ -444,7 +444,7 @@ const res = await fetch(url, {
 });
 console.log(res.status, await res.json());</pre>
 
-                            <pre x-show="lang==='php'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">$url = "{{ url('/api/v1/pme/sync-clients') }}";
+                            <pre x-show="lang==='php'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">$url = "{{ url('/api/v1/pme/sync-clients') }}";
 $payload = json_encode([
   "clients" =&gt; [[
     "code_client" =&gt; "C001","nom" =&gt; "A","prenom" =&gt; "B","email" =&gt; "abonne@example.com",
@@ -468,7 +468,7 @@ $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 echo $code . PHP_EOL . $out;</pre>
 
-                            <pre x-show="lang==='dotnet'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">using System.Net.Http.Headers;
+                            <pre x-show="lang==='dotnet'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -485,7 +485,7 @@ var res = await http.PostAsync(url, new StringContent(json, Encoding.UTF8, "appl
 Console.WriteLine((int)res.StatusCode);
 Console.WriteLine(await res.Content.ReadAsStringAsync());</pre>
 
-                            <pre x-show="lang==='ruby'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">require "net/http"
+                            <pre x-show="lang==='ruby'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">require "net/http"
 require "json"
 require "uri"
 
@@ -503,7 +503,7 @@ res = http.request(req)
 puts res.code
 puts res.body</pre>
 
-                            <pre x-show="lang==='go'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">package main
+                            <pre x-show="lang==='go'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">package main
 
 import (
   "bytes"
@@ -525,7 +525,7 @@ func main() {
   fmt.Println(res.StatusCode)
 }</pre>
 
-                            <pre x-show="lang==='kotlin'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import okhttp3.MediaType.Companion.toMediaType
+                            <pre x-show="lang==='kotlin'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -544,7 +544,7 @@ client.newCall(req).execute().use { res -&gt;
   println(res.body?.string())
 }</pre>
 
-                            <pre x-show="lang==='dart'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import "dart:convert";
+                            <pre x-show="lang==='dart'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">import "dart:convert";
 import "package:http/http.dart" as http;
 
 final url = Uri.parse("{{ url('/api/v1/pme/sync-clients') }}");
@@ -566,7 +566,7 @@ final res = await http.post(
 print(res.statusCode);
 print(res.body);</pre>
 
-                            <pre x-show="lang==='delphi'" class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">uses
+                            <pre x-show="lang==='delphi'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed overflow-x-auto">uses
   System.SysUtils, System.Net.HttpClient, System.Net.URLClient, System.JSON;
 
 var
