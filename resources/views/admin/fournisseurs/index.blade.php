@@ -62,9 +62,14 @@
                             <td class="py-3 px-4 text-white/80">{{ $f->telephone }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $f->wilaya_nom }}</td>
                             <td class="py-3 px-4">
-                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$f->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                                    {{ (int)$f->actif === 1 ? 'Actif' : 'Inactif' }}
-                                </span>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$f->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
+                                        {{ (int)$f->actif === 1 ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                    <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)($f->is_visible ?? 0) === 1 ? 'bg-sky-500/15 text-sky-200 border border-sky-400/20' : 'bg-slate-500/15 text-slate-200 border border-slate-400/20' }}">
+                                        {{ (int)($f->is_visible ?? 0) === 1 ? 'Visible' : 'Non visible' }}
+                                    </span>
+                                </div>
                             </td>
                             <td class="py-3 px-4">
                                 <div class="flex items-center gap-2">
@@ -94,14 +99,18 @@
                                         @csrf
                                         <button type="submit"
                                                 onclick="return confirm('Régénérer le token ?')"
-                                                class="rounded-xl px-3 py-2 text-xs font-bold border border-white/10 hover:bg-white/10">
-                                            Régénérer Token
+                                                class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
+                                                title="Régénérer token"
+                                                aria-label="Régénérer token">
+                                            <i class="fa-solid fa-arrows-rotate"></i>
                                         </button>
                                     </form>
 
                                     <a href="{{ url('/admin/fournisseurs/'.$f->id.'/edit') }}"
-                                       class="rounded-xl px-3 py-2 text-xs font-bold border border-white/10 hover:bg-white/10">
-                                        Éditer
+                                       class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
+                                       title="Éditer"
+                                       aria-label="Éditer">
+                                        <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
 
                                     <form method="POST" action="{{ url('/admin/fournisseurs/'.$f->id) }}">
@@ -109,8 +118,10 @@
                                         @method('DELETE')
                                         <button type="submit"
                                                 onclick="return confirm('Supprimer ce fournisseur ?')"
-                                                class="rounded-xl px-3 py-2 text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10">
-                                            Supprimer
+                                                class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
+                                                title="Supprimer"
+                                                aria-label="Supprimer">
+                                            <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
                                 </div>
