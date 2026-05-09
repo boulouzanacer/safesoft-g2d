@@ -54,8 +54,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div class="xl:col-span-2 space-y-4">
+    <div class="space-y-4">
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
                 <div class="flex items-center justify-between gap-3">
                     <div class="text-lg font-extrabold tracking-wide">Mobile API (v1)</div>
@@ -368,9 +367,7 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="space-y-4">
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
                 <div class="flex items-center justify-between gap-3">
                     <div class="text-lg font-extrabold tracking-wide">PME API (integration)</div>
@@ -655,7 +652,6 @@ end;</pre>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </div>
 @endsection
