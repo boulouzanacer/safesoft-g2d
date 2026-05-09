@@ -58,7 +58,7 @@
                     ? ['Rupture', 'bg-red-500/15 text-red-300 border border-red-400/20']
                     : ($stock < 5
                         ? ['Stock faible', 'bg-amber-500/15 text-amber-300 border border-amber-400/20']
-                        : ['Disponible', 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20']);
+                        : ['Disponible', 'bg-sky-500/15 text-sky-200 border border-sky-400/20']);
             @endphp
 
             <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] overflow-hidden">
@@ -73,7 +73,7 @@
 
                     <div class="absolute top-2 left-2 flex flex-col gap-1">
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $stockBadge[1] }}">{{ $stockBadge[0] }} ({{ $stock }})</span>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ (int)$p->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ (int)$p->actif === 1 ? 'bg-sky-500/15 text-sky-200 border border-sky-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
                             {{ (int)$p->actif === 1 ? 'Actif' : 'Inactif' }}
                         </span>
                     </div>
