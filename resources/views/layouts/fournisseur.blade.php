@@ -169,6 +169,11 @@
                         <div class="text-left leading-tight hidden sm:block max-w-[180px]">
                             <div class="text-sm font-bold truncate">{{ $frs?->nom_frs ?? 'Fournisseur' }}</div>
                             <div class="text-xs opacity-70 truncate">{{ $frs?->email }}</div>
+                            <div class="mt-1">
+                                <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-bold {{ (int)($frs?->actif ?? 0) === 1 ? 'border-emerald-400/20 bg-emerald-500/15 text-emerald-300' : 'border-red-400/20 bg-red-500/15 text-red-300' }}">
+                                    {{ (int)($frs?->actif ?? 0) === 1 ? 'Actif' : 'Inactif' }}
+                                </span>
+                            </div>
                         </div>
                         <i class="fa-solid fa-chevron-down text-xs opacity-70"></i>
                     </button>
@@ -177,6 +182,12 @@
                          x-transition
                          class="absolute right-0 mt-2 w-52 rounded-xl border border-white/10 shadow-2xl overflow-hidden"
                          :class="dark ? 'bg-[var(--frs-card)]' : 'bg-white border-slate-200'">
+                        <div class="px-4 py-3 text-xs font-bold border-b border-white/10"
+                             :class="dark ? '' : 'border-slate-200'">
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-1 {{ (int)($frs?->actif ?? 0) === 1 ? 'border-emerald-400/20 bg-emerald-500/15 text-emerald-300' : 'border-red-400/20 bg-red-500/15 text-red-300' }}">
+                                {{ (int)($frs?->actif ?? 0) === 1 ? 'Actif' : 'Inactif' }}
+                            </span>
+                        </div>
                         <a href="{{ url('/fournisseur/profil') }}"
                            class="block px-4 py-3 text-sm hover:bg-white/10"
                            :class="dark ? '' : 'hover:bg-slate-100'">
