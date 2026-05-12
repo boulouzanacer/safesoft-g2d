@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 class ClientAuthController extends Controller
@@ -128,7 +129,11 @@ class ClientAuthController extends Controller
             ? tap($existing)->update($payload)
             : Client::create($payload);
 
-        $this->sendEmailVerificationCode($client);
+        if (! $this->sendEmailVerificationCode($client)) {
+            return back()
+                ->withInput($request->only('nom', 'prenom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
+                ->withErrors(['email' => 'Impossible d’envoyer le code. Vérifiez la configuration Resend/Mail.']);
+        }
 
         $request->session()->forget(['role', 'client_id']);
         $request->session()->put([
@@ -214,12 +219,14 @@ class ClientAuthController extends Controller
             return redirect()->to('/login')->with('success', 'Email déjà vérifié. Vous pouvez vous connecter.');
         }
 
-        $this->sendEmailVerificationCode($client);
+        if (! $this->sendEmailVerificationCode($client)) {
+            return redirect()->to('/register')->withErrors(['code' => 'Impossible d’envoyer le code. Vérifiez la configuration Resend/Mail.']);
+        }
 
         return redirect()->to('/register')->with('success', 'Code renvoyé.');
     }
 
-    private function sendEmailVerificationCode(Client $client): void
+    private function sendEmailVerificationCode(Client $client): bool
     {
         $code = (string) random_int(100000, 999999);
 
@@ -232,9 +239,46 @@ class ClientAuthController extends Controller
         $subject = 'Code de vérification email';
         $body = "Votre code de vérification est : {$code}\n\nCe code expire dans 10 minutes.\n\n" . config('app.name');
 
-        Mail::raw($body, function ($message) use ($client, $subject) {
-            $message->to($client->email)->subject($subject);
-        });
+        try {
+            $resendKey = (string) (config('services.resend.key') ?? '');
+            $from = (string) (config('services.resend.from') ?? '');
+
+            if ($resendKey !== '' && $from !== '') {
+                $res = Http::timeout(10)
+                    ->acceptJson()
+                    ->withToken($resendKey)
+                    ->post('https://api.resend.com/emails', [
+                        'from' => $from,
+                        'to' => [$client->email],
+                        'subject' => $subject,
+                        'text' => $body,
+                    ]);
+
+                if ($res->successful()) {
+                    return true;
+                }
+
+                $client->forceFill([
+                    'email_verification_code_hash' => null,
+                    'email_verification_expires_at' => null,
+                ])->save();
+
+                return false;
+            }
+
+            Mail::raw($body, function ($message) use ($client, $subject) {
+                $message->to($client->email)->subject($subject);
+            });
+
+            return true;
+        } catch (\Throwable) {
+            $client->forceFill([
+                'email_verification_code_hash' => null,
+                'email_verification_expires_at' => null,
+            ])->save();
+
+            return false;
+        }
     }
 
     public function logout(Request $request): RedirectResponse

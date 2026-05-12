@@ -31,4 +31,9 @@ return [
         ],
     ],
 
+    'resend' => [
+        'key' => env('RESEND_API_KEY'),
+        'from' => env('RESEND_FROM', env('MAIL_FROM_ADDRESS')),
+    ],
+
 ];
