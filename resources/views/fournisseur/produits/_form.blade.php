@@ -114,13 +114,18 @@
 </div>
 
 @php
-    $tierEnabled = (int) old('enable_tier_pricing', $produit?->enable_tier_pricing ?? 0) === 1;
+    $tierOldEnabled = old('enable_tier_pricing');
+    $tierEnabled = $tierOldEnabled !== null
+        ? ((int) $tierOldEnabled === 1)
+        : ((bool) ($produit?->enable_tier_pricing ?? false));
+
     $tierOld = old('quantity_prices');
     $tierDefaults = [];
     if (is_array($tierOld)) {
         $tierDefaults = $tierOld;
-    } elseif (isset($produit) && $produit && $produit->relationLoaded('quantityPrices')) {
-        $tierDefaults = $produit->quantityPrices
+    } elseif (isset($produit) && $produit) {
+        $tierDefaults = $produit->quantityPrices()
+            ->get(['quantity_min', 'quantity_max', 'price'])
             ->map(fn ($t) => ['quantity_min' => (int) $t->quantity_min, 'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max, 'price' => (float) $t->price])
             ->values()
             ->all();
@@ -135,6 +140,7 @@
                    name="enable_tier_pricing"
                    value="1"
                    class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                   @checked($tierEnabled)
                    x-model="enabled">
             <span class="text-sm font-extrabold text-white/80">Prix par palier</span>
         </label>
