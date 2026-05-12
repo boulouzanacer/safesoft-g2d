@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::middleware('throttle:public')->group(function () {
         Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:auth');
+        Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:auth');
+        Route::post('/auth/resend-email-code', [AuthController::class, 'resendEmailCode'])->middleware('throttle:auth');
         Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:auth');
 
         Route::middleware(['auth:sanctum', 'throttle:auth'])->group(function () {

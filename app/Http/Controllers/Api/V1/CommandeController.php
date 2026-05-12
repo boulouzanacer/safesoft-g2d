@@ -23,6 +23,10 @@ class CommandeController extends Controller
         $client = $request->user();
         $frsId = (int) $data['id_frs'];
 
+        if ((string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== $frsId) {
+            return $this->error('Non autorisé', null, 403);
+        }
+
         $allowInvisible = (string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === $frsId;
 
         $frs = Fournisseur::query()

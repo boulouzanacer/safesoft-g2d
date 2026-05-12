@@ -11,8 +11,11 @@ use App\Models\Client;
 use App\Models\Fournisseur;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -30,36 +33,44 @@ class AuthController extends Controller
             ? (int) $data['id_commune']
             : (int) (DB::table('commune')->where('ID_WILAYA', $idWilaya)->min('ID_COMMUNE') ?? 1);
 
-        $client = Client::create([
+        $existing = Client::query()->where('email', $data['email'])->first();
+
+        if ($existing && ! empty($existing->email_verified_at)) {
+            return $this->error('Email déjà utilisé', null, 422);
+        }
+
+        if ($existing && $existing->type_client !== 'simple') {
+            return $this->error('Email déjà utilisé', null, 422);
+        }
+
+        $payload = [
             'nom' => $data['nom'],
             'prenom' => $data['prenom'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'telephone' => $data['telephone'] ?? null,
+            'telephone' => $data['telephone'],
             'adresse' => $data['adresse'] ?? '',
             'id_wilaya' => $idWilaya,
             'id_commune' => $idCommune,
             'type_client' => 'simple',
             'id_frs' => null,
             'actif' => 1,
-            'email_verified_at' => now(),
-        ]);
+            'email_verified_at' => null,
+        ];
 
-        $token = $client->createToken('client')->plainTextToken;
+        $client = $existing
+            ? tap($existing)->update($payload)
+            : Client::create($payload);
+
+        if (! $this->sendEmailVerificationCode($client)) {
+            return $this->error('Impossible d’envoyer le code', null, 500);
+        }
 
         return $this->success([
-            'token' => $token,
-            'client' => [
-                'id' => $client->id,
-                'nom' => $client->nom,
-                'prenom' => $client->prenom,
-                'email' => $client->email,
-                'telephone' => $client->telephone,
-                'type_client' => $client->type_client,
-                'tarif' => (int) ($client->tarif ?? 1),
-                'id_frs' => $client->id_frs,
-            ],
-        ], 'Inscription réussie');
+            'verification_required' => true,
+            'email' => $client->email,
+            'expires_in_minutes' => 10,
+        ], 'Code envoyé. Vérifiez votre email.');
     }
 
     public function login(AuthLoginRequest $request)
@@ -74,6 +85,10 @@ class AuthController extends Controller
 
         if ((int) $client->actif !== 1) {
             return $this->error('Compte désactivé', null, 403);
+        }
+
+        if ($client->type_client === 'simple' && empty($client->email_verified_at)) {
+            return $this->error('Email non vérifié', null, 403);
         }
 
         $token = $client->createToken('client')->plainTextToken;
@@ -106,6 +121,163 @@ class AuthController extends Controller
                 'fournisseur' => $fournisseur,
             ],
         ], 'Connexion réussie');
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+            'code' => ['required', 'string', 'size:6'],
+        ]);
+
+        $client = Client::query()->where('email', $data['email'])->first();
+        if (! $client) {
+            return $this->notFound();
+        }
+
+        if ($client->type_client !== 'simple') {
+            return $this->error('Non autorisé', null, 403);
+        }
+
+        if (! empty($client->email_verified_at)) {
+            $token = $client->createToken('client')->plainTextToken;
+            return $this->success([
+                'token' => $token,
+                'client' => [
+                    'id' => $client->id,
+                    'nom' => $client->nom,
+                    'prenom' => $client->prenom,
+                    'email' => $client->email,
+                    'telephone' => $client->telephone,
+                    'type_client' => $client->type_client,
+                    'tarif' => (int) ($client->tarif ?? 1),
+                    'id_frs' => $client->id_frs,
+                ],
+            ], 'Email déjà vérifié');
+        }
+
+        if (empty($client->email_verification_code_hash) || empty($client->email_verification_expires_at)) {
+            return $this->error('Code invalide', null, 422);
+        }
+
+        $expiresAt = Carbon::parse($client->email_verification_expires_at);
+        if (Carbon::now()->greaterThan($expiresAt)) {
+            return $this->error('Code expiré', null, 422);
+        }
+
+        if (! Hash::check($data['code'], $client->email_verification_code_hash)) {
+            return $this->error('Code incorrect', null, 422);
+        }
+
+        $client->forceFill([
+            'email_verified_at' => Carbon::now(),
+            'email_verification_code_hash' => null,
+            'email_verification_expires_at' => null,
+        ])->save();
+
+        $token = $client->createToken('client')->plainTextToken;
+
+        return $this->success([
+            'token' => $token,
+            'client' => [
+                'id' => $client->id,
+                'nom' => $client->nom,
+                'prenom' => $client->prenom,
+                'email' => $client->email,
+                'telephone' => $client->telephone,
+                'type_client' => $client->type_client,
+                'tarif' => (int) ($client->tarif ?? 1),
+                'id_frs' => $client->id_frs,
+            ],
+        ], 'Email vérifié');
+    }
+
+    public function resendEmailCode(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        $client = Client::query()->where('email', $data['email'])->first();
+        if (! $client) {
+            return $this->notFound();
+        }
+
+        if ($client->type_client !== 'simple') {
+            return $this->error('Non autorisé', null, 403);
+        }
+
+        if (! empty($client->email_verified_at)) {
+            return $this->success([
+                'verification_required' => false,
+                'email' => $client->email,
+            ], 'Email déjà vérifié');
+        }
+
+        if (! $this->sendEmailVerificationCode($client)) {
+            return $this->error('Impossible d’envoyer le code', null, 500);
+        }
+
+        return $this->success([
+            'verification_required' => true,
+            'email' => $client->email,
+            'expires_in_minutes' => 10,
+        ], 'Code renvoyé');
+    }
+
+    private function sendEmailVerificationCode(Client $client): bool
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $client->forceFill([
+            'email_verification_code_hash' => Hash::make($code),
+            'email_verification_expires_at' => Carbon::now()->addMinutes(10),
+            'email_verified_at' => null,
+        ])->save();
+
+        $subject = 'Code de vérification email';
+        $body = "Votre code de vérification est : {$code}\n\nCe code expire dans 10 minutes.\n\n" . config('app.name');
+
+        try {
+            $resendKey = (string) (config('services.resend.key') ?? '');
+            $from = (string) (config('services.resend.from') ?? '');
+
+            if ($resendKey !== '' && $from !== '') {
+                $res = Http::timeout(10)
+                    ->acceptJson()
+                    ->withToken($resendKey)
+                    ->post('https://api.resend.com/emails', [
+                        'from' => $from,
+                        'to' => [$client->email],
+                        'subject' => $subject,
+                        'text' => $body,
+                    ]);
+
+                if ($res->successful()) {
+                    return true;
+                }
+
+                $client->forceFill([
+                    'email_verification_code_hash' => null,
+                    'email_verification_expires_at' => null,
+                ])->save();
+
+                return false;
+            }
+
+            Mail::raw($body, function ($message) use ($client, $subject) {
+                $message->to($client->email)->subject($subject);
+            });
+
+            return true;
+        } catch (\Throwable) {
+            $client->forceFill([
+                'email_verification_code_hash' => null,
+                'email_verification_expires_at' => null,
+            ])->save();
+
+            return false;
+        }
     }
 
     public function logout(Request $request)

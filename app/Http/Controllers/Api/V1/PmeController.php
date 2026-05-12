@@ -139,6 +139,7 @@ class PmeController extends Controller
                     'tarif' => (int) ($item['tarif'] ?? 1),
                     'id_frs' => $frs->id,
                     'actif' => 1,
+                    'email_verified_at' => now(),
                 ];
 
                 if ($existing) {

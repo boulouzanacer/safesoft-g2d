@@ -78,10 +78,10 @@
                                         <span class="text-xs text-white/60">Public</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
-                                        { "nom": "...", "prenom": "...", "email": "...", "password": "..." }<br>
-                                        Optional: telephone, adresse, id_wilaya, id_commune
+                                        { "nom": "...", "prenom": "...", "email": "...", "password": "...", "telephone": "..." }<br>
+                                        Optional: adresse, id_wilaya, id_commune
                                     </div>
-                                    <div class="mt-2 text-xs text-white/60">Client created as <span class="font-mono">type_client=simple</span> and <span class="font-mono">tarif=1</span>.</div>
+                                    <div class="mt-2 text-xs text-white/60">Inscription client <span class="font-mono">type_client=simple</span> avec vérification email par code (6 chiffres).</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -92,7 +92,30 @@
                                         { "email": "...", "password": "..." }<br>
                                         Response contains: token + client
                                     </div>
-                                    <div class="mt-2 text-xs text-white/60">Response client includes: <span class="font-mono">type_client</span>, <span class="font-mono">tarif</span> (1|2|3), and optional fournisseur.</div>
+                                    <div class="mt-2 text-xs text-white/60">If simple client email not verified, returns 403.</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                        <span class="font-bold">POST /auth/verify-email</span>
+                                        <span class="text-xs text-white/60">Public</span>
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed">
+                                        { "email": "...", "code": "123456" }<br>
+                                        Response contains: token + client
+                                    </div>
+                                </div>
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                        <span class="font-bold">POST /auth/resend-email-code</span>
+                                        <span class="text-xs text-white/60">Public</span>
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed">
+                                        { "email": "..." }<br>
+                                        Resends code (expires in 10 min)
+                                    </div>
                                 </div>
                             </div>
 
