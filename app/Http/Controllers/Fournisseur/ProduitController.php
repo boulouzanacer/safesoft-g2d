@@ -205,6 +205,11 @@ class ProduitController extends Controller
             ->with('success', 'Produit créé.');
     }
 
+    public function show(int $id): RedirectResponse
+    {
+        return redirect()->to("/fournisseur/produits/{$id}/edit");
+    }
+
     public function edit(int $id): View
     {
         $frsId = (int) session('frs_id');

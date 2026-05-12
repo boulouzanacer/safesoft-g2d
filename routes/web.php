@@ -92,6 +92,7 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
     Route::get('/produits', [FrsProduitController::class, 'index']);
     Route::get('/produits/create', [FrsProduitController::class, 'create']);
     Route::post('/produits', [FrsProduitController::class, 'store']);
+    Route::get('/produits/{id}', [FrsProduitController::class, 'show']);
     Route::get('/produits/{id}/edit', [FrsProduitController::class, 'edit']);
     Route::put('/produits/{id}', [FrsProduitController::class, 'update']);
     Route::delete('/produits/{id}', [FrsProduitController::class, 'destroy']);
