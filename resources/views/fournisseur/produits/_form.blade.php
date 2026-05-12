@@ -143,9 +143,12 @@
             <input type="checkbox"
                    name="enable_tier_pricing"
                    value="1"
-                   class="h-5 w-5 rounded border-white/20 accent-[var(--frs-primary)] bg-[var(--frs-card)]"
+                   class="sr-only peer"
                    @checked($tierEnabled)
                    x-model="enabled">
+            <span class="h-5 w-5 rounded border border-white/20 bg-[var(--frs-card)] flex items-center justify-center peer-checked:bg-[var(--frs-primary)] peer-checked:border-[var(--frs-primary)]">
+                <i class="fa-solid fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i>
+            </span>
             <span class="text-sm font-extrabold text-white/80">Prix par palier</span>
         </label>
         <div class="text-xs text-white/50">Illimité • Sans chevauchement • Ignore le tarif client si activé</div>
