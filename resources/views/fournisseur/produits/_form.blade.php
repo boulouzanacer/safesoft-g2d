@@ -154,7 +154,7 @@
         <div class="text-xs text-white/50">Illimité • Sans chevauchement • Ignore le tarif client si activé</div>
     </div>
 
-    <div class="mt-4" x-show="enabled" x-cloak>
+    <div class="mt-4" x-show="enabled" style="{{ $tierEnabled ? '' : 'display:none;' }}">
         <div class="grid grid-cols-12 gap-2 text-xs font-bold text-white/60">
             <div class="col-span-3">Qté min</div>
             <div class="col-span-3">Qté max</div>
