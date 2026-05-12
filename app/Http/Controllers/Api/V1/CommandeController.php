@@ -70,7 +70,7 @@ class CommandeController extends Controller
                         throw new \RuntimeException("Stock insuffisant pour le produit {$produit->id}");
                     }
 
-                    $prix = (float) $produit->prixPourClient($client);
+                    $prix = (float) $produit->prixUnitairePourQuantite($client, $qte);
                     $sousTotal = $prix * $qte;
                     $montantTotal += $sousTotal;
 

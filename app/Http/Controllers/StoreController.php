@@ -108,7 +108,7 @@ class StoreController extends Controller
             ->where('actif', 1)
             ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
             ->whereIn('id', $ids)
-            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
+            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at', 'quantityPrices'])
             ->get()
             ->keyBy('id');
 
@@ -142,7 +142,7 @@ class StoreController extends Controller
 
             $cart[$id] = $qty;
 
-            $prixUnitaire = (float) $p->prixPourClient($client);
+            $prixUnitaire = (float) $p->prixUnitairePourQuantite($client, $qty);
             $line = $prixUnitaire * $qty;
             $total += $line;
 
@@ -197,7 +197,7 @@ class StoreController extends Controller
             ->whereNull('deleted_at')
             ->where('actif', 1)
             ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q) => $q->where('abonne_only', 0))
-            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
+            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at', 'quantityPrices'])
             ->whereHas('fournisseur', function ($q) use ($forcedFournisseurId) {
                 $q->where('actif', 1)
                     ->whereNull('deleted_at')
@@ -294,6 +294,7 @@ class StoreController extends Controller
             ->where('actif', 1)
             ->where('id_frs', $id)
             ->when(! $client || (string) $client->type_client !== 'abonne', fn ($q2) => $q2->where('abonne_only', 0))
+            ->with('quantityPrices')
             ->when($categorie !== '', fn ($q2) => $q2->where('categorie', $categorie))
             ->when($q !== '', function ($q2) use ($q) {
                 $q2->where(function ($sub) use ($q) {
@@ -328,7 +329,7 @@ class StoreController extends Controller
         $p = Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
-            ->with(['images' => fn ($q) => $q->orderBy('ordre'), 'fournisseur:id,nom_frs,actif,is_visible,deleted_at'])
+            ->with(['images' => fn ($q) => $q->orderBy('ordre'), 'fournisseur:id,nom_frs,actif,is_visible,deleted_at', 'quantityPrices'])
             ->findOrFail($id);
 
         if (! $p->fournisseur || (int) $p->fournisseur->actif !== 1 || (int) ($p->fournisseur->is_visible ?? 1) !== 1 || $p->fournisseur->deleted_at) {
@@ -620,7 +621,7 @@ class StoreController extends Controller
                     throw new \RuntimeException("Stock insuffisant pour {$pdb->designation}.");
                 }
 
-                $prixUnitaire = (float) $pdb->prixPourClient($client);
+                $prixUnitaire = (float) $pdb->prixUnitairePourQuantite($client, $qty);
                 $lineTotal = $prixUnitaire * $qty;
                 $montantTotal += $lineTotal;
 

@@ -9,9 +9,71 @@ use App\Services\ImageProduitService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProduitController extends Controller
 {
+    /**
+     * Normalise et valide les paliers (min/max/price) et empêche les chevauchements.
+     * Important: la validation côté serveur est la source de vérité (le JS est seulement UX).
+     */
+    private function normalizeQuantityPrices(array $tiers): array
+    {
+        $normalized = [];
+
+        foreach ($tiers as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $min = (int) ($row['quantity_min'] ?? 0);
+            $maxRaw = $row['quantity_max'] ?? null;
+            $max = ($maxRaw === null || $maxRaw === '') ? null : (int) $maxRaw;
+            $price = (float) ($row['price'] ?? -1);
+
+            if ($min <= 0) {
+                throw new \InvalidArgumentException('Quantité min invalide.');
+            }
+            if ($max !== null && $max < $min) {
+                throw new \InvalidArgumentException('Quantité max doit être >= quantité min.');
+            }
+            if ($price < 0) {
+                throw new \InvalidArgumentException('Prix invalide.');
+            }
+
+            $normalized[] = [
+                'quantity_min' => $min,
+                'quantity_max' => $max,
+                'price' => $price,
+            ];
+        }
+
+        if (count($normalized) === 0) {
+            throw new \InvalidArgumentException('Ajoutez au moins un palier.');
+        }
+
+        usort($normalized, fn ($a, $b) => $a['quantity_min'] <=> $b['quantity_min']);
+
+        $prevMax = null;
+        foreach ($normalized as $i => $t) {
+            if ($i === 0) {
+                $prevMax = $t['quantity_max'];
+                continue;
+            }
+
+            if ($prevMax === null) {
+                throw new \InvalidArgumentException('Aucun palier ne peut suivre un palier sans quantité max.');
+            }
+            if ($t['quantity_min'] <= $prevMax) {
+                throw new \InvalidArgumentException('Chevauchement détecté entre paliers.');
+            }
+
+            $prevMax = $t['quantity_max'];
+        }
+
+        return $normalized;
+    }
+
     public function index(Request $request): View
     {
         $frsId = (int) session('frs_id');
@@ -73,6 +135,7 @@ class ProduitController extends Controller
             'categorie' => ['required', 'string', 'max:100'],
             'abonne_only' => ['nullable', 'boolean'],
             'actif' => ['nullable', 'boolean'],
+            'enable_tier_pricing' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'images_order' => ['nullable', 'array'],
@@ -80,19 +143,51 @@ class ProduitController extends Controller
             'primary_image' => ['nullable', 'string'],
         ]);
 
-        $produit = Produit::create([
-            'id_frs' => $frsId,
-            'reference' => $data['reference'],
-            'designation' => $data['designation'],
-            'description' => $data['description'],
-            'pv_1' => $data['pv_1'],
-            'pv_2' => $data['pv_2'],
-            'pv_3' => $data['pv_3'],
-            'stock' => $data['stock'],
-            'categorie' => $data['categorie'],
-            'abonne_only' => (int) ($data['abonne_only'] ?? 0) === 1 ? 1 : 0,
-            'actif' => (int) ($data['actif'] ?? 0) === 1 ? 1 : 0,
-        ]);
+        $enableTier = (int) ($data['enable_tier_pricing'] ?? 0) === 1;
+        $tiers = [];
+        if ($enableTier) {
+            $tierData = $request->validate([
+                'quantity_prices' => ['required', 'array', 'min:1'],
+                'quantity_prices.*.quantity_min' => ['required', 'integer', 'min:1'],
+                'quantity_prices.*.quantity_max' => ['nullable', 'integer', 'min:1'],
+                'quantity_prices.*.price' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            try {
+                $tiers = $this->normalizeQuantityPrices($tierData['quantity_prices']);
+            } catch (\InvalidArgumentException $e) {
+                return back()->withErrors(['quantity_prices' => $e->getMessage()])->withInput();
+            }
+        }
+
+        $produit = DB::transaction(function () use ($frsId, $data, $enableTier, $tiers) {
+            $produit = Produit::create([
+                'id_frs' => $frsId,
+                'reference' => $data['reference'],
+                'designation' => $data['designation'],
+                'description' => $data['description'],
+                'pv_1' => $data['pv_1'],
+                'pv_2' => $data['pv_2'],
+                'pv_3' => $data['pv_3'],
+                'stock' => $data['stock'],
+                'categorie' => $data['categorie'],
+                'abonne_only' => (int) ($data['abonne_only'] ?? 0) === 1 ? 1 : 0,
+                'enable_tier_pricing' => $enableTier ? 1 : 0,
+                'actif' => (int) ($data['actif'] ?? 0) === 1 ? 1 : 0,
+            ]);
+
+            if ($enableTier) {
+                foreach ($tiers as $t) {
+                    $produit->quantityPrices()->create([
+                        'quantity_min' => $t['quantity_min'],
+                        'quantity_max' => $t['quantity_max'],
+                        'price' => $t['price'],
+                    ]);
+                }
+            }
+
+            return $produit;
+        });
 
         $files = $request->file('images', []);
         if (count($files) > 0) {
@@ -116,6 +211,7 @@ class ProduitController extends Controller
 
         $produit = Produit::query()
             ->where('id_frs', $frsId)
+            ->with('quantityPrices')
             ->findOrFail($id);
 
         $images = ProduitImage::query()
@@ -151,6 +247,7 @@ class ProduitController extends Controller
             'categorie' => ['required', 'string', 'max:100'],
             'abonne_only' => ['nullable', 'boolean'],
             'actif' => ['nullable', 'boolean'],
+            'enable_tier_pricing' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'delete_images' => ['nullable', 'array'],
@@ -160,18 +257,49 @@ class ProduitController extends Controller
             'primary_image' => ['nullable', 'string'],
         ]);
 
-        $produit->update([
-            'reference' => $data['reference'],
-            'designation' => $data['designation'],
-            'description' => $data['description'],
-            'pv_1' => $data['pv_1'],
-            'pv_2' => $data['pv_2'],
-            'pv_3' => $data['pv_3'],
-            'stock' => $data['stock'],
-            'categorie' => $data['categorie'],
-            'abonne_only' => (int) ($data['abonne_only'] ?? 0) === 1 ? 1 : 0,
-            'actif' => (int) ($data['actif'] ?? 0) === 1 ? 1 : 0,
-        ]);
+        $enableTier = (int) ($data['enable_tier_pricing'] ?? 0) === 1;
+        $tiers = [];
+        if ($enableTier) {
+            $tierData = $request->validate([
+                'quantity_prices' => ['required', 'array', 'min:1'],
+                'quantity_prices.*.quantity_min' => ['required', 'integer', 'min:1'],
+                'quantity_prices.*.quantity_max' => ['nullable', 'integer', 'min:1'],
+                'quantity_prices.*.price' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            try {
+                $tiers = $this->normalizeQuantityPrices($tierData['quantity_prices']);
+            } catch (\InvalidArgumentException $e) {
+                return back()->withErrors(['quantity_prices' => $e->getMessage()])->withInput();
+            }
+        }
+
+        DB::transaction(function () use ($produit, $data, $enableTier, $tiers) {
+            $produit->update([
+                'reference' => $data['reference'],
+                'designation' => $data['designation'],
+                'description' => $data['description'],
+                'pv_1' => $data['pv_1'],
+                'pv_2' => $data['pv_2'],
+                'pv_3' => $data['pv_3'],
+                'stock' => $data['stock'],
+                'categorie' => $data['categorie'],
+                'abonne_only' => (int) ($data['abonne_only'] ?? 0) === 1 ? 1 : 0,
+                'enable_tier_pricing' => $enableTier ? 1 : 0,
+                'actif' => (int) ($data['actif'] ?? 0) === 1 ? 1 : 0,
+            ]);
+
+            $produit->quantityPrices()->delete();
+            if ($enableTier) {
+                foreach ($tiers as $t) {
+                    $produit->quantityPrices()->create([
+                        'quantity_min' => $t['quantity_min'],
+                        'quantity_max' => $t['quantity_max'],
+                        'price' => $t['price'],
+                    ]);
+                }
+            }
+        });
 
         if (! empty($data['delete_images'] ?? [])) {
             $imageService->deleteImages($produit, $frsId, $data['delete_images']);

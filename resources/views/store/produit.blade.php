@@ -39,11 +39,29 @@
             <div class="mt-1 text-sm text-slate-600">Ref: {{ $produit->reference }}</div>
             <div class="mt-1 text-sm text-slate-600">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
 
+            @php
+                $initialQty = 1;
+                $initialUnit = (float) $produit->prixUnitairePourQuantite($client ?? null, $initialQty);
+                $tiers = ($produit->relationLoaded('quantityPrices') ? $produit->quantityPrices : collect())
+                    ->map(fn ($t) => [
+                        'quantity_min' => (int) $t->quantity_min,
+                        'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
+                        'price' => (float) $t->price,
+                    ])
+                    ->values()
+                    ->all();
+            @endphp
+
             <div class="mt-4 flex items-center justify-between gap-3">
-                <div class="text-2xl font-extrabold">{{ number_format((float)$produit->prixPourClient($client ?? null), 2, '.', ' ') }} DA</div>
+                <div class="text-2xl font-extrabold">
+                    <span id="unitPrice">{{ number_format($initialUnit, 2, '.', ' ') }}</span> DA
+                </div>
                 <span class="text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
                     {{ $produit->categorie ?: '—' }}
                 </span>
+            </div>
+            <div class="mt-1 text-xs text-slate-500">
+                Total: <span class="font-bold text-slate-700"><span id="totalPrice">{{ number_format($initialUnit * $initialQty, 2, '.', ' ') }}</span> DA</span>
             </div>
 
             <div class="mt-2 text-sm {{ (int)$produit->stock > 0 ? 'text-emerald-700' : 'text-red-600' }}">
@@ -54,12 +72,33 @@
                 {{ trim((string)$produit->description) !== '' ? $produit->description : '—' }}
             </div>
 
+            @if((bool)($produit->enable_tier_pricing ?? false) === true && count($tiers) > 0)
+                <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="font-extrabold tracking-wide">Tarifs par quantité</div>
+                    <div class="mt-3 space-y-2 text-sm">
+                        @foreach($tiers as $t)
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="text-slate-600">
+                                    @if($t['quantity_max'] === null)
+                                        {{ (int)$t['quantity_min'] }}+ pièces
+                                    @else
+                                        {{ (int)$t['quantity_min'] }}-{{ (int)$t['quantity_max'] }} pièces
+                                    @endif
+                                </div>
+                                <div class="font-extrabold">{{ number_format((float)$t['price'], 2, '.', ' ') }} DA</div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <div class="mt-6">
                 <form method="POST" action="{{ url('/panier/add') }}" class="flex items-center gap-2">
                     @csrf
                     <input type="hidden" name="produit_id" value="{{ $produit->id }}">
                     <input type="number"
                            name="qty"
+                           id="qtyInput"
                            min="1"
                            max="{{ max(1, (int)$produit->stock) }}"
                            value="1"
@@ -76,4 +115,47 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const qtyInput = document.getElementById('qtyInput');
+        const unitEl = document.getElementById('unitPrice');
+        const totalEl = document.getElementById('totalPrice');
+
+        if (!qtyInput || !unitEl || !totalEl) return;
+
+        const enableTier = @json((bool)($produit->enable_tier_pricing ?? false));
+        const tiers = @json($tiers);
+        const baseUnit = Number(@json($initialUnit));
+
+        function matchTier(qty) {
+            if (!enableTier) return null;
+            const sorted = [...tiers].sort((a, b) => Number(a.quantity_min) - Number(b.quantity_min));
+            for (let i = sorted.length - 1; i >= 0; i--) {
+                const t = sorted[i];
+                const min = Number(t.quantity_min);
+                const max = (t.quantity_max === null || t.quantity_max === '') ? null : Number(t.quantity_max);
+                if (qty < min) continue;
+                if (max === null || qty <= max) return Number(t.price);
+            }
+            return null;
+        }
+
+        function fmt(v) {
+            const n = Number(v);
+            if (!Number.isFinite(n)) return '0,00';
+            return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function update() {
+            const qty = Math.max(1, Number(qtyInput.value || 1));
+            const unit = matchTier(qty) ?? baseUnit;
+            unitEl.textContent = fmt(unit);
+            totalEl.textContent = fmt(unit * qty);
+        }
+
+        qtyInput.addEventListener('input', update);
+        update();
+    })();
+</script>
 @endsection

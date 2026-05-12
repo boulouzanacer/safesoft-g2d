@@ -113,6 +113,181 @@
     </div>
 </div>
 
+@php
+    $tierEnabled = (int) old('enable_tier_pricing', $produit?->enable_tier_pricing ?? 0) === 1;
+    $tierOld = old('quantity_prices');
+    $tierDefaults = [];
+    if (is_array($tierOld)) {
+        $tierDefaults = $tierOld;
+    } elseif (isset($produit) && $produit && $produit->relationLoaded('quantityPrices')) {
+        $tierDefaults = $produit->quantityPrices
+            ->map(fn ($t) => ['quantity_min' => (int) $t->quantity_min, 'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max, 'price' => (float) $t->price])
+            ->values()
+            ->all();
+    }
+@endphp
+
+<div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4"
+     x-data="window.__tierPricingForm({ enabled: @json($tierEnabled), tiers: @json($tierDefaults) })">
+    <div class="flex items-center justify-between gap-3">
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+            <input type="checkbox"
+                   name="enable_tier_pricing"
+                   value="1"
+                   class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                   x-model="enabled">
+            <span class="text-sm font-extrabold text-white/80">Prix par palier</span>
+        </label>
+        <div class="text-xs text-white/50">Illimité • Sans chevauchement • Ignore le tarif client si activé</div>
+    </div>
+
+    <div class="mt-4" x-show="enabled" x-cloak>
+        <div class="grid grid-cols-12 gap-2 text-xs font-bold text-white/60">
+            <div class="col-span-3">Qté min</div>
+            <div class="col-span-3">Qté max</div>
+            <div class="col-span-4">Prix (DA)</div>
+            <div class="col-span-2 text-right">Actions</div>
+        </div>
+
+        <div class="mt-2 space-y-2">
+            <template x-for="(row, i) in tiers" :key="i">
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <div class="col-span-3">
+                        <input type="number"
+                               min="1"
+                               class="w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]"
+                               x-model.number="row.quantity_min"
+                               :name="`quantity_prices[${i}][quantity_min]`"
+                               :disabled="!enabled"
+                               @input="validate()">
+                    </div>
+                    <div class="col-span-3">
+                        <input type="number"
+                               min="1"
+                               placeholder="∞"
+                               class="w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]"
+                               x-model="row.quantity_max"
+                               :name="`quantity_prices[${i}][quantity_max]`"
+                               :disabled="!enabled"
+                               @input="validate()">
+                    </div>
+                    <div class="col-span-4">
+                        <input type="number"
+                               min="0"
+                               step="0.01"
+                               class="w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]"
+                               x-model.number="row.price"
+                               :name="`quantity_prices[${i}][price]`"
+                               :disabled="!enabled"
+                               @input="validate()">
+                    </div>
+                    <div class="col-span-2 flex justify-end">
+                        <button type="button"
+                                class="h-9 w-9 rounded-xl border border-white/10 bg-[var(--frs-card)] hover:bg-white/5 flex items-center justify-center"
+                                @click="remove(i)">
+                            <i class="fa-solid fa-trash text-white/80"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-3">
+            <button type="button"
+                    class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold border border-white/10 bg-[var(--frs-card)] hover:bg-white/5"
+                    @click="add()">
+                <i class="fa-solid fa-plus"></i>
+                Ajouter un palier
+            </button>
+            <div class="text-xs text-red-300" x-text="error" x-show="error"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.__tierPricingForm = function (init) {
+        const safeBool = (v) => v === true || v === 1 || v === '1';
+        const safeNum = (v) => (v === null || v === undefined || v === '') ? null : Number(v);
+
+        const tiers = Array.isArray(init?.tiers) ? init.tiers.map((t) => ({
+            quantity_min: Number(t.quantity_min ?? 1),
+            quantity_max: (t.quantity_max === null || t.quantity_max === '') ? null : Number(t.quantity_max),
+            price: Number(t.price ?? 0),
+        })) : [];
+
+        return {
+            enabled: safeBool(init?.enabled),
+            tiers: tiers.length ? tiers : [{ quantity_min: 1, quantity_max: null, price: 0 }],
+            error: '',
+
+            add() {
+                const last = this.tiers[this.tiers.length - 1];
+                const lastMax = safeNum(last?.quantity_max);
+                if (lastMax === null) {
+                    this.error = 'Définissez une quantité max pour le dernier palier avant d’en ajouter un autre.';
+                    return;
+                }
+                this.tiers.push({ quantity_min: lastMax + 1, quantity_max: null, price: 0 });
+                this.validate();
+            },
+
+            remove(i) {
+                this.tiers.splice(i, 1);
+                if (this.tiers.length === 0) {
+                    this.tiers.push({ quantity_min: 1, quantity_max: null, price: 0 });
+                }
+                this.validate();
+            },
+
+            validate() {
+                this.error = '';
+                if (!this.enabled) return true;
+
+                const rows = this.tiers.map((r) => ({
+                    quantity_min: Number(r.quantity_min ?? 0),
+                    quantity_max: (r.quantity_max === null || r.quantity_max === '') ? null : Number(r.quantity_max),
+                    price: Number(r.price ?? -1),
+                }));
+
+                for (const r of rows) {
+                    if (!Number.isFinite(r.quantity_min) || r.quantity_min < 1) {
+                        this.error = 'Quantité min invalide.';
+                        return false;
+                    }
+                    if (r.quantity_max !== null && (!Number.isFinite(r.quantity_max) || r.quantity_max < r.quantity_min)) {
+                        this.error = 'Quantité max doit être >= quantité min.';
+                        return false;
+                    }
+                    if (!Number.isFinite(r.price) || r.price < 0) {
+                        this.error = 'Prix invalide.';
+                        return false;
+                    }
+                }
+
+                rows.sort((a, b) => a.quantity_min - b.quantity_min);
+                for (let i = 1; i < rows.length; i++) {
+                    const prev = rows[i - 1];
+                    const cur = rows[i];
+                    if (prev.quantity_max === null) {
+                        this.error = 'Aucun palier ne peut suivre un palier sans quantité max.';
+                        return false;
+                    }
+                    if (cur.quantity_min <= prev.quantity_max) {
+                        this.error = 'Chevauchement détecté entre paliers.';
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+
+            init() {
+                this.validate();
+            },
+        }
+    }
+</script>
+
 <div class="mt-6">
     <div class="flex items-center justify-between">
         <div class="font-extrabold tracking-wide">Images</div>

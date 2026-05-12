@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class Produit extends Model
 {
@@ -27,6 +28,7 @@ class Produit extends Model
         'image_principale',
         'categorie',
         'abonne_only',
+        'enable_tier_pricing',
         'actif',
     ];
 
@@ -35,6 +37,7 @@ class Produit extends Model
         'pv_2' => 'float',
         'pv_3' => 'float',
         'abonne_only' => 'integer',
+        'enable_tier_pricing' => 'boolean',
         'actif' => 'integer',
     ];
 
@@ -61,6 +64,48 @@ class Produit extends Model
         return $this->prixPourTarif((int) ($client->tarif ?? 1));
     }
 
+    public function prixUnitairePourQuantite(?Client $client, int $quantite): float
+    {
+        $qty = max(1, (int) $quantite);
+
+        if ((bool) ($this->enable_tier_pricing ?? false) === true) {
+            if ($this->relationLoaded('quantityPrices')) {
+                /** @var Collection<int, ProduitQuantityPrice> $tiers */
+                $tiers = $this->getRelation('quantityPrices');
+
+                $match = $tiers
+                    ->sortByDesc('quantity_min')
+                    ->first(function (ProduitQuantityPrice $t) use ($qty) {
+                        if ($t->quantity_min > $qty) {
+                            return false;
+                        }
+                        if ($t->quantity_max === null) {
+                            return true;
+                        }
+                        return $qty <= (int) $t->quantity_max;
+                    });
+
+                if ($match) {
+                    return (float) $match->price;
+                }
+            } else {
+                $match = $this->quantityPrices()
+                    ->where('quantity_min', '<=', $qty)
+                    ->where(function ($q) use ($qty) {
+                        $q->whereNull('quantity_max')->orWhere('quantity_max', '>=', $qty);
+                    })
+                    ->orderByDesc('quantity_min')
+                    ->first();
+
+                if ($match) {
+                    return (float) $match->price;
+                }
+            }
+        }
+
+        return $this->prixPourClient($client);
+    }
+
     public function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class, 'id_frs', 'id');
@@ -69,5 +114,10 @@ class Produit extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProduitImage::class, 'id_produit', 'id');
+    }
+
+    public function quantityPrices(): HasMany
+    {
+        return $this->hasMany(ProduitQuantityPrice::class, 'id_produit', 'id')->orderBy('quantity_min');
     }
 }

@@ -30,6 +30,7 @@ class ProduitController extends Controller
             ->with([
                 'images' => fn ($q) => $q->orderBy('ordre'),
                 'fournisseur:id,nom_frs,actif,is_visible,deleted_at',
+                'quantityPrices',
             ])
             ->whereHas('fournisseur', function ($q) use ($forcedFrsId) {
                 $q->where('actif', 1)
@@ -70,11 +71,17 @@ class ProduitController extends Controller
                 'pv_1' => (float) $p->pv_1,
                 'pv_2' => (float) $p->pv_2,
                 'pv_3' => (float) $p->pv_3,
-                'prix' => (float) $p->prixPourClient($client instanceof Client ? $client : null),
+                'prix' => (float) $p->prixUnitairePourQuantite($client instanceof Client ? $client : null, 1),
                 'stock' => (int) $p->stock,
                 'image_principale' => $p->image_principale,
                 'categorie' => $p->categorie,
                 'abonne_only' => (int) ($p->abonne_only ?? 0),
+                'enable_tier_pricing' => (bool) ($p->enable_tier_pricing ?? false),
+                'quantity_prices' => $p->quantityPrices->map(fn ($t) => [
+                    'quantity_min' => (int) $t->quantity_min,
+                    'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
+                    'price' => (float) $t->price,
+                ])->values(),
                 'actif' => (int) $p->actif,
                 'images' => $p->images->map(fn ($img) => [
                     'id' => $img->id,
@@ -110,6 +117,7 @@ class ProduitController extends Controller
             ->with([
                 'images' => fn ($q) => $q->orderBy('ordre'),
                 'fournisseur:id,nom_frs,actif,is_visible,deleted_at',
+                'quantityPrices',
             ])
             ->whereHas('fournisseur', function ($q) use ($isAbonne, $client) {
                 $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
@@ -138,11 +146,17 @@ class ProduitController extends Controller
             'pv_1' => (float) $p->pv_1,
             'pv_2' => (float) $p->pv_2,
             'pv_3' => (float) $p->pv_3,
-            'prix' => (float) $p->prixPourClient($client instanceof Client ? $client : null),
+            'prix' => (float) $p->prixUnitairePourQuantite($client instanceof Client ? $client : null, 1),
             'stock' => (int) $p->stock,
             'image_principale' => $p->image_principale,
             'categorie' => $p->categorie,
             'abonne_only' => (int) ($p->abonne_only ?? 0),
+            'enable_tier_pricing' => (bool) ($p->enable_tier_pricing ?? false),
+            'quantity_prices' => $p->quantityPrices->map(fn ($t) => [
+                'quantity_min' => (int) $t->quantity_min,
+                'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
+                'price' => (float) $t->price,
+            ])->values(),
             'actif' => (int) $p->actif,
             'images' => $p->images->map(fn ($img) => [
                 'id' => $img->id,
