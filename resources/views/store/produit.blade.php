@@ -50,6 +50,7 @@
                     ])
                     ->values()
                     ->all();
+                $tierEnabled = $produit->isTierPricingEnabled() && count($tiers) > 0;
             @endphp
 
             <div class="mt-4 flex items-center justify-between gap-3">
@@ -72,7 +73,7 @@
                 {{ trim((string)$produit->description) !== '' ? $produit->description : '—' }}
             </div>
 
-            @if((bool)($produit->enable_tier_pricing ?? false) === true && count($tiers) > 0)
+            @if($tierEnabled)
                 <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <div class="font-extrabold tracking-wide">Tarifs par quantité</div>
                     <div class="mt-3 space-y-2 text-sm">
@@ -124,7 +125,7 @@
 
         if (!qtyInput || !unitEl || !totalEl) return;
 
-        const enableTier = @json((bool)($produit->enable_tier_pricing ?? false));
+        const enableTier = @json($tierEnabled);
         const tiers = @json($tiers);
         const baseUnit = Number(@json($initialUnit));
 

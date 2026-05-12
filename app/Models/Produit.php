@@ -64,11 +64,27 @@ class Produit extends Model
         return $this->prixPourTarif((int) ($client->tarif ?? 1));
     }
 
+    public function isTierPricingEnabled(): bool
+    {
+        if ((bool) ($this->enable_tier_pricing ?? false) === true) {
+            return true;
+        }
+
+        if ($this->relationLoaded('quantityPrices')) {
+            $tiers = $this->getRelation('quantityPrices');
+            if ($tiers instanceof Collection) {
+                return $tiers->isNotEmpty();
+            }
+        }
+
+        return $this->quantityPrices()->exists();
+    }
+
     public function prixUnitairePourQuantite(?Client $client, int $quantite): float
     {
         $qty = max(1, (int) $quantite);
 
-        if ((bool) ($this->enable_tier_pricing ?? false) === true) {
+        if ($this->isTierPricingEnabled()) {
             if ($this->relationLoaded('quantityPrices')) {
                 /** @var Collection<int, ProduitQuantityPrice> $tiers */
                 $tiers = $this->getRelation('quantityPrices');

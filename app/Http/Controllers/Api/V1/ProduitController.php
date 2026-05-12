@@ -76,7 +76,7 @@ class ProduitController extends Controller
                 'image_principale' => $p->image_principale,
                 'categorie' => $p->categorie,
                 'abonne_only' => (int) ($p->abonne_only ?? 0),
-                'enable_tier_pricing' => (bool) ($p->enable_tier_pricing ?? false),
+                'enable_tier_pricing' => $p->isTierPricingEnabled(),
                 'quantity_prices' => $p->quantityPrices->map(fn ($t) => [
                     'quantity_min' => (int) $t->quantity_min,
                     'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
@@ -151,7 +151,7 @@ class ProduitController extends Controller
             'image_principale' => $p->image_principale,
             'categorie' => $p->categorie,
             'abonne_only' => (int) ($p->abonne_only ?? 0),
-            'enable_tier_pricing' => (bool) ($p->enable_tier_pricing ?? false),
+            'enable_tier_pricing' => $p->isTierPricingEnabled(),
             'quantity_prices' => $p->quantityPrices->map(fn ($t) => [
                 'quantity_min' => (int) $t->quantity_min,
                 'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
