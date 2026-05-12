@@ -23,6 +23,9 @@ class Client extends Authenticatable
         'nom',
         'prenom',
         'email',
+        'email_verified_at',
+        'email_verification_code_hash',
+        'email_verification_expires_at',
         'password',
         'telephone',
         'adresse',
@@ -36,6 +39,11 @@ class Client extends Authenticatable
 
     protected $hidden = [
         'password',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'email_verification_expires_at' => 'datetime',
     ];
 
     public function fournisseur(): BelongsTo

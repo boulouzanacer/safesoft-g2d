@@ -18,7 +18,7 @@ class AuthRegisterRequest extends FormRequest
             'prenom' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:client,email'],
             'password' => ['required', 'string', 'min:8'],
-            'telephone' => ['nullable', 'string', 'max:255'],
+            'telephone' => ['required', 'string', 'max:255'],
             'type_client' => ['nullable', 'in:simple'],
             'adresse' => ['nullable', 'string'],
             'id_wilaya' => ['nullable', 'integer', 'exists:wilaya,ID_WILAYA'],
@@ -26,4 +26,3 @@ class AuthRegisterRequest extends FormRequest
         ];
     }
 }
-

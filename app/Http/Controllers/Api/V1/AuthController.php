@@ -42,6 +42,7 @@ class AuthController extends Controller
             'type_client' => 'simple',
             'id_frs' => null,
             'actif' => 1,
+            'email_verified_at' => now(),
         ]);
 
         $token = $client->createToken('client')->plainTextToken;
