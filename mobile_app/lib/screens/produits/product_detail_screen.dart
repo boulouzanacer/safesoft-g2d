@@ -98,6 +98,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           final hasStock = p.stock > 0;
           final desc = p.description.trim();
           final longDesc = desc.length > 140;
+          final unit = p.unitPriceForQty(_qty);
+          final total = unit * _qty;
 
           return Column(
             children: [
@@ -188,11 +190,68 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       Text('Catégorie : ${p.categorie}'),
                       const SizedBox(height: 14),
                       Text(
-                        _price(p.prix),
+                        _price(unit),
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w900),
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Total: ${_price(total)}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color
+                              ?.withValues(alpha: 0.8),
+                        ),
+                      ),
                       const SizedBox(height: 10),
+                      CheckboxListTile(
+                        value: p.enableTierPricing,
+                        onChanged: null,
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        title: const Text('Prix par palier'),
+                        subtitle: p.quantityPrices.isEmpty
+                            ? const Text('Aucun palier')
+                            : Text('${p.quantityPrices.length} palier(s)'),
+                      ),
+                      if (p.hasTierPricing) ...[
+                        Card(
+                          margin: const EdgeInsets.only(top: 6, bottom: 10),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Tarifs par quantité',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w900)),
+                                const SizedBox(height: 10),
+                                ...p.quantityPrices.map((t) {
+                                  final range = t.quantityMax == null
+                                      ? '${t.quantityMin}+'
+                                      : '${t.quantityMin}-${t.quantityMax}';
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 8.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(child: Text('$range pièces')),
+                                        Text(_price(t.price),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w800)),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                       Row(
                         children: [
                           Icon(
@@ -277,7 +336,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                     fontWeight: FontWeight.w800)),
                           ),
                           IconButton(
-                            onPressed: () => setState(() => _qty += 1),
+                            onPressed: !hasStock || _qty >= p.stock
+                                ? null
+                                : () => setState(() => _qty += 1),
                             icon: const Icon(Icons.add_circle_outline),
                           ),
                         ],

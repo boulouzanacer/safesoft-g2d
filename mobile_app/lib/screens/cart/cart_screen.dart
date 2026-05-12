@@ -151,7 +151,22 @@ class CartScreen extends ConsumerWidget {
                                       fontWeight: FontWeight.w800),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(_price(it.produit.prix)),
+                                Text(
+                                  '${_price(it.prixUnitaire)} / unité',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Sous-total: ${_price(it.sousTotal)}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color
+                                        ?.withValues(alpha: 0.8),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [

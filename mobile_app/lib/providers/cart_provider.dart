@@ -11,7 +11,8 @@ class CartItem {
 
   const CartItem({required this.produit, required this.quantite});
 
-  double get sousTotal => produit.prix * quantite;
+  double get prixUnitaire => produit.unitPriceForQty(quantite);
+  double get sousTotal => prixUnitaire * quantite;
 
   CartItem copyWith({ProduitModel? produit, int? quantite}) {
     return CartItem(
