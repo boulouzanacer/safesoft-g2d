@@ -130,6 +130,10 @@
             ->values()
             ->all();
     }
+
+    if ($tierOldEnabled === null && $tierEnabled === false && count($tierDefaults) > 0) {
+        $tierEnabled = true;
+    }
 @endphp
 
 <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4"
@@ -139,7 +143,7 @@
             <input type="checkbox"
                    name="enable_tier_pricing"
                    value="1"
-                   class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                   class="h-5 w-5 rounded border-white/20 accent-[var(--frs-primary)] bg-[var(--frs-card)]"
                    @checked($tierEnabled)
                    x-model="enabled">
             <span class="text-sm font-extrabold text-white/80">Prix par palier</span>
