@@ -1,0 +1,384 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../../models/boutique_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/produit_provider.dart';
+import '../../widgets/common/error_state.dart';
+import '../../widgets/product/product_card.dart';
+import '../../widgets/skeletons/product_card_skeleton.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final _scrollCtrl = ScrollController();
+  final _searchCtrl = TextEditingController();
+  Timer? _debounce;
+  String? _selectedCategorie;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollCtrl.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _scrollCtrl.dispose();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollCtrl.hasClients) return;
+    final max = _scrollCtrl.position.maxScrollExtent;
+    final current = _scrollCtrl.position.pixels;
+    if (max <= 0) return;
+    if (current >= max - 320) {
+      final auth = ref.read(authProvider);
+      final frsId =
+          (auth.client?.typeClient == 'abonne') ? auth.client?.idFrs : null;
+      ref
+          .read(produitProvider(ProduitListQuery(frsId: frsId)).notifier)
+          .loadMore();
+    }
+  }
+
+  void _onSearchChanged(String v, {required int? frsId}) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      ref
+          .read(produitProvider(ProduitListQuery(frsId: frsId)).notifier)
+          .refresh(search: v);
+    });
+  }
+
+  Widget _searchBar({required int? frsId}) {
+    return TextField(
+      controller: _searchCtrl,
+      onChanged: (v) {
+        setState(() {});
+        _onSearchChanged(v, frsId: frsId);
+      },
+      decoration: InputDecoration(
+        hintText: 'Rechercher un produit',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: _searchCtrl.text.isEmpty
+            ? null
+            : IconButton(
+                onPressed: () {
+                  _searchCtrl.clear();
+                  ref
+                      .read(produitProvider(ProduitListQuery(frsId: frsId))
+                          .notifier)
+                      .refresh(search: '');
+                  setState(() {});
+                },
+                icon: const Icon(Icons.close),
+              ),
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String title, {VoidCallback? onTap}) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          ),
+        ),
+        if (onTap != null)
+          TextButton(onPressed: onTap, child: const Text('Voir tout')),
+      ],
+    );
+  }
+
+  Widget _boutiqueCard(BoutiqueModel b) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => context.push('/boutiques/${b.id}'),
+      child: Container(
+        width: 220,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    b.nomFrs,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, size: 14),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              b.wilaya ?? '-',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7),
+              ),
+            ),
+            const Spacer(),
+            Text(
+              '${b.nbProduits} produits',
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _gridSkeleton() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.62,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemBuilder: (_, __) => const ProductCardSkeleton(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    final client = auth.client;
+    final isAbonne = client?.typeClient == 'abonne';
+    final frsId = isAbonne ? client?.idFrs : null;
+
+    final produitsState =
+        ref.watch(produitProvider(ProduitListQuery(frsId: frsId)));
+    final boutiquesAsync = ref.watch(boutiquesProvider);
+    final categoriesAsync =
+        isAbonne ? ref.watch(categoriesProvider(frsId)) : null;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Accueil'),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/notifications'),
+            icon: const Icon(Icons.notifications_none),
+          )
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref
+              .read(produitProvider(ProduitListQuery(frsId: frsId)).notifier)
+              .refresh(search: _searchCtrl.text, categorie: _selectedCategorie);
+        },
+        child: Builder(
+          builder: (context) {
+            final children = <Widget>[
+              if (isAbonne) ...[
+                Text(
+                  'Bienvenue, ${client?.prenom ?? ''}',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  client?.fournisseur?.nomFrs ?? '—',
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              _searchBar(frsId: frsId),
+              const SizedBox(height: 16),
+              if (!isAbonne) ...[
+                _sectionTitle('Nos Boutiques'),
+                const SizedBox(height: 10),
+                boutiquesAsync.when(
+                  loading: () => SizedBox(
+                    height: 110,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 3,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (_, __) => Shimmer.fromColors(
+                        baseColor: Colors.black.withValues(alpha: 0.06),
+                        highlightColor: Colors.black.withValues(alpha: 0.02),
+                        child: Container(
+                          width: 220,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  error: (_, __) => TextButton(
+                    onPressed: () => ref.invalidate(boutiquesProvider),
+                    child: const Text('Réessayer'),
+                  ),
+                  data: (boutiques) => SizedBox(
+                    height: 110,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: boutiques.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (_, i) => _boutiqueCard(boutiques[i]),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                _sectionTitle('Tous les produits',
+                    onTap: () => context.go('/home/produits')),
+                const SizedBox(height: 10),
+              ] else ...[
+                const Text(
+                  'Catégories',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 10),
+                categoriesAsync!.when(
+                  loading: () => const LinearProgressIndicator(minHeight: 2),
+                  error: (_, __) => TextButton(
+                    onPressed: () => ref.invalidate(categoriesProvider(frsId)),
+                    child: const Text('Réessayer'),
+                  ),
+                  data: (cats) => SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: cats.length + 1,
+                      itemBuilder: (_, i) {
+                        if (i == 0) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: const Text('Tous'),
+                              selected: _selectedCategorie == null,
+                              onSelected: (_) async {
+                                setState(() => _selectedCategorie = null);
+                                await ref
+                                    .read(produitProvider(
+                                            ProduitListQuery(frsId: frsId))
+                                        .notifier)
+                                    .refresh(clearCategorie: true);
+                              },
+                            ),
+                          );
+                        }
+                        final c = cats[i - 1];
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(c),
+                            selected: _selectedCategorie == c,
+                            onSelected: (_) async {
+                              setState(() => _selectedCategorie = c);
+                              await ref
+                                  .read(produitProvider(
+                                          ProduitListQuery(frsId: frsId))
+                                      .notifier)
+                                  .refresh(categorie: c);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
+              if (produitsState.isLoading && produitsState.produits.isEmpty)
+                _gridSkeleton()
+              else if (produitsState.error != null &&
+                  produitsState.produits.isEmpty)
+                ErrorState(
+                  message: produitsState.error ?? 'Erreur',
+                  onRetry: () => ref
+                      .read(produitProvider(ProduitListQuery(frsId: frsId))
+                          .notifier)
+                      .fetchProduits(page: 1),
+                )
+              else if (produitsState.produits.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Column(
+                    children: [
+                      Icon(Icons.inventory_2_outlined, size: 52),
+                      SizedBox(height: 10),
+                      Text('Aucun produit'),
+                      SizedBox(height: 6),
+                      Text(
+                        'Essayez de modifier votre recherche.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: produitsState.produits.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.62,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemBuilder: (_, i) =>
+                      ProductCard(produit: produitsState.produits[i]),
+                ),
+              if (produitsState.isLoading && produitsState.produits.isNotEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ];
+
+            return ListView.builder(
+              controller: _scrollCtrl,
+              padding: const EdgeInsets.all(16),
+              itemCount: children.length,
+              itemBuilder: (_, i) => children[i],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
