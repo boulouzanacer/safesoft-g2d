@@ -364,11 +364,32 @@ class StoreController extends Controller
 
         $cartSummary = $this->cartSummary();
 
+        $tierModels = $p->relationLoaded('quantityPrices')
+            ? $p->quantityPrices
+            : $p->quantityPrices()->get(['quantity_min', 'quantity_max', 'price']);
+
+        $tiers = $tierModels
+            ->map(fn ($t) => [
+                'quantity_min' => (int) $t->quantity_min,
+                'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
+                'price' => (float) $t->price,
+            ])
+            ->values()
+            ->all();
+
+        $tierEnabled = $p->isTierPricingEnabled() && count($tiers) > 0;
+        $initialQty = 1;
+        $initialUnit = (float) $p->prixUnitairePourQuantite($client ?? null, $initialQty);
+
         return view('store.produit', [
             'title' => $p->designation,
             'client' => $client,
             'produit' => $p,
             'images' => $images,
+            'tiers' => $tiers,
+            'tierEnabled' => $tierEnabled,
+            'initialQty' => $initialQty,
+            'initialUnit' => $initialUnit,
             'cart_total' => $cartSummary['total'],
             'cart_count' => count($cartSummary['items']),
         ]);

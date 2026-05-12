@@ -40,9 +40,10 @@
             <div class="mt-1 text-sm text-slate-600">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
 
             @php
-                $initialQty = 1;
-                $initialUnit = (float) $produit->prixUnitairePourQuantite($client ?? null, $initialQty);
-                $tiers = ($produit->relationLoaded('quantityPrices') ? $produit->quantityPrices : collect())
+                $initialQty = (int) ($initialQty ?? 1);
+                $initialUnit = (float) ($initialUnit ?? $produit->prixUnitairePourQuantite($client ?? null, $initialQty));
+
+                $tiers = $tiers ?? ($produit->relationLoaded('quantityPrices') ? $produit->quantityPrices : $produit->quantityPrices()->get(['quantity_min', 'quantity_max', 'price']))
                     ->map(fn ($t) => [
                         'quantity_min' => (int) $t->quantity_min,
                         'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
@@ -50,7 +51,8 @@
                     ])
                     ->values()
                     ->all();
-                $tierEnabled = $produit->isTierPricingEnabled() && count($tiers) > 0;
+
+                $tierEnabled = (bool) ($tierEnabled ?? ($produit->isTierPricingEnabled() && count($tiers) > 0));
             @endphp
 
             <div class="mt-4 flex items-center justify-between gap-3">
