@@ -89,6 +89,12 @@
                     </div>
 
                     <div class="mt-2 flex items-center justify-end gap-2">
+                        <a href="{{ url('/fournisseur/produits/'.$p->id) }}"
+                           class="h-8 w-8 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
+                           title="Détails">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+
                         <a href="{{ url('/fournisseur/produits/'.$p->id.'/edit') }}"
                            class="h-8 w-8 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
                            title="Modifier">

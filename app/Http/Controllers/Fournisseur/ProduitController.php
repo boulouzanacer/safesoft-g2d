@@ -205,9 +205,25 @@ class ProduitController extends Controller
             ->with('success', 'Produit créé.');
     }
 
-    public function show(int $id): RedirectResponse
+    public function show(int $id): View
     {
-        return redirect()->to("/fournisseur/produits/{$id}/edit");
+        $frsId = (int) session('frs_id');
+
+        $produit = Produit::query()
+            ->where('id_frs', $frsId)
+            ->with('quantityPrices')
+            ->findOrFail($id);
+
+        $images = ProduitImage::query()
+            ->where('id_produit', $produit->id)
+            ->orderBy('ordre')
+            ->get();
+
+        return view('fournisseur.produits.show', [
+            'title' => 'Détail Produit',
+            'produit' => $produit,
+            'images' => $images,
+        ]);
     }
 
     public function edit(int $id): View
