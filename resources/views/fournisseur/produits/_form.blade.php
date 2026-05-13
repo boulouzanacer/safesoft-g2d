@@ -158,6 +158,25 @@
     }
 @endphp
 
+@if(request()->query('debug') === '1' && isset($produit) && $produit)
+    @php
+        $dbTierCount = $produit->quantityPrices()->count();
+        $dbEnabled = (bool) ($produit->enable_tier_pricing ?? false);
+    @endphp
+    <div class="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-amber-200 text-xs">
+        <div class="font-extrabold">Debug palier</div>
+        <div class="mt-1 font-mono break-words">
+            produit_id={{ $produit->id }} |
+            db_enable={{ $dbEnabled ? '1' : '0' }} |
+            db_tiers={{ (int)$dbTierCount }} |
+            use_old={{ $useOldTier ? '1' : '0' }} |
+            old_enable={{ $tierOldEnabled === null ? 'null' : (string)$tierOldEnabled }} |
+            view_enable={{ $tierEnabled ? '1' : '0' }} |
+            view_tiers={{ count($tierDefaults) }}
+        </div>
+    </div>
+@endif
+
 <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4"
      x-data="window.__tierPricingForm({ enabled: @json($tierEnabled), tiers: @json($tierDefaults) })">
     <div class="flex items-center justify-between gap-3">
