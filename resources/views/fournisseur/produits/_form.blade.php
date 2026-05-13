@@ -91,27 +91,41 @@
                required>
     </div>
 
-    <div class="md:col-span-2 flex items-center justify-between">
-        <label class="flex items-center gap-3 cursor-pointer select-none">
-            <input type="checkbox"
-                   name="actif"
-                   value="1"
-                   class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
-                   @checked((int)old('actif', $produit->actif ?? 1) === 1)>
-            <span class="text-sm font-semibold text-white/70">Actif</span>
-        </label>
-        <div class="text-xs text-white/50">Max 5 images • WebP généré automatiquement</div>
-    </div>
+    @php
+        $actifDefault = (int) old('actif', $produit->actif ?? 1) === 1;
+        $abonneOnlyDefault = (int) old('abonne_only', $produit->abonne_only ?? 0) === 1;
+    @endphp
 
-    <div class="md:col-span-2">
-        <label class="flex items-center gap-3 cursor-pointer select-none">
-            <input type="checkbox"
-                   name="abonne_only"
-                   value="1"
-                   class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
-                   @checked((int)old('abonne_only', $produit->abonne_only ?? 0) === 1)>
-            <span class="text-sm font-semibold text-white/70">Visible uniquement pour abonnés</span>
-        </label>
+    <div class="md:col-span-2"
+         x-data="{ actif: @json($actifDefault), abonneOnly: @json($abonneOnlyDefault) }">
+        <div class="flex items-center justify-between">
+            <label class="flex items-center gap-3 cursor-pointer select-none">
+                <input type="checkbox"
+                       name="actif"
+                       value="1"
+                       class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                       @checked($actifDefault)
+                       x-model="actif">
+                <span class="text-sm font-semibold text-white/70">Actif</span>
+            </label>
+            <div class="text-xs text-white/50">Max 5 images • WebP généré automatiquement</div>
+        </div>
+
+        <div class="mt-3"
+             :class="!actif ? 'opacity-50' : ''">
+            <label class="flex items-center gap-3 cursor-pointer select-none"
+                   :class="!actif ? 'cursor-not-allowed' : ''">
+                <input type="hidden" name="abonne_only" :value="abonneOnly ? 1 : 0">
+                <input type="checkbox"
+                       name="abonne_only"
+                       value="1"
+                       class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                       @checked($abonneOnlyDefault)
+                       x-model="abonneOnly"
+                       :disabled="!actif">
+                <span class="text-sm font-semibold text-white/70">Visible uniquement pour abonnés</span>
+            </label>
+        </div>
     </div>
 </div>
 
