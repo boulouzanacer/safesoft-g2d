@@ -16,6 +16,8 @@
     </div>
 @endif
 
+<input type="hidden" name="__produit_id" value="{{ $produit->id ?? '' }}">
+
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
         <label class="block text-sm font-semibold text-white/70 mb-1">Référence</label>
@@ -114,12 +116,15 @@
 </div>
 
 @php
-    $tierOldEnabled = old('enable_tier_pricing');
+    $oldProduitId = old('__produit_id');
+    $useOldTier = $oldProduitId !== null && (string) $oldProduitId !== '' && (string) $oldProduitId === (string) ($produit->id ?? '');
+
+    $tierOldEnabled = $useOldTier ? old('enable_tier_pricing') : null;
     $tierEnabled = $tierOldEnabled !== null
         ? ((int) $tierOldEnabled === 1)
         : ((bool) ($produit?->enable_tier_pricing ?? false));
 
-    $tierOld = old('quantity_prices');
+    $tierOld = $useOldTier ? old('quantity_prices') : null;
     $tierDefaults = [];
     if (is_array($tierOld)) {
         $tierDefaults = $tierOld;
