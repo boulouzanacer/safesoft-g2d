@@ -131,7 +131,10 @@
 
 @php
     $oldProduitId = old('__produit_id');
-    $useOldTier = $oldProduitId !== null && (string) $oldProduitId !== '' && (string) $oldProduitId === (string) ($produit->id ?? '');
+    $useOldTier = $errors->any()
+        && $oldProduitId !== null
+        && (string) $oldProduitId !== ''
+        && (string) $oldProduitId === (string) ($produit->id ?? '');
 
     $tierOldEnabled = $useOldTier ? old('enable_tier_pricing') : null;
     $tierEnabled = $tierOldEnabled !== null
