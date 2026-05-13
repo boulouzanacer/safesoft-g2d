@@ -178,24 +178,23 @@
 @endif
 
 <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4"
-     x-data="window.__tierPricingForm({ enabled: @json($tierEnabled), tiers: @json($tierDefaults) })">
+     id="tierPricingRoot"
+     data-enabled="{{ $tierEnabled ? '1' : '0' }}"
+     data-tiers='@json($tierDefaults)'>
     <div class="flex items-center justify-between gap-3">
         <label class="flex items-center gap-3 cursor-pointer select-none">
             <input type="checkbox"
+                   id="tierEnabledInput"
                    name="enable_tier_pricing"
                    value="1"
-                   class="sr-only peer"
-                   @checked($tierEnabled)
-                   x-model="enabled">
-            <span class="h-5 w-5 rounded border border-white/20 bg-[var(--frs-card)] flex items-center justify-center peer-checked:bg-[var(--frs-primary)] peer-checked:border-[var(--frs-primary)]">
-                <i class="fa-solid fa-check text-white text-[10px] opacity-0 peer-checked:opacity-100"></i>
-            </span>
+                   class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
+                   @checked($tierEnabled)>
             <span class="text-sm font-extrabold text-white/80">Prix par palier</span>
         </label>
         <div class="text-xs text-white/50">Illimité • Sans chevauchement • Ignore le tarif client si activé</div>
     </div>
 
-    <div class="mt-4" x-show="enabled" style="{{ $tierEnabled ? '' : 'display:none;' }}">
+    <div class="mt-4" id="tierRowsWrap" style="{{ $tierEnabled ? '' : 'display:none;' }}">
         <div class="grid grid-cols-12 gap-2 text-xs font-bold text-white/60">
             <div class="col-span-3">Qté min</div>
             <div class="col-span-3">Qté max</div>
@@ -203,143 +202,218 @@
             <div class="col-span-2 text-right">Actions</div>
         </div>
 
-        <div class="mt-2 space-y-2">
-            <template x-for="(row, i) in tiers" :key="i">
-                <div class="grid grid-cols-12 gap-2 items-center">
-                    <div class="col-span-3">
-                        <input type="number"
-                               min="1"
-                               class="w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]"
-                               x-model.number="row.quantity_min"
-                               :name="`quantity_prices[${i}][quantity_min]`"
-                               :disabled="!enabled"
-                               @input="validate()">
-                    </div>
-                    <div class="col-span-3">
-                        <input type="number"
-                               min="1"
-                               placeholder="∞"
-                               class="w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]"
-                               x-model="row.quantity_max"
-                               :name="`quantity_prices[${i}][quantity_max]`"
-                               :disabled="!enabled"
-                               @input="validate()">
-                    </div>
-                    <div class="col-span-4">
-                        <input type="number"
-                               min="0"
-                               step="0.01"
-                               class="w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]"
-                               x-model.number="row.price"
-                               :name="`quantity_prices[${i}][price]`"
-                               :disabled="!enabled"
-                               @input="validate()">
-                    </div>
-                    <div class="col-span-2 flex justify-end">
-                        <button type="button"
-                                class="h-9 w-9 rounded-xl border border-white/10 bg-[var(--frs-card)] hover:bg-white/5 flex items-center justify-center"
-                                @click="remove(i)">
-                            <i class="fa-solid fa-trash text-white/80"></i>
-                        </button>
-                    </div>
-                </div>
-            </template>
-        </div>
+        <div class="mt-2 space-y-2" id="tierRows"></div>
 
         <div class="mt-3 flex items-center justify-between gap-3">
             <button type="button"
                     class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold border border-white/10 bg-[var(--frs-card)] hover:bg-white/5"
-                    @click="add()">
+                    id="tierAddBtn">
                 <i class="fa-solid fa-plus"></i>
                 Ajouter un palier
             </button>
-            <div class="text-xs text-red-300" x-text="error" x-show="error"></div>
+            <div class="text-xs text-red-300" id="tierError"></div>
         </div>
     </div>
 </div>
 
 <script>
-    window.__tierPricingForm = function (init) {
-        const safeBool = (v) => v === true || v === 1 || v === '1';
+    (function () {
+        const root = document.getElementById('tierPricingRoot');
+        if (!root) return;
+
+        const enabledInput = document.getElementById('tierEnabledInput');
+        const rowsWrap = document.getElementById('tierRowsWrap');
+        const rowsEl = document.getElementById('tierRows');
+        const addBtn = document.getElementById('tierAddBtn');
+        const errorEl = document.getElementById('tierError');
+
+        const parseBool = (v) => v === true || v === 1 || v === '1';
         const safeNum = (v) => (v === null || v === undefined || v === '') ? null : Number(v);
 
-        const tiers = Array.isArray(init?.tiers) ? init.tiers.map((t) => ({
-            quantity_min: Number(t.quantity_min ?? 1),
-            quantity_max: (t.quantity_max === null || t.quantity_max === '') ? null : Number(t.quantity_max),
-            price: Number(t.price ?? 0),
-        })) : [];
+        let enabled = parseBool(root.dataset.enabled);
+        let tiers = [];
+        try {
+            const raw = root.dataset.tiers || '[]';
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) {
+                tiers = arr.map((t) => ({
+                    quantity_min: Number(t.quantity_min ?? 1),
+                    quantity_max: (t.quantity_max === null || t.quantity_max === '') ? null : Number(t.quantity_max),
+                    price: Number(t.price ?? 0),
+                }));
+            }
+        } catch (_) {
+            tiers = [];
+        }
 
-        return {
-            enabled: safeBool(init?.enabled),
-            tiers: tiers.length ? tiers : [{ quantity_min: 1, quantity_max: null, price: 0 }],
-            error: '',
+        if (!tiers.length) {
+            tiers = [{ quantity_min: 1, quantity_max: null, price: 0 }];
+        }
 
-            add() {
-                const last = this.tiers[this.tiers.length - 1];
+        function setError(msg) {
+            errorEl.textContent = msg || '';
+        }
+
+        function validate() {
+            setError('');
+            if (!enabled) return true;
+
+            const rows = tiers.map((r) => ({
+                quantity_min: Number(r.quantity_min ?? 0),
+                quantity_max: (r.quantity_max === null || r.quantity_max === '') ? null : Number(r.quantity_max),
+                price: Number(r.price ?? -1),
+            }));
+
+            for (const r of rows) {
+                if (!Number.isFinite(r.quantity_min) || r.quantity_min < 1) {
+                    setError('Quantité min invalide.');
+                    return false;
+                }
+                if (r.quantity_max !== null && (!Number.isFinite(r.quantity_max) || r.quantity_max < r.quantity_min)) {
+                    setError('Quantité max doit être >= quantité min.');
+                    return false;
+                }
+                if (!Number.isFinite(r.price) || r.price < 0) {
+                    setError('Prix invalide.');
+                    return false;
+                }
+            }
+
+            rows.sort((a, b) => a.quantity_min - b.quantity_min);
+            for (let i = 1; i < rows.length; i++) {
+                const prev = rows[i - 1];
+                const cur = rows[i];
+                if (prev.quantity_max === null) {
+                    setError('Aucun palier ne peut suivre un palier sans quantité max.');
+                    return false;
+                }
+                if (cur.quantity_min <= prev.quantity_max) {
+                    setError('Chevauchement détecté entre paliers.');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function rebuildNames() {
+            rowsEl.querySelectorAll('[data-tier-row]').forEach((rowEl, i) => {
+                rowEl.querySelectorAll('[data-tier-field]').forEach((input) => {
+                    const field = input.getAttribute('data-tier-field');
+                    input.name = `quantity_prices[${i}][${field}]`;
+                });
+            });
+        }
+
+        function render() {
+            if (enabledInput) enabledInput.checked = !!enabled;
+            if (rowsWrap) rowsWrap.style.display = enabled ? '' : 'none';
+
+            rowsEl.innerHTML = '';
+
+            tiers.forEach((row, i) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'grid grid-cols-12 gap-2 items-center';
+                rowDiv.setAttribute('data-tier-row', '1');
+
+                const minWrap = document.createElement('div');
+                minWrap.className = 'col-span-3';
+                const minInput = document.createElement('input');
+                minInput.type = 'number';
+                minInput.min = '1';
+                minInput.className = 'w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]';
+                minInput.value = String(Number(row.quantity_min ?? 1));
+                minInput.disabled = !enabled;
+                minInput.setAttribute('data-tier-field', 'quantity_min');
+                minInput.addEventListener('input', () => {
+                    tiers[i].quantity_min = Number(minInput.value || 0);
+                    validate();
+                });
+                minWrap.appendChild(minInput);
+
+                const maxWrap = document.createElement('div');
+                maxWrap.className = 'col-span-3';
+                const maxInput = document.createElement('input');
+                maxInput.type = 'number';
+                maxInput.min = '1';
+                maxInput.placeholder = '∞';
+                maxInput.className = 'w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]';
+                maxInput.value = (row.quantity_max === null || row.quantity_max === undefined) ? '' : String(Number(row.quantity_max));
+                maxInput.disabled = !enabled;
+                maxInput.setAttribute('data-tier-field', 'quantity_max');
+                maxInput.addEventListener('input', () => {
+                    const v = maxInput.value;
+                    tiers[i].quantity_max = (v === '' ? null : Number(v));
+                    validate();
+                });
+                maxWrap.appendChild(maxInput);
+
+                const priceWrap = document.createElement('div');
+                priceWrap.className = 'col-span-4';
+                const priceInput = document.createElement('input');
+                priceInput.type = 'number';
+                priceInput.min = '0';
+                priceInput.step = '0.01';
+                priceInput.className = 'w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]';
+                priceInput.value = String(Number(row.price ?? 0));
+                priceInput.disabled = !enabled;
+                priceInput.setAttribute('data-tier-field', 'price');
+                priceInput.addEventListener('input', () => {
+                    tiers[i].price = Number(priceInput.value || 0);
+                    validate();
+                });
+                priceWrap.appendChild(priceInput);
+
+                const actionsWrap = document.createElement('div');
+                actionsWrap.className = 'col-span-2 flex justify-end';
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.className = 'h-9 w-9 rounded-xl border border-white/10 bg-[var(--frs-card)] hover:bg-white/5 flex items-center justify-center';
+                delBtn.disabled = !enabled;
+                delBtn.innerHTML = '<i class="fa-solid fa-trash text-white/80"></i>';
+                delBtn.addEventListener('click', () => {
+                    tiers.splice(i, 1);
+                    if (tiers.length === 0) tiers.push({ quantity_min: 1, quantity_max: null, price: 0 });
+                    render();
+                    validate();
+                });
+                actionsWrap.appendChild(delBtn);
+
+                rowDiv.appendChild(minWrap);
+                rowDiv.appendChild(maxWrap);
+                rowDiv.appendChild(priceWrap);
+                rowDiv.appendChild(actionsWrap);
+
+                rowsEl.appendChild(rowDiv);
+            });
+
+            rebuildNames();
+            validate();
+        }
+
+        if (enabledInput) {
+            enabledInput.addEventListener('change', () => {
+                enabled = !!enabledInput.checked;
+                render();
+            });
+        }
+
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                const last = tiers[tiers.length - 1];
                 const lastMax = safeNum(last?.quantity_max);
                 if (lastMax === null) {
-                    this.error = 'Définissez une quantité max pour le dernier palier avant d’en ajouter un autre.';
+                    setError('Définissez une quantité max pour le dernier palier avant d’en ajouter un autre.');
                     return;
                 }
-                this.tiers.push({ quantity_min: lastMax + 1, quantity_max: null, price: 0 });
-                this.validate();
-            },
-
-            remove(i) {
-                this.tiers.splice(i, 1);
-                if (this.tiers.length === 0) {
-                    this.tiers.push({ quantity_min: 1, quantity_max: null, price: 0 });
-                }
-                this.validate();
-            },
-
-            validate() {
-                this.error = '';
-                if (!this.enabled) return true;
-
-                const rows = this.tiers.map((r) => ({
-                    quantity_min: Number(r.quantity_min ?? 0),
-                    quantity_max: (r.quantity_max === null || r.quantity_max === '') ? null : Number(r.quantity_max),
-                    price: Number(r.price ?? -1),
-                }));
-
-                for (const r of rows) {
-                    if (!Number.isFinite(r.quantity_min) || r.quantity_min < 1) {
-                        this.error = 'Quantité min invalide.';
-                        return false;
-                    }
-                    if (r.quantity_max !== null && (!Number.isFinite(r.quantity_max) || r.quantity_max < r.quantity_min)) {
-                        this.error = 'Quantité max doit être >= quantité min.';
-                        return false;
-                    }
-                    if (!Number.isFinite(r.price) || r.price < 0) {
-                        this.error = 'Prix invalide.';
-                        return false;
-                    }
-                }
-
-                rows.sort((a, b) => a.quantity_min - b.quantity_min);
-                for (let i = 1; i < rows.length; i++) {
-                    const prev = rows[i - 1];
-                    const cur = rows[i];
-                    if (prev.quantity_max === null) {
-                        this.error = 'Aucun palier ne peut suivre un palier sans quantité max.';
-                        return false;
-                    }
-                    if (cur.quantity_min <= prev.quantity_max) {
-                        this.error = 'Chevauchement détecté entre paliers.';
-                        return false;
-                    }
-                }
-
-                return true;
-            },
-
-            init() {
-                this.validate();
-            },
+                tiers.push({ quantity_min: lastMax + 1, quantity_max: null, price: 0 });
+                render();
+            });
         }
-    }
+
+        enabled = !!(enabledInput ? enabledInput.checked : enabled);
+        render();
+    })();
 </script>
 
 <div class="mt-6">
