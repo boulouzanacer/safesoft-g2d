@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,6 +46,32 @@ class Client extends Authenticatable
         'email_verified_at' => 'datetime',
         'email_verification_expires_at' => 'datetime',
     ];
+
+    public function scopeSimpleRoot(Builder $query): Builder
+    {
+        return $query
+            ->where('type_client', 'simple')
+            ->whereNull('id_frs');
+    }
+
+    public static function findSimpleByEmail(string $email): ?self
+    {
+        return static::query()
+            ->simpleRoot()
+            ->where('email', $email)
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    public static function findForFournisseurByEmail(int $frsId, string $email): ?self
+    {
+        return static::query()
+            ->where('id_frs', $frsId)
+            ->where('email', $email)
+            ->orderByRaw("CASE WHEN type_client = 'abonne' THEN 0 ELSE 1 END")
+            ->orderByDesc('id')
+            ->first();
+    }
 
     public function fournisseur(): BelongsTo
     {

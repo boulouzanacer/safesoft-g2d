@@ -29,9 +29,14 @@ class ClientAuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $client = Client::query()->where('email', $credentials['email'])->first();
+        $client = Client::query()
+            ->where('email', $credentials['email'])
+            ->orderByRaw("CASE WHEN type_client = 'simple' AND id_frs IS NULL THEN 0 ELSE 1 END")
+            ->orderByDesc('id')
+            ->get()
+            ->first(fn (Client $candidate) => Hash::check($credentials['password'], $candidate->password));
 
-        if (! $client || ! Hash::check($credentials['password'], $client->password)) {
+        if (! $client) {
             return back()
                 ->withInput($request->only('email'))
                 ->withErrors(['email' => 'Identifiants invalides.']);
@@ -96,15 +101,9 @@ class ClientAuthController extends Controller
             ? (int) $data['id_commune']
             : (int) (DB::table('commune')->where('ID_WILAYA', $idWilaya)->min('ID_COMMUNE') ?? 1);
 
-        $existing = Client::query()->where('email', $data['email'])->first();
+        $existing = Client::findSimpleByEmail($data['email']);
 
         if ($existing && ! empty($existing->email_verified_at)) {
-            return back()
-                ->withInput($request->only('nom', 'prenom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
-                ->withErrors(['email' => 'Email déjà utilisé.']);
-        }
-
-        if ($existing && $existing->type_client !== 'simple') {
             return back()
                 ->withInput($request->only('nom', 'prenom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
                 ->withErrors(['email' => 'Email déjà utilisé.']);

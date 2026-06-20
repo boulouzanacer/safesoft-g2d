@@ -33,13 +33,9 @@ class AuthController extends Controller
             ? (int) $data['id_commune']
             : (int) (DB::table('commune')->where('ID_WILAYA', $idWilaya)->min('ID_COMMUNE') ?? 1);
 
-        $existing = Client::query()->where('email', $data['email'])->first();
+        $existing = Client::findSimpleByEmail($data['email']);
 
         if ($existing && ! empty($existing->email_verified_at)) {
-            return $this->error('Email déjà utilisé', null, 422);
-        }
-
-        if ($existing && $existing->type_client !== 'simple') {
             return $this->error('Email déjà utilisé', null, 422);
         }
 
@@ -77,9 +73,14 @@ class AuthController extends Controller
     {
         $data = $request->validated();
 
-        $client = Client::query()->where('email', $data['email'])->first();
+        $client = Client::query()
+            ->where('email', $data['email'])
+            ->orderByRaw("CASE WHEN type_client = 'simple' AND id_frs IS NULL THEN 0 ELSE 1 END")
+            ->orderByDesc('id')
+            ->get()
+            ->first(fn (Client $candidate) => Hash::check($data['password'], $candidate->password));
 
-        if (! $client || ! Hash::check($data['password'], $client->password)) {
+        if (! $client) {
             return $this->error('Identifiants invalides', null, 401);
         }
 
@@ -130,13 +131,9 @@ class AuthController extends Controller
             'code' => ['required', 'string', 'size:6'],
         ]);
 
-        $client = Client::query()->where('email', $data['email'])->first();
+        $client = Client::findSimpleByEmail($data['email']);
         if (! $client) {
             return $this->notFound();
-        }
-
-        if ($client->type_client !== 'simple') {
-            return $this->error('Non autorisé', null, 403);
         }
 
         if (! empty($client->email_verified_at)) {
@@ -198,13 +195,9 @@ class AuthController extends Controller
             'email' => ['required', 'email', 'max:255'],
         ]);
 
-        $client = Client::query()->where('email', $data['email'])->first();
+        $client = Client::findSimpleByEmail($data['email']);
         if (! $client) {
             return $this->notFound();
-        }
-
-        if ($client->type_client !== 'simple') {
-            return $this->error('Non autorisé', null, 403);
         }
 
         if (! empty($client->email_verified_at)) {
