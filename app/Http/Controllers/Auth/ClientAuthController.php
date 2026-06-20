@@ -226,6 +226,37 @@ class ClientAuthController extends Controller
         return redirect()->to('/register')->with('success', 'Code renvoyé.');
     }
 
+    public function restartRegister(Request $request): RedirectResponse
+    {
+        $pendingId = (int) $request->session()->get('pending_client_id');
+        $input = [];
+
+        if ($pendingId > 0) {
+            $client = Client::query()->find($pendingId);
+
+            if ($client && $client->type_client === 'simple' && empty($client->email_verified_at)) {
+                $input = [
+                    'nom' => $client->nom,
+                    'prenom' => $client->prenom,
+                    'email' => $client->email,
+                    'telephone' => $client->telephone,
+                    'adresse' => $client->adresse,
+                    'id_wilaya' => $client->id_wilaya,
+                    'id_commune' => $client->id_commune,
+                ];
+
+                $client->delete();
+            }
+        }
+
+        $request->session()->forget(['pending_client_id', 'pending_client_email']);
+
+        return redirect()
+            ->to('/register')
+            ->withInput($input)
+            ->with('info', 'Vous pouvez corriger votre adresse email et recréer le compte.');
+    }
+
     private function sendEmailVerificationCode(Client $client): bool
     {
         $code = (string) random_int(100000, 999999);

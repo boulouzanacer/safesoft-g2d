@@ -41,6 +41,14 @@
                     Renvoyer le code
                 </button>
             </form>
+
+            <form method="POST" action="{{ url('/register/restart') }}" class="mt-3">
+                @csrf
+                <button type="submit"
+                        class="w-full rounded-2xl px-4 py-3 font-bold border border-slate-200 hover:bg-slate-50">
+                    Adresse email incorrecte ? Recréer le compte
+                </button>
+            </form>
         @else
             <form method="POST" action="{{ url('/register') }}" class="mt-6 space-y-4">
                 @csrf
@@ -169,6 +177,18 @@
             Déjà un compte ?
             <a href="{{ url('/login') }}" class="text-[var(--store-primary)] font-bold hover:underline">Se connecter</a>
         </div>
+
+        @if(session('pending_client_id'))
+            <div class="mt-2 text-sm text-slate-600">
+                Besoin de corriger l'email ?
+                <form method="POST" action="{{ url('/register/restart') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="text-[var(--store-primary)] font-bold hover:underline">
+                        Recréer le compte
+                    </button>
+                </form>
+            </div>
+        @endif
     </div>
 </div>
 
