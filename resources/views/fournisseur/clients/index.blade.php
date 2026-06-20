@@ -7,7 +7,7 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
             <input name="q"
                    value="{{ $q }}"
-                   placeholder="Rechercher nom ou code client..."
+                   placeholder="Rechercher nom, code, email ou téléphone..."
                    class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--frs-primary)]">
         </div>
         <button class="rounded-2xl px-4 py-3 font-bold text-white"
@@ -29,6 +29,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Nom</th>
                         <th class="text-left py-3 px-4 font-semibold">Email</th>
                         <th class="text-left py-3 px-4 font-semibold">Téléphone</th>
+                        <th class="text-left py-3 px-4 font-semibold">Type</th>
                         <th class="text-left py-3 px-4 font-semibold">Commune</th>
                         <th class="text-right py-3 px-4 font-semibold">Nb commandes</th>
                     </tr>
@@ -41,12 +42,17 @@
                             <td class="py-3 px-4 text-white/80">{{ $c->prenom }} {{ $c->nom }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->email }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->telephone }}</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $c->type_client === 'abonne' ? 'bg-sky-500/15 text-sky-300 border border-sky-400/20' : 'bg-white/10 text-white/70 border border-white/10' }}">
+                                    {{ $c->type_client }}
+                                </span>
+                            </td>
                             <td class="py-3 px-4 text-white/80">{{ $c->commune_nom ?? '-' }}</td>
                             <td class="py-3 px-4 text-right font-extrabold">{{ (int)$c->nb_commandes }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-10 text-center text-white/60">Aucun client abonné</td>
+                            <td colspan="7" class="py-10 text-center text-white/60">Aucun client</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -59,4 +65,3 @@
     </div>
 </div>
 @endsection
-

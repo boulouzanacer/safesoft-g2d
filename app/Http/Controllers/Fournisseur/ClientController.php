@@ -32,12 +32,13 @@ class ClientController extends Controller
                 DB::raw('COALESCE(cc.nb, 0) as nb_commandes'),
             ])
             ->where('client.id_frs', $frsId)
-            ->where('client.type_client', 'abonne')
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('client.nom', 'like', "%{$q}%")
                         ->orWhere('client.prenom', 'like', "%{$q}%")
-                        ->orWhere('client.code_client', 'like', "%{$q}%");
+                        ->orWhere('client.code_client', 'like', "%{$q}%")
+                        ->orWhere('client.email', 'like', "%{$q}%")
+                        ->orWhere('client.telephone', 'like', "%{$q}%");
                 });
             })
             ->orderByDesc('client.created_at')
@@ -57,7 +58,6 @@ class ClientController extends Controller
 
         $client = Client::query()
             ->where('id_frs', $frsId)
-            ->where('type_client', 'abonne')
             ->findOrFail($id);
 
         $commandes = Cmd1::query()
@@ -73,4 +73,3 @@ class ClientController extends Controller
         ]);
     }
 }
-

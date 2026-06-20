@@ -125,6 +125,26 @@ class StoreController extends Controller
         return $this->fournisseurClientFor($client, $frsId) !== null;
     }
 
+    private function relatedClientIds(?Client $client): array
+    {
+        if (! $client) {
+            return [];
+        }
+
+        $email = trim((string) $client->email);
+        if ($email === '') {
+            return [(int) $client->id];
+        }
+
+        return Client::query()
+            ->where('email', $email)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     private function cartFournisseurId(): ?int
     {
         $id = session('cart_frs_id');
@@ -820,10 +840,12 @@ class StoreController extends Controller
             return redirect()->to('/login')->with('error', 'Connectez-vous pour continuer.');
         }
 
+        $clientIds = $this->relatedClientIds($client);
+
         $commandes = Cmd1::query()
             ->leftJoin('frs', 'frs.id', '=', 'cmd1.id_frs')
             ->select(['cmd1.*', 'frs.nom_frs as frs_nom'])
-            ->where('cmd1.id_client', $client->id)
+            ->whereIn('cmd1.id_client', $clientIds)
             ->orderByDesc('cmd1.date_cmd')
             ->paginate(15);
 
@@ -842,10 +864,12 @@ class StoreController extends Controller
             return redirect()->to('/login')->with('error', 'Connectez-vous pour continuer.');
         }
 
+        $clientIds = $this->relatedClientIds($client);
+
         $commande = Cmd1::query()
             ->leftJoin('frs', 'frs.id', '=', 'cmd1.id_frs')
             ->select(['cmd1.*', 'frs.nom_frs as frs_nom'])
-            ->where('cmd1.id_client', $client->id)
+            ->whereIn('cmd1.id_client', $clientIds)
             ->where('cmd1.id', $id)
             ->firstOrFail();
 
