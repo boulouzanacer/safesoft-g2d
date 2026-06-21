@@ -6,96 +6,162 @@
     $versementClient = (float) ($client->versement_client ?? 0);
     $soldeClient = (float) ($client->solde_client ?? 0);
     $soldeBadge = $soldeClient > 0
-        ? 'from-red-500/20 to-red-500/5 border-red-400/20 text-red-200'
+        ? 'border-red-400/20 from-red-500/20 to-red-500/5 text-red-200'
         : ($soldeClient < 0
-            ? 'from-emerald-500/20 to-emerald-500/5 border-emerald-400/20 text-emerald-200'
-            : 'from-slate-500/20 to-slate-500/5 border-white/10 text-white');
+            ? 'border-emerald-400/20 from-emerald-500/20 to-emerald-500/5 text-emerald-200'
+            : 'border-white/10 from-slate-500/20 to-slate-500/5 text-white');
+    $typeBadge = (string) ($client->type_client ?? '') === 'abonne'
+        ? 'border-sky-400/20 bg-sky-500/15 text-sky-200'
+        : 'border-white/10 bg-white/5 text-white/80';
+    $statusBadge = (int) ($client->actif ?? 0) === 1
+        ? 'border-emerald-400/20 bg-emerald-500/15 text-emerald-200'
+        : 'border-red-400/20 bg-red-500/15 text-red-200';
 @endphp
-<div class="space-y-4">
-    <div class="flex items-center justify-between">
-        <div>
-            <div class="text-2xl font-extrabold tracking-wide">{{ $client->prenom }} {{ $client->nom }}</div>
-            <div class="text-sm text-white/60">{{ $client->email }}</div>
+<div class="max-w-7xl space-y-6">
+    <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="h-16 w-16 shrink-0 rounded-2xl bg-[var(--frs-primary)]/15 text-[var(--frs-primary)] flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-2xl font-extrabold tracking-wide break-words">{{ $client->prenom }} {{ $client->nom }}</div>
+                    <div class="mt-1 text-sm text-white/60 break-all">{{ $client->email ?: '-' }}</div>
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold {{ $typeBadge }}">
+                            {{ $client->type_client ?: 'client' }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold {{ $statusBadge }}">
+                            {{ (int) ($client->actif ?? 0) === 1 ? 'Actif' : 'Inactif' }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/80">
+                            Tarif {{ (int) ($client->tarif ?? 1) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ url('/fournisseur/commandes?client='.$client->id) }}"
+                   class="rounded-2xl px-4 py-3 text-sm font-bold border border-white/10 hover:bg-white/10">
+                    Voir commandes
+                </a>
+                <a href="{{ url('/fournisseur/clients') }}"
+                   class="rounded-2xl px-4 py-3 text-sm font-bold border border-white/10 hover:bg-white/10">
+                    Retour
+                </a>
+            </div>
         </div>
-        <a href="{{ url('/fournisseur/clients') }}"
-           class="rounded-2xl px-4 py-3 font-bold border border-white/10 hover:bg-white/10">
-            Retour
-        </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="rounded-3xl border border-sky-400/20 bg-gradient-to-br from-sky-500/20 to-sky-500/5 p-5 shadow-lg shadow-sky-950/10">
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/80">Achat Client</div>
-                    <div class="mt-2 text-3xl font-extrabold text-sky-100">{{ number_format($achatClient, 2, '.', ' ') }}</div>
+                    <div class="mt-2 text-3xl font-extrabold text-sky-100 break-words">{{ number_format($achatClient, 2, '.', ' ') }}</div>
                 </div>
-                <div class="h-12 w-12 rounded-2xl bg-sky-500/15 text-sky-200 flex items-center justify-center text-xl">
+                <div class="h-12 w-12 shrink-0 rounded-2xl bg-sky-500/15 text-sky-200 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-cart-shopping"></i>
                 </div>
             </div>
-            <div class="mt-3 text-xs text-sky-100/70">Total des achats du client chez ce fournisseur.</div>
+            <div class="mt-3 text-xs text-sky-100/70">Total purchases for this client with this fournisseur.</div>
         </div>
 
         <div class="rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-5 shadow-lg shadow-emerald-950/10">
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200/80">Versement Client</div>
-                    <div class="mt-2 text-3xl font-extrabold text-emerald-100">{{ number_format($versementClient, 2, '.', ' ') }}</div>
+                    <div class="mt-2 text-3xl font-extrabold text-emerald-100 break-words">{{ number_format($versementClient, 2, '.', ' ') }}</div>
                 </div>
-                <div class="h-12 w-12 rounded-2xl bg-emerald-500/15 text-emerald-200 flex items-center justify-center text-xl">
+                <div class="h-12 w-12 shrink-0 rounded-2xl bg-emerald-500/15 text-emerald-200 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
             </div>
-            <div class="mt-3 text-xs text-emerald-100/70">Montant total verse par le client.</div>
+            <div class="mt-3 text-xs text-emerald-100/70">Total payments received from this client.</div>
         </div>
 
         <div class="rounded-3xl border bg-gradient-to-br p-5 shadow-lg {{ $soldeBadge }}">
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Solde Client</div>
-                    <div class="mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
+                    <div class="mt-2 text-3xl font-extrabold break-words">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
                 </div>
-                <div class="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-xl">
+                <div class="h-12 w-12 shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-scale-balanced"></i>
                 </div>
             </div>
             <div class="mt-3 text-xs text-white/70">
-                {{ $soldeClient > 0 ? 'Solde a recouvrer.' : ($soldeClient < 0 ? 'Client crediteur.' : 'Compte equilibre.') }}
+                {{ $soldeClient > 0 ? 'Outstanding balance to collect.' : ($soldeClient < 0 ? 'Client has credit available.' : 'Account is balanced.') }}
             </div>
         </div>
     </div>
 
-        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
-            <div class="text-sm text-white/60">Code client</div>
-            <div class="font-extrabold mt-1">{{ $client->code_client ?? '-' }}</div>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="xl:col-span-2 rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
+            <div class="flex items-center justify-between gap-3">
+                <div class="font-extrabold tracking-wide">Client Information</div>
+                <div class="text-xs text-white/50">Structured overview</div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Code Client</div>
+                    <div class="mt-2 font-extrabold break-words">{{ $client->code_client ?: '-' }}</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Telephone</div>
+                    <div class="mt-2 font-extrabold break-words">{{ $client->telephone ?: '-' }}</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Type</div>
+                    <div class="mt-2 font-extrabold capitalize">{{ $client->type_client ?: '-' }}</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Tarif</div>
+                    <div class="mt-2 font-extrabold">PV {{ (int) ($client->tarif ?? 1) }}</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4 md:col-span-2">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Adresse</div>
+                    <div class="mt-2 font-semibold text-white/85 break-words">{{ trim((string) $client->adresse) !== '' ? $client->adresse : '-' }}</div>
+                </div>
+            </div>
         </div>
-        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
-        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
-            <div class="text-sm text-white/60">Téléphone</div>
-            <div class="font-extrabold mt-1">{{ $client->telephone ?? '-' }}</div>
-        </div>
-        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
-            <div class="text-sm text-white/60">Type</div>
-            <div class="font-extrabold mt-1">{{ $client->type_client }}</div>
-        </div>
-        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
-            <div class="text-sm text-white/60">Tarif</div>
-            <div class="font-extrabold mt-1">{{ (int)($client->tarif ?? 1) }}</div>
+
+        <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
+            <div class="font-extrabold tracking-wide">Quick Summary</div>
+            <div class="mt-5 space-y-3 text-sm">
+                <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    <span class="text-white/60">Client ID</span>
+                    <span class="font-extrabold">#{{ $client->id }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    <span class="text-white/60">Orders</span>
+                    <span class="font-extrabold">{{ $commandes->total() }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    <span class="text-white/60">Status</span>
+                    <span class="font-extrabold {{ (int) ($client->actif ?? 0) === 1 ? 'text-emerald-300' : 'text-red-300' }}">
+                        {{ (int) ($client->actif ?? 0) === 1 ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    <span class="text-white/60">Email</span>
+                    <span class="font-extrabold truncate max-w-[12rem] text-right">{{ $client->email ?: '-' }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
-        <div class="font-extrabold tracking-wide mb-3">Adresse</div>
-        <div class="text-white/80">{{ $client->adresse }}</div>
-    </div>
-
-    <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4">
-            <div class="font-extrabold tracking-wide">Historique commandes</div>
-            <a href="{{ url('/fournisseur/commandes?client='.$client->id) }}" class="text-sm text-[var(--frs-primary)] hover:opacity-90">
-                Voir dans commandes
+    <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] overflow-hidden">
+        <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <div class="font-extrabold tracking-wide">Order History</div>
+                <div class="text-sm text-white/50">Recent commandes linked to this client.</div>
+            </div>
+            <a href="{{ url('/fournisseur/commandes?client='.$client->id) }}"
+               class="text-sm font-bold text-[var(--frs-primary)] hover:opacity-90">
+                Open full commandes list
             </a>
         </div>
 
@@ -105,9 +171,9 @@
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">#</th>
                         <th class="text-left py-3 px-4 font-semibold">Date</th>
-                        <th class="text-left py-3 px-4 font-semibold">Statut</th>
-                        <th class="text-right py-3 px-4 font-semibold">Montant</th>
-                        <th class="text-right py-3 px-4 font-semibold"></th>
+                        <th class="text-left py-3 px-4 font-semibold">Status</th>
+                        <th class="text-right py-3 px-4 font-semibold">Amount</th>
+                        <th class="text-right py-3 px-4 font-semibold">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -123,22 +189,24 @@
                             };
                         @endphp
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 px-4 font-semibold">#{{ $c->id }}</td>
-                            <td class="py-3 px-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="py-3 px-4 font-semibold whitespace-nowrap">#{{ $c->id }}</td>
+                            <td class="py-3 px-4 text-white/80 whitespace-nowrap">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
                             <td class="py-3 px-4">
-                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $c->statut }}</span>
+                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold {{ $badge }}">
+                                    {{ $c->statut }}
+                                </span>
                             </td>
-                            <td class="py-3 px-4 text-right font-extrabold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
+                            <td class="py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float) $c->montant_total, 2, '.', ' ') }}</td>
                             <td class="py-3 px-4 text-right">
                                 <a href="{{ url('/fournisseur/commandes/'.$c->id) }}"
-                                   class="rounded-xl px-3 py-2 text-xs font-bold border border-white/10 hover:bg-white/10">
-                                    Détail
+                                   class="inline-flex items-center rounded-xl px-3 py-2 text-xs font-bold border border-white/10 hover:bg-white/10">
+                                    Detail
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-10 text-center text-white/60">Aucune commande</td>
+                            <td colspan="5" class="py-10 text-center text-white/60">No orders found for this client.</td>
                         </tr>
                     @endforelse
                 </tbody>
