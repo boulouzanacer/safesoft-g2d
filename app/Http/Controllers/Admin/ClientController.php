@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Fournisseur;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -42,5 +43,18 @@ class ClientController extends Controller
             'selected_fournisseur' => $fournisseurId,
             'q' => $q,
         ]);
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $client = Client::query()->findOrFail($id);
+
+        if ($client->id_frs !== null) {
+            return back()->with('error', 'Seuls les clients sans fournisseur peuvent etre supprimes ici.');
+        }
+
+        $client->delete();
+
+        return back()->with('success', 'Client supprime.');
     }
 }

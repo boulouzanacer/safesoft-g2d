@@ -2,6 +2,18 @@
 
 @section('content')
 <div class="space-y-4">
+    @if(session('success'))
+        <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-200">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-red-200">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <form id="clientsFiltersForm" method="GET" action="{{ url('/admin/clients') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <div class="md:col-span-2">
             <div class="relative">
@@ -39,6 +51,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Fournisseur</th>
                         <th class="text-left py-3 px-4 font-semibold">Synced PME</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
+                        <th class="text-right py-3 px-4 font-semibold">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -58,10 +71,28 @@
                                     {{ (int)$c->actif === 1 ? 'Actif' : 'Inactif' }}
                                 </span>
                             </td>
+                            <td class="py-3 px-4">
+                                <div class="flex items-center justify-end">
+                                    @if($c->id_frs === null)
+                                        <form method="POST" action="{{ url('/admin/clients/'.$c->id) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    onclick="return confirm('Supprimer ce client sans fournisseur ?')"
+                                                    class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
+                                                    title="Supprimer">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-xs text-white/40">-</span>
+                                    @endif
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-10 text-center text-white/60">Aucun client</td>
+                            <td colspan="7" class="py-10 text-center text-white/60">Aucun client</td>
                         </tr>
                     @endforelse
                 </tbody>
