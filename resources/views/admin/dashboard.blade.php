@@ -118,7 +118,17 @@
                     <tr class="hover:bg-white/5">
                         <td class="py-3 pr-4 font-semibold">#{{ $c->id }}</td>
                         <td class="py-3 pr-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
-                        <td class="py-3 pr-4 text-white/80">{{ trim(($c->client_prenom ?? '').' '.($c->client_nom ?? '')) }}</td>
+                        <td class="py-3 pr-4 text-white/80">
+                            @if((int)($c->client_id ?? 0) > 0)
+                                <a href="{{ url('/admin/clients/'.$c->client_id) }}"
+                                   class="inline-flex items-center gap-2 font-semibold text-sky-300 hover:text-sky-200">
+                                    <span>{{ trim(($c->client_prenom ?? '').' '.($c->client_nom ?? '')) }}</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                </a>
+                            @else
+                                {{ trim(($c->client_prenom ?? '').' '.($c->client_nom ?? '')) }}
+                            @endif
+                        </td>
                         <td class="py-3 pr-4 text-white/80">{{ $c->frs_nom }}</td>
                         <td class="py-3 pr-4">
                             <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
@@ -164,4 +174,3 @@
     });
 </script>
 @endsection
-

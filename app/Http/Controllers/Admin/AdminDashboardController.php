@@ -46,6 +46,7 @@ class AdminDashboardController extends Controller
             ->leftJoin('frs', 'frs.id', '=', 'cmd1.id_frs')
             ->select([
                 'cmd1.id',
+                'client.id as client_id',
                 'cmd1.date_cmd',
                 'cmd1.statut',
                 'cmd1.montant_total',
@@ -76,4 +77,3 @@ class AdminDashboardController extends Controller
         ]);
     }
 }
-

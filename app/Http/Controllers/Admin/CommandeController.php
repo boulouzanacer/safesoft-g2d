@@ -23,6 +23,7 @@ class CommandeController extends Controller
             ->leftJoin('frs', 'frs.id', '=', 'cmd1.id_frs')
             ->select([
                 'cmd1.*',
+                'client.id as client_id',
                 'client.nom as client_nom',
                 'client.prenom as client_prenom',
                 'frs.nom_frs as frs_nom',
@@ -63,4 +64,3 @@ class CommandeController extends Controller
         ]);
     }
 }
-
