@@ -14,6 +14,7 @@ class PmeSyncClientsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'synced' => ['nullable', 'integer', 'in:0,1'],
             'clients' => ['required', 'array', 'min:1'],
             'clients.*.code_client' => ['required', 'string', 'max:50'],
             'clients.*.nom' => ['required', 'string', 'max:255'],

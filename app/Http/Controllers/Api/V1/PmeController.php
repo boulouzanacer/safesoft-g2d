@@ -107,7 +107,9 @@ class PmeController extends Controller
     public function syncClients(PmeSyncClientsRequest $request)
     {
         $frs = $request->attributes->get('fournisseur');
-        $payload = $request->validated()['clients'];
+        $validated = $request->validated();
+        $payload = $validated['clients'];
+        $syncedPme = (int) ($validated['synced'] ?? 1) === 1 ? 1 : 0;
 
         $inserted = 0;
         $updated = 0;
@@ -138,6 +140,7 @@ class PmeController extends Controller
                     'type_client' => 'abonne',
                     'tarif' => (int) ($item['tarif'] ?? 1),
                     'id_frs' => $frs->id,
+                    'synced_pme' => $syncedPme,
                     'actif' => 1,
                     'email_verified_at' => now(),
                 ];
@@ -164,6 +167,42 @@ class PmeController extends Controller
             'nb_erreurs' => count($failed),
             'erreurs' => $failed,
         ], 'Sync clients terminé');
+    }
+
+    public function clients(Request $request)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        $synced = $request->query('synced');
+        $typeClient = trim((string) $request->query('type_client', ''));
+
+        $items = Client::query()
+            ->where('id_frs', $frs->id)
+            ->when(in_array((string) $synced, ['0', '1'], true), fn ($q) => $q->where('synced_pme', (int) $synced))
+            ->when(in_array($typeClient, ['simple', 'abonne'], true), fn ($q) => $q->where('type_client', $typeClient))
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->limit(500)
+            ->get()
+            ->map(fn (Client $client) => [
+                'id' => (int) $client->id,
+                'code_client' => $client->code_client,
+                'nom' => $client->nom,
+                'prenom' => $client->prenom,
+                'email' => $client->email,
+                'telephone' => $client->telephone,
+                'adresse' => $client->adresse,
+                'id_wilaya' => (int) $client->id_wilaya,
+                'id_commune' => (int) $client->id_commune,
+                'type_client' => (string) $client->type_client,
+                'tarif' => (int) ($client->tarif ?? 1),
+                'actif' => (int) $client->actif,
+                'synced_pme' => (int) ($client->synced_pme ?? 0),
+                'created_at' => optional($client->created_at)?->toISOString(),
+                'updated_at' => optional($client->updated_at)?->toISOString(),
+            ])
+            ->values();
+
+        return $this->success($items, 'Clients PME');
     }
 
     public function syncProduits(PmeSyncProduitsRequest $request)

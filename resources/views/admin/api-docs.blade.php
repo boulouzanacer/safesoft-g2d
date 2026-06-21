@@ -409,9 +409,9 @@
                 <div class="mt-4 space-y-3 text-sm text-white/80">
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">
                         <div class="font-bold">POST /pme/sync-clients</div>
-                        <div class="mt-2 text-xs text-white/70">Synchroniser des clients abonnés (tarif 1|2|3).</div>
+                        <div class="mt-2 text-xs text-white/70">Synchroniser des clients abonnés (tarif 1|2|3). Le champ racine <span class="font-mono">synced</span> accepte <span class="font-mono">0|1</span> et vaut <span class="font-mono">1</span> par défaut.</div>
                         <div class="mt-3 font-mono text-xs leading-relaxed break-words">
-                            { "clients": [ { "code_client": "C001", "nom": "A", "prenom": "B", "email": "abonne@example.com", "password": "Pass@12345", "id_wilaya": 16, "id_commune": 1601, "tarif": 2 } ] }
+                            { "synced": 1, "clients": [ { "code_client": "C001", "nom": "A", "prenom": "B", "email": "abonne@example.com", "password": "Pass@12345", "id_wilaya": 16, "id_commune": 1601, "tarif": 2 } ] }
                         </div>
 
                         <div class="mt-4" x-data="{ lang: 'python' }">
@@ -449,12 +449,12 @@
 
 url = "{{ url('/api/v1/pme/sync-clients') }}"
 headers = {"Accept":"application/json","Authorization":"Bearer YOUR_FOURNISSEUR_TOKEN","Content-Type":"application/json"}
-payload = {"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}
+payload = {"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}
 res = requests.post(url, headers=headers, json=payload)
 print(res.status_code, res.json())</pre>
 
                             <pre x-show="lang==='node'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">const url = "{{ url('/api/v1/pme/sync-clients') }}";
-const payload = { clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] };
+const payload = { synced: 1, clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] };
 
 const res = await fetch(url, {
   method: "POST",
@@ -469,6 +469,7 @@ console.log(res.status, await res.json());</pre>
 
                             <pre x-show="lang==='php'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">$url = "{{ url('/api/v1/pme/sync-clients') }}";
 $payload = json_encode([
+  "synced" =&gt; 1,
   "clients" =&gt; [[
     "code_client" =&gt; "C001","nom" =&gt; "A","prenom" =&gt; "B","email" =&gt; "abonne@example.com",
     "password" =&gt; "Pass@12345","id_wilaya" =&gt; 16,"id_commune" =&gt; 1601,"tarif" =&gt; 2
@@ -501,6 +502,7 @@ http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("appli
 http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer","YOUR_FOURNISSEUR_TOKEN");
 
 var payload = new {
+  synced = 1,
   clients = new[] { new { code_client="C001", nom="A", prenom="B", email="abonne@example.com", password="Pass@12345", id_wilaya=16, id_commune=1601, tarif=2 } }
 };
 var json = JsonSerializer.Serialize(payload);
@@ -520,7 +522,7 @@ req = Net::HTTP::Post.new(uri)
 req["Accept"] = "application/json"
 req["Content-Type"] = "application/json"
 req["Authorization"] = "Bearer YOUR_FOURNISSEUR_TOKEN"
-req.body = JSON.generate({ clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] })
+req.body = JSON.generate({ synced: 1, clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] })
 
 res = http.request(req)
 puts res.code
@@ -536,7 +538,7 @@ import (
 
 func main() {
   url := "{{ url('/api/v1/pme/sync-clients') }}"
-  body := []byte(`{"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}`)
+  body := []byte(`{"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}`)
   req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
   req.Header.Set("Accept", "application/json")
   req.Header.Set("Content-Type", "application/json")
@@ -554,7 +556,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 val url = "{{ url('/api/v1/pme/sync-clients') }}"
-val json = """{"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}"""
+val json = """{"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}"""
 val client = OkHttpClient()
 val req = Request.Builder()
   .url(url)
@@ -572,6 +574,7 @@ import "package:http/http.dart" as http;
 
 final url = Uri.parse("{{ url('/api/v1/pme/sync-clients') }}");
 final payload = {
+  "synced": 1,
   "clients": [
     {"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}
   ]
@@ -600,7 +603,7 @@ var
   Json: string;
 begin
   Url := '{{ url('/api/v1/pme/sync-clients') }}';
-  Json := '{"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}';
+  Json := '{"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}';
 
   Http := THTTPClient.Create;
   try
@@ -627,6 +630,12 @@ end;</pre>
                         <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                             { "produits": [ { "reference": "R1", "designation": "Prod 1", "pv_1": 100.0, "pv_2": 95.0, "pv_3": 90.0, "stock": 10, "categorie": "Cat", "abonne_only": true } ] }
                         </div>
+                    </div>
+
+                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <div class="font-bold">GET /pme/clients?synced=0|1&amp;type_client=simple|abonne</div>
+                        <div class="mt-2 text-xs text-white/70">Lister les clients du fournisseur avec filtre sur le statut de synchronisation PME et le type client.</div>
+                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/clients?synced=0&type_client=simple') }}</div>
                     </div>
 
                     <div class="rounded-xl border border-white/10 bg-black/20 p-4">

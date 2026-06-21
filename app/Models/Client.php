@@ -35,6 +35,7 @@ class Client extends Authenticatable
         'type_client',
         'tarif',
         'id_frs',
+        'synced_pme',
         'actif',
     ];
 
@@ -45,6 +46,7 @@ class Client extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'email_verification_expires_at' => 'datetime',
+        'synced_pme' => 'integer',
     ];
 
     public function scopeSimpleRoot(Builder $query): Builder

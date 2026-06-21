@@ -194,6 +194,7 @@ class StoreController extends Controller
         return Client::create($payload + [
             'type_client' => 'simple',
             'tarif' => 1,
+            'synced_pme' => 0,
             'email_verified_at' => $client->email_verified_at ?? now(),
         ]);
     }

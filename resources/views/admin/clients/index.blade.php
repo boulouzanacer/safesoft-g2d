@@ -37,6 +37,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Email</th>
                         <th class="text-left py-3 px-4 font-semibold">Type</th>
                         <th class="text-left py-3 px-4 font-semibold">Fournisseur</th>
+                        <th class="text-left py-3 px-4 font-semibold">Synced PME</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
                     </tr>
                 </thead>
@@ -48,6 +49,11 @@
                             <td class="py-3 px-4 text-white/80">{{ $c->type_client }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->frs_nom ?? '-' }}</td>
                             <td class="py-3 px-4">
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)($c->synced_pme ?? 0) === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
+                                    {{ (int)($c->synced_pme ?? 0) === 1 ? 'Synced' : 'Not Synced' }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$c->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
                                     {{ (int)$c->actif === 1 ? 'Actif' : 'Inactif' }}
                                 </span>
@@ -55,7 +61,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-10 text-center text-white/60">Aucun client</td>
+                            <td colspan="6" class="py-10 text-center text-white/60">Aucun client</td>
                         </tr>
                     @endforelse
                 </tbody>
