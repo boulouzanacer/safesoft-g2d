@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\PmeClientUpsertRequest;
 use App\Http\Requests\Api\V1\PmeSyncClientsRequest;
 use App\Http\Requests\Api\V1\PmeSyncProduitsRequest;
 use App\Models\Client;
@@ -18,6 +19,127 @@ use Illuminate\Support\Facades\Storage;
 class PmeController extends Controller
 {
     use ApiResponseTrait;
+
+    private function formatClient(Client $client): array
+    {
+        return [
+            'id' => (int) $client->id,
+            'code_client' => $client->code_client,
+            'nom' => $client->nom,
+            'prenom' => $client->prenom,
+            'email' => $client->email,
+            'telephone' => $client->telephone,
+            'adresse' => $client->adresse,
+            'id_wilaya' => (int) $client->id_wilaya,
+            'id_commune' => (int) $client->id_commune,
+            'type_client' => (string) $client->type_client,
+            'tarif' => (int) ($client->tarif ?? 1),
+            'actif' => (int) $client->actif,
+            'synced_pme' => (int) ($client->synced_pme ?? 0),
+            'created_at' => optional($client->created_at)?->toISOString(),
+            'updated_at' => optional($client->updated_at)?->toISOString(),
+        ];
+    }
+
+    private function resolveClientData(array $validated, int $frsId, ?Client $existing = null): array
+    {
+        $payload = [
+            'id_frs' => $frsId,
+        ];
+
+        foreach ([
+            'code_client',
+            'nom',
+            'prenom',
+            'email',
+            'telephone',
+            'adresse',
+            'id_wilaya',
+            'id_commune',
+            'type_client',
+            'tarif',
+            'synced_pme',
+            'actif',
+        ] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $payload[$field] = $validated[$field];
+            }
+        }
+
+        if (array_key_exists('password', $validated) && filled($validated['password'])) {
+            $payload['password'] = str_starts_with($validated['password'], '$')
+                ? $validated['password']
+                : Hash::make($validated['password']);
+        }
+
+        if (! $existing) {
+            $payload['adresse'] = $payload['adresse'] ?? '';
+            $payload['type_client'] = $payload['type_client'] ?? 'simple';
+            $payload['tarif'] = (int) ($payload['tarif'] ?? 1);
+            $payload['synced_pme'] = (int) ($payload['synced_pme'] ?? 1);
+            $payload['actif'] = (int) ($payload['actif'] ?? 1);
+            $payload['email_verified_at'] = now();
+        } else {
+            if (array_key_exists('tarif', $payload)) {
+                $payload['tarif'] = (int) $payload['tarif'];
+            }
+            if (array_key_exists('synced_pme', $payload)) {
+                $payload['synced_pme'] = (int) $payload['synced_pme'];
+            }
+            if (array_key_exists('actif', $payload)) {
+                $payload['actif'] = (int) $payload['actif'];
+            }
+            if (array_key_exists('email', $payload) && ! $existing->email_verified_at) {
+                $payload['email_verified_at'] = now();
+            }
+        }
+
+        return $payload;
+    }
+
+    public function storeClient(PmeClientUpsertRequest $request)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        $client = Client::create($this->resolveClientData($request->validated(), (int) $frs->id));
+
+        return $this->success($this->formatClient($client), 'Client cree', 201);
+    }
+
+    public function updateClient(PmeClientUpsertRequest $request, int $id)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        $client = Client::query()
+            ->where('id_frs', $frs->id)
+            ->find($id);
+
+        if (! $client) {
+            return $this->notFound('Client introuvable');
+        }
+
+        $client->update($this->resolveClientData($request->validated(), (int) $frs->id, $client));
+        $client->refresh();
+
+        return $this->success($this->formatClient($client), 'Client mis a jour');
+    }
+
+    public function destroyClient(Request $request, int $id)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        $client = Client::query()
+            ->where('id_frs', $frs->id)
+            ->find($id);
+
+        if (! $client) {
+            return $this->notFound('Client introuvable');
+        }
+
+        $client->delete();
+
+        return $this->success([
+            'id' => $id,
+            'deleted' => true,
+        ], 'Client supprime');
+    }
 
     public function exportCommandesCsv(Request $request)
     {
@@ -192,23 +314,7 @@ class PmeController extends Controller
             ->orderByDesc('id')
             ->limit(500)
             ->get()
-            ->map(fn (Client $client) => [
-                'id' => (int) $client->id,
-                'code_client' => $client->code_client,
-                'nom' => $client->nom,
-                'prenom' => $client->prenom,
-                'email' => $client->email,
-                'telephone' => $client->telephone,
-                'adresse' => $client->adresse,
-                'id_wilaya' => (int) $client->id_wilaya,
-                'id_commune' => (int) $client->id_commune,
-                'type_client' => (string) $client->type_client,
-                'tarif' => (int) ($client->tarif ?? 1),
-                'actif' => (int) $client->actif,
-                'synced_pme' => (int) ($client->synced_pme ?? 0),
-                'created_at' => optional($client->created_at)?->toISOString(),
-                'updated_at' => optional($client->updated_at)?->toISOString(),
-            ])
+            ->map(fn (Client $client) => $this->formatClient($client))
             ->values();
 
         return $this->success($items, 'Clients PME');

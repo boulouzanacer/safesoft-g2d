@@ -404,267 +404,392 @@
                         Authorization: Bearer &lt;fournisseur_token&gt;<br>
                         Accept: application/json
                     </div>
+                    <div class="mt-3 text-xs text-white/65 leading-relaxed">
+                        Each fournisseur only sees and modifies its own PME data. All client, product and order endpoints are automatically restricted by the fournisseur token.
+                    </div>
                 </div>
 
                 <div class="mt-4 space-y-3 text-sm text-white/80">
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">POST /pme/sync-clients</div>
-                        <div class="mt-2 text-xs text-white/70">Synchroniser des clients abonnés (tarif 1|2|3). Le champ racine <span class="font-mono">synced</span> accepte <span class="font-mono">0|1</span> et vaut <span class="font-mono">1</span> par défaut.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-words">
-                            { "synced": 1, "clients": [ { "code_client": "C001", "nom": "A", "prenom": "B", "email": "abonne@example.com", "password": "Pass@12345", "id_wilaya": 16, "id_commune": 1601, "tarif": 2 } ] }
-                        </div>
-
-                        <div class="mt-4" x-data="{ lang: 'python' }">
-                            <div class="flex flex-wrap gap-2">
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='delphi'"
-                                        :class="lang==='delphi' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Delphi</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='python'"
-                                        :class="lang==='python' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Python</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='node'"
-                                        :class="lang==='node' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Node.js</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='php'"
-                                        :class="lang==='php' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">PHP</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='dotnet'"
-                                        :class="lang==='dotnet' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">C# (.NET)</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='ruby'"
-                                        :class="lang==='ruby' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Ruby</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='go'"
-                                        :class="lang==='go' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Go</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='kotlin'"
-                                        :class="lang==='kotlin' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Kotlin</button>
-                                <button type="button" class="rounded-lg border border-white/10 px-3 py-1 text-xs font-bold"
-                                        @click="lang='dart'"
-                                        :class="lang==='dart' ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10'">Dart</button>
+                    <details open class="group rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+                        <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-3 min-w-0">
+                                <span class="inline-flex items-center rounded-lg bg-sky-500/15 border border-sky-400/20 px-2.5 py-1 text-xs font-extrabold text-sky-200">CLIENTS</span>
+                                <span class="font-bold">Clients PME</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
+                        </summary>
+                        <div class="mt-4 space-y-3">
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">Objectif</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Cette rubrique permet a votre logiciel PME de lister, creer, modifier, supprimer et synchroniser en masse les clients du fournisseur authentifie.
+                                    Tous les enregistrements sont automatiquement limites au fournisseur du token PME. Les champs retournes par l'API sont:
+                                    <span class="font-mono">id</span>, <span class="font-mono">code_client</span>, <span class="font-mono">nom</span>, <span class="font-mono">prenom</span>,
+                                    <span class="font-mono">email</span>, <span class="font-mono">telephone</span>, <span class="font-mono">adresse</span>,
+                                    <span class="font-mono">id_wilaya</span>, <span class="font-mono">id_commune</span>, <span class="font-mono">type_client</span>,
+                                    <span class="font-mono">tarif</span>, <span class="font-mono">actif</span>, <span class="font-mono">synced_pme</span>,
+                                    <span class="font-mono">created_at</span>, <span class="font-mono">updated_at</span>.
+                                </div>
                             </div>
 
-                            <pre x-show="lang==='python'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">import requests
-
-url = "{{ url('/api/v1/pme/sync-clients') }}"
-headers = {"Accept":"application/json","Authorization":"Bearer YOUR_FOURNISSEUR_TOKEN","Content-Type":"application/json"}
-payload = {"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}
-res = requests.post(url, headers=headers, json=payload)
-print(res.status_code, res.json())</pre>
-
-                            <pre x-show="lang==='node'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">const url = "{{ url('/api/v1/pme/sync-clients') }}";
-const payload = { synced: 1, clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] };
-
-const res = await fetch(url, {
-  method: "POST",
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    Authorization: "Bearer YOUR_FOURNISSEUR_TOKEN",
-  },
-  body: JSON.stringify(payload),
-});
-console.log(res.status, await res.json());</pre>
-
-                            <pre x-show="lang==='php'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">$url = "{{ url('/api/v1/pme/sync-clients') }}";
-$payload = json_encode([
-  "synced" =&gt; 1,
-  "clients" =&gt; [[
-    "code_client" =&gt; "C001","nom" =&gt; "A","prenom" =&gt; "B","email" =&gt; "abonne@example.com",
-    "password" =&gt; "Pass@12345","id_wilaya" =&gt; 16,"id_commune" =&gt; 1601,"tarif" =&gt; 2
-  ]]
-]);
-
-$ch = curl_init($url);
-curl_setopt_array($ch, [
-  CURLOPT_RETURNTRANSFER =&gt; true,
-  CURLOPT_POST =&gt; true,
-  CURLOPT_HTTPHEADER =&gt; [
-    "Accept: application/json",
-    "Content-Type: application/json",
-    "Authorization: Bearer YOUR_FOURNISSEUR_TOKEN",
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <span class="font-bold">GET /clients</span>
+                                    <span class="text-xs text-white/60">Lister les clients</span>
+                                </div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Utilisez cet endpoint pour recuperer les clients du fournisseur connecte. Filtres supportes:
+                                    <span class="font-mono">synced=0|1</span> et <span class="font-mono">type_client=simple|abonne</span>.
+                                    Limite actuelle: 500 lignes, triees par <span class="font-mono">updated_at DESC</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Exemple usage: recuperer uniquement les clients simples non synchronises.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/clients?synced=0&type_client=simple') }}</div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": [
+    {
+      "id": 15,
+      "code_client": "C12536",
+      "nom": "client1",
+      "prenom": "client1",
+      "email": "client1@example.com",
+      "telephone": "0656232454",
+      "adresse": "",
+      "id_wilaya": 1,
+      "id_commune": 1,
+      "type_client": "simple",
+      "tarif": 1,
+      "actif": 1,
+      "synced_pme": 0
+    }
   ],
-  CURLOPT_POSTFIELDS =&gt; $payload,
-]);
-$out = curl_exec($ch);
-$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
-echo $code . PHP_EOL . $out;</pre>
-
-                            <pre x-show="lang==='dotnet'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-
-var url = "{{ url('/api/v1/pme/sync-clients') }}";
-using var http = new HttpClient();
-http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer","YOUR_FOURNISSEUR_TOKEN");
-
-var payload = new {
-  synced = 1,
-  clients = new[] { new { code_client="C001", nom="A", prenom="B", email="abonne@example.com", password="Pass@12345", id_wilaya=16, id_commune=1601, tarif=2 } }
-};
-var json = JsonSerializer.Serialize(payload);
-var res = await http.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
-Console.WriteLine((int)res.StatusCode);
-Console.WriteLine(await res.Content.ReadAsStringAsync());</pre>
-
-                            <pre x-show="lang==='ruby'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">require "net/http"
-require "json"
-require "uri"
-
-uri = URI("{{ url('/api/v1/pme/sync-clients') }}")
-http = Net::HTTP.new(uri.host, uri.port)
-http.use_ssl = (uri.scheme == "https")
-
-req = Net::HTTP::Post.new(uri)
-req["Accept"] = "application/json"
-req["Content-Type"] = "application/json"
-req["Authorization"] = "Bearer YOUR_FOURNISSEUR_TOKEN"
-req.body = JSON.generate({ synced: 1, clients: [{ code_client:"C001", nom:"A", prenom:"B", email:"abonne@example.com", password:"Pass@12345", id_wilaya:16, id_commune:1601, tarif:2 }] })
-
-res = http.request(req)
-puts res.code
-puts res.body</pre>
-
-                            <pre x-show="lang==='go'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">package main
-
-import (
-  "bytes"
-  "fmt"
-  "net/http"
-)
-
-func main() {
-  url := "{{ url('/api/v1/pme/sync-clients') }}"
-  body := []byte(`{"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}`)
-  req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
-  req.Header.Set("Accept", "application/json")
-  req.Header.Set("Content-Type", "application/json")
-  req.Header.Set("Authorization", "Bearer YOUR_FOURNISSEUR_TOKEN")
-
-  res, err := http.DefaultClient.Do(req)
-  if err != nil { panic(err) }
-  defer res.Body.Close()
-  fmt.Println(res.StatusCode)
+  "message": "Clients PME"
 }</pre>
+                            </div>
 
-                            <pre x-show="lang==='kotlin'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-
-val url = "{{ url('/api/v1/pme/sync-clients') }}"
-val json = """{"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}"""
-val client = OkHttpClient()
-val req = Request.Builder()
-  .url(url)
-  .addHeader("Accept","application/json")
-  .addHeader("Authorization","Bearer YOUR_FOURNISSEUR_TOKEN")
-  .post(json.toRequestBody("application/json".toMediaType()))
-  .build()
-client.newCall(req).execute().use { res -&gt;
-  println(res.code)
-  println(res.body?.string())
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">POST /clients</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Cree un client unitaire depuis le logiciel PME.
+                                        Si vous n'envoyez pas certains champs, les valeurs par defaut sont:
+                                        <span class="font-mono">type_client=simple</span>,
+                                        <span class="font-mono">tarif=1</span>,
+                                        <span class="font-mono">synced_pme=1</span>,
+                                        <span class="font-mono">actif=1</span>.
+                                        Le mot de passe peut etre envoye en clair; l'API le hash automatiquement.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: ajout manuel d'un nouveau client.
+                                    </div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "code_client": "C12536",
+  "nom": "client1",
+  "prenom": "client1",
+  "email": "client1@example.com",
+  "password": "12345678",
+  "telephone": "0656232454",
+  "adresse": "Alger centre",
+  "id_wilaya": 16,
+  "id_commune": 1601,
+  "type_client": "abonne",
+  "tarif": 2,
+  "synced_pme": 1,
+  "actif": 1
 }</pre>
+                                </div>
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">PUT /clients/{id}</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Met a jour un client existant appartenant au fournisseur du token. Vous pouvez envoyer uniquement les champs modifies.
+                                        Si <span class="font-mono">password</span> est envoye, il sera remplace; sinon il reste inchangé.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: mise a jour telephone, tarif, statut synchronisation ou type client.
+                                    </div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "telephone": "0550123456",
+  "type_client": "abonne",
+  "tarif": 3,
+  "synced_pme": 1
+}</pre>
+                                </div>
+                            </div>
 
-                            <pre x-show="lang==='dart'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">import "dart:convert";
-import "package:http/http.dart" as http;
-
-final url = Uri.parse("{{ url('/api/v1/pme/sync-clients') }}");
-final payload = {
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">DELETE /clients/{id}</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Supprime logiquement le client (soft delete). L'historique des commandes reste conserve.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: client obsolete ou bloque dans le logiciel PME.
+                                    </div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": { "id": 15, "deleted": true },
+  "message": "Client supprime"
+}</pre>
+                                </div>
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">POST /sync-clients</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Synchronisation en masse des clients. C'est l'endpoint recommande pour les imports PME automatiques.
+                                        Le matching se fait d'abord par <span class="font-mono">code_client</span>, puis par
+                                        <span class="font-mono">email</span> chez le meme fournisseur pour eviter les doublons.
+                                        Le parametre racine <span class="font-mono">synced</span> accepte <span class="font-mono">0|1</span> et vaut <span class="font-mono">1</span> par defaut.
+                                        Chaque element cree ou met a jour un client en <span class="font-mono">type_client=abonne</span>.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: push quotidien depuis le logiciel de gestion.
+                                    </div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
   "synced": 1,
   "clients": [
-    {"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}
+    {
+      "code_client": "C12536",
+      "nom": "client1",
+      "prenom": "client1",
+      "email": "client1@example.com",
+      "password": "12345678",
+      "telephone": "0656232454",
+      "id_wilaya": 1,
+      "id_commune": 1,
+      "tarif": 2
+    }
   ]
-};
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
 
-final res = await http.post(
-  url,
-  headers: {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_FOURNISSEUR_TOKEN",
+                    <details open class="group rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+                        <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-3 min-w-0">
+                                <span class="inline-flex items-center rounded-lg bg-amber-500/15 border border-amber-400/20 px-2.5 py-1 text-xs font-extrabold text-amber-200">COMMANDES</span>
+                                <span class="font-bold">Commandes PME</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
+                        </summary>
+                        <div class="mt-4 space-y-3">
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">Objectif</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Cette rubrique permet d'exporter les commandes web vers le logiciel PME, soit en JSON, soit en CSV.
+                                    Les commandes sont filtrees par fournisseur et par etat de synchronisation
+                                    <span class="font-mono">synced_pme</span>.
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">GET /commandes</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Liste les commandes du fournisseur avec leurs lignes. Parametre supporte:
+                                        <span class="font-mono">synced=0|1</span>.
+                                        Par defaut, l'API retourne uniquement les commandes non synchronisees.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: recuperer les nouvelles commandes a importer dans le logiciel PME.
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes?synced=0') }}</div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": [
+    {
+      "id": 101,
+      "id_client": 15,
+      "date_cmd": "2026-05-12 14:05:22",
+      "statut": "en_attente",
+      "montant_total": 2800,
+      "adresse_livraison": "Alger centre",
+      "id_wilaya": 16,
+      "id_commune": 1601,
+      "notes": "",
+      "synced_pme": 0,
+      "lignes": [
+        {
+          "id_produit": 1,
+          "reference": "R1",
+          "designation": "Prod 1",
+          "quantite": 2,
+          "prix_unitaire": 900,
+          "sous_total": 1800
+        }
+      ]
+    }
+  ],
+  "message": "Commandes PME"
+}</pre>
+                                </div>
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">PUT /commandes/{id}/sync</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Marque une commande comme synchronisee apres import reussi dans le logiciel PME.
+                                        L'API retourne <span class="font-mono">synced_pme=1</span>.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: confirmation d'import unitaire apres traitement comptable/stock.
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/1/sync') }}</div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 101,
+    "synced_pme": 1
   },
-  body: jsonEncode(payload),
-);
-print(res.statusCode);
-print(res.body);</pre>
+  "message": "Commande synchronisee"
+}</pre>
+                                </div>
+                            </div>
 
-                            <pre x-show="lang==='delphi'" class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-[10px] sm:text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">uses
-  System.SysUtils, System.Net.HttpClient, System.Net.URLClient, System.JSON;
-
-var
-  Http: THTTPClient;
-  ReqBody: TStringStream;
-  Resp: IHTTPResponse;
-  Url: string;
-  Json: string;
-begin
-  Url := '{{ url('/api/v1/pme/sync-clients') }}';
-  Json := '{"synced":1,"clients":[{"code_client":"C001","nom":"A","prenom":"B","email":"abonne@example.com","password":"Pass@12345","id_wilaya":16,"id_commune":1601,"tarif":2}]}';
-
-  Http := THTTPClient.Create;
-  try
-    Http.CustomHeaders['Accept'] := 'application/json';
-    Http.CustomHeaders['Authorization'] := 'Bearer YOUR_FOURNISSEUR_TOKEN';
-    ReqBody := TStringStream.Create(Json, TEncoding.UTF8);
-    try
-      Resp := Http.Post(Url, ReqBody, nil, [TNameValuePair.Create('Content-Type','application/json')]);
-      Writeln(Resp.StatusCode);
-      Writeln(Resp.ContentAsString(TEncoding.UTF8));
-    finally
-      ReqBody.Free;
-    end;
-  finally
-    Http.Free;
-  end;
-end;</pre>
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">GET /commandes/export-csv</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Exporte les memes commandes au format CSV UTF-8 avec separateur <span class="font-mono">;</span>.
+                                    Parametre supporte: <span class="font-mono">synced=0|1</span>.
+                                    Le fichier contient a la fois l'entete commande et les lignes produit.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Cas d'usage: logiciels PME anciens qui importent un fichier CSV plutot qu'une API JSON.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/export-csv?synced=0') }}</div>
+                            </div>
                         </div>
-                    </div>
+                    </details>
 
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">POST /pme/sync-produits</div>
-                        <div class="mt-2 text-xs text-white/70">Synchroniser produits (pv_1/pv_2/pv_3 + abonne_only). Compatible: envoyer prix au lieu de pv_1.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-words">
-                            { "produits": [ { "reference": "R1", "designation": "Prod 1", "pv_1": 100.0, "pv_2": 95.0, "pv_3": 90.0, "stock": 10, "categorie": "Cat", "abonne_only": true } ] }
+                    <details open class="group rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+                        <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-3 min-w-0">
+                                <span class="inline-flex items-center rounded-lg bg-emerald-500/15 border border-emerald-400/20 px-2.5 py-1 text-xs font-extrabold text-emerald-200">PRODUITS</span>
+                                <span class="font-bold">Produits PME</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
+                        </summary>
+                        <div class="mt-4 space-y-3">
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">Objectif</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    La partie produits expose pour le moment un endpoint de synchronisation en masse.
+                                    Il cree ou met a jour les produits du fournisseur connecte en matchant sur
+                                    <span class="font-mono">reference</span>.
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /sync-produits</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Cree ou met a jour une liste de produits.
+                                    Champs supportes par produit:
+                                    <span class="font-mono">reference</span>, <span class="font-mono">designation</span>,
+                                    <span class="font-mono">prix</span> ou <span class="font-mono">pv_1</span>,
+                                    <span class="font-mono">pv_2</span>, <span class="font-mono">pv_3</span>,
+                                    <span class="font-mono">stock</span>, <span class="font-mono">categorie</span>,
+                                    <span class="font-mono">abonne_only</span>.
+                                    Si <span class="font-mono">pv_2</span> et <span class="font-mono">pv_3</span> ne sont pas fournis,
+                                    ils reprennent la valeur de <span class="font-mono">pv_1</span> ou <span class="font-mono">prix</span>.
+                                    L'API force actuellement <span class="font-mono">actif=1</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Cas d'usage: synchronisation catalogue depuis PME. Pas encore d'endpoint dedie pour supprimer un produit.
+                                </div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "produits": [
+    {
+      "reference": "R1",
+      "designation": "Prod 1",
+      "pv_1": 100.0,
+      "pv_2": 95.0,
+      "pv_3": 90.0,
+      "stock": 10,
+      "categorie": "Cat",
+      "abonne_only": 1
+    },
+    {
+      "reference": "R2",
+      "designation": "Prod 2",
+      "prix": 250.0,
+      "stock": 4,
+      "categorie": "Accessoires"
+    }
+  ]
+}</pre>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "nb_inseres": 1,
+    "nb_mis_a_jour": 1
+  },
+  "message": "Sync produits terminé"
+}</pre>
+                            </div>
                         </div>
-                    </div>
+                    </details>
 
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">GET /pme/clients?synced=0|1&amp;type_client=simple|abonne</div>
-                        <div class="mt-2 text-xs text-white/70">Lister les clients du fournisseur avec filtre sur le statut de synchronisation PME et le type client.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/clients?synced=0&type_client=simple') }}</div>
-                    </div>
+                    <details open class="group rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
+                        <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-3 min-w-0">
+                                <span class="inline-flex items-center rounded-lg bg-violet-500/15 border border-violet-400/20 px-2.5 py-1 text-xs font-extrabold text-violet-200">FOURNISSEUR</span>
+                                <span class="font-bold">Fournisseur PME</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
+                        </summary>
+                        <div class="mt-4 space-y-3">
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">Objectif</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Cette rubrique sert a mettre a jour les informations du fournisseur depuis le logiciel PME:
+                                    nom, telephone, adresse, geolocalisation, visibilite et logo.
+                                </div>
+                            </div>
 
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">POST /pme/sync-fournisseur</div>
-                        <div class="mt-2 text-xs text-white/70">
-                            Mise à jour fournisseur. Pour logo: <span class="font-mono">multipart/form-data</span>. Champs: nom_frs, telephone, adresse, id_wilaya, id_commune, latitude, longitude, is_visible, remove_logo.
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /sync-fournisseur</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Met a jour le fournisseur du token PME.
+                                    Pour les champs texte utilisez JSON classique.
+                                    Pour charger un logo, utilisez <span class="font-mono">multipart/form-data</span>.
+                                    Champs supportes:
+                                    <span class="font-mono">nom_frs</span>, <span class="font-mono">telephone</span>, <span class="font-mono">adresse</span>,
+                                    <span class="font-mono">id_wilaya</span>, <span class="font-mono">id_commune</span>,
+                                    <span class="font-mono">latitude</span>, <span class="font-mono">longitude</span>,
+                                    <span class="font-mono">is_visible</span>, <span class="font-mono">remove_logo</span>, <span class="font-mono">logo</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Cas d'usage: mise a jour de la fiche fournisseur ou remplacement/suppression du logo depuis PME.
+                                </div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "telephone": "0550123456",
+  "adresse": "Alger",
+  "id_wilaya": 16,
+  "id_commune": 1601,
+  "latitude": 36.7538,
+  "longitude": 3.0588,
+  "is_visible": 1,
+  "remove_logo": 0
+}</pre>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 3,
+    "nom_frs": "Amantek",
+    "telephone": "0550123456",
+    "adresse": "Alger",
+    "id_wilaya": 16,
+    "id_commune": 1601,
+    "latitude": 36.7538,
+    "longitude": 3.0588,
+    "logo_url": "https://...",
+    "is_visible": 1
+  },
+  "message": "Sync fournisseur terminé"
+}</pre>
+                            </div>
                         </div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-words">
-                            JSON (sans logo): { "telephone": "0550...", "is_visible": 1 }
-                        </div>
-                    </div>
-
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">GET /pme/commandes?synced=0|1</div>
-                        <div class="mt-2 text-xs text-white/70">Lister commandes à synchroniser.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes?synced=0') }}</div>
-                    </div>
-
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">GET /pme/commandes/export-csv?synced=0|1</div>
-                        <div class="mt-2 text-xs text-white/70">Télécharger CSV.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/export-csv?synced=0') }}</div>
-                    </div>
-
-                    <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-                        <div class="font-bold">PUT /pme/commandes/{id}/sync</div>
-                        <div class="mt-2 text-xs text-white/70">Marquer commande synchronisée.</div>
-                        <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/1/sync') }}</div>
-                    </div>
+                    </details>
                 </div>
             </div>
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
