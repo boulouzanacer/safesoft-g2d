@@ -847,9 +847,26 @@ class StoreController extends Controller
             'commune:ID_COMMUNE,COMMUNE',
         ]);
 
+        $associatedFournisseurs = collect();
+        $email = trim((string) ($client->email ?? ''));
+        if ($email !== '') {
+            $associatedFournisseurs = Client::query()
+                ->with('fournisseur:id,nom_frs')
+                ->where('email', $email)
+                ->whereNotNull('id_frs')
+                ->where('type_client', 'abonne')
+                ->where('actif', 1)
+                ->get()
+                ->pluck('fournisseur')
+                ->filter()
+                ->unique('id')
+                ->values();
+        }
+
         return view('store.profil', [
             'title' => 'Mon profil',
             'client' => $client,
+            'associated_fournisseurs' => $associatedFournisseurs,
         ]);
     }
 

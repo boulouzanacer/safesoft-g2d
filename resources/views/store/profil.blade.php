@@ -67,7 +67,13 @@
                 </div>
                 <div class="sm:col-span-2">
                     <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Fournisseur associe</div>
-                    <div class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">{{ $client->fournisseur->nom_frs ?? 'Aucun fournisseur' }}</div>
+                    <div class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">
+                        @if(($associated_fournisseurs ?? collect())->isNotEmpty())
+                            {{ $associated_fournisseurs->pluck('nom_frs')->implode(' , ') }}
+                        @else
+                            {{ $client->fournisseur->nom_frs ?? 'Aucun fournisseur' }}
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
