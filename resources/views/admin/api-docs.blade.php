@@ -469,6 +469,41 @@
 }</pre>
                             </div>
 
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <span class="font-bold">GET /clients/{id}</span>
+                                    <span class="text-xs text-white/60">Detail client</span>
+                                </div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Retourne le detail d'un client unique appartenant au fournisseur du token PME.
+                                    Si l'id n'appartient pas au fournisseur, l'API retourne
+                                    <span class="font-mono">Ressource introuvable</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Cas d'usage: ouvrir la fiche client depuis le logiciel PME apres avoir liste les clients.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/clients/6') }}</div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 6,
+    "code_client": "C10006",
+    "nom": "client6",
+    "prenom": "client6",
+    "email": "client6@example.com",
+    "telephone": "0550000006",
+    "adresse": "Alger",
+    "id_wilaya": 16,
+    "id_commune": 1601,
+    "type_client": "abonne",
+    "tarif": 2,
+    "actif": 1,
+    "synced_pme": 1
+  },
+  "message": "Client PME"
+}</pre>
+                            </div>
+
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="font-bold">POST /clients</div>

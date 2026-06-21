@@ -105,6 +105,20 @@ class PmeController extends Controller
         return $this->success($this->formatClient($client), 'Client cree', 201);
     }
 
+    public function showClient(Request $request, int $id)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        $client = Client::query()
+            ->where('id_frs', $frs->id)
+            ->find($id);
+
+        if (! $client) {
+            return $this->notFound('Client introuvable');
+        }
+
+        return $this->success($this->formatClient($client), 'Client PME');
+    }
+
     public function updateClient(PmeClientUpsertRequest $request, int $id)
     {
         $frs = $request->attributes->get('fournisseur');
