@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\Cmd1;
 use App\Models\Fournisseur;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -45,6 +46,43 @@ class ClientController extends Controller
             'selected_fournisseur' => $fournisseurId,
             'q' => $q,
             'without_fournisseur' => $withoutFournisseur,
+        ]);
+    }
+
+    public function show(int $id): View
+    {
+        $client = Client::query()
+            ->with([
+                'fournisseur:id,nom_frs',
+                'wilaya:ID_WILAYA,WILAYA',
+                'commune:ID_COMMUNE,COMMUNE',
+            ])
+            ->findOrFail($id);
+
+        $associatedAccounts = collect();
+        $email = trim((string) ($client->email ?? ''));
+
+        if ($email !== '') {
+            $associatedAccounts = Client::query()
+                ->with('fournisseur:id,nom_frs')
+                ->where('email', $email)
+                ->where('id', '!=', $client->id)
+                ->orderByDesc('id')
+                ->get();
+        }
+
+        $commandes = Cmd1::query()
+            ->leftJoin('frs', 'frs.id', '=', 'cmd1.id_frs')
+            ->select(['cmd1.*', 'frs.nom_frs as frs_nom'])
+            ->where('cmd1.id_client', $client->id)
+            ->orderByDesc('cmd1.date_cmd')
+            ->paginate(10);
+
+        return view('admin.clients.show', [
+            'title' => 'Détail Client',
+            'client' => $client,
+            'associated_accounts' => $associatedAccounts,
+            'commandes' => $commandes,
         ]);
     }
 

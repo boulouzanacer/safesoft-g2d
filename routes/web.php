@@ -72,6 +72,7 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
     Route::get('/wilayas/{idWilaya}/communes', [FournisseurController::class, 'communes']);
 
     Route::get('/clients', [AdminClientController::class, 'index']);
+    Route::get('/clients/{id}', [AdminClientController::class, 'show']);
     Route::delete('/clients/{id}', [AdminClientController::class, 'destroy']);
     Route::get('/produits', [AdminProduitController::class, 'index']);
     Route::get('/commandes', [AdminCommandeController::class, 'index']);

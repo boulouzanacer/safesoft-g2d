@@ -83,7 +83,12 @@
                                 </span>
                             </td>
                             <td class="py-3 px-4">
-                                <div class="flex items-center justify-end">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ url('/admin/clients/'.$c->id) }}"
+                                       class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-sky-400/20 text-sky-300 hover:bg-sky-500/10"
+                                       title="Détail">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
                                     @if($c->id_frs === null)
                                         <form method="POST" action="{{ url('/admin/clients/'.$c->id) }}">
                                             @csrf
