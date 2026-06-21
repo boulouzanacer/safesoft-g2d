@@ -1,6 +1,16 @@
 @extends('layouts.fournisseur')
 
 @section('content')
+@php
+    $achatClient = (float) ($client->achat_client ?? 0);
+    $versementClient = (float) ($client->versement_client ?? 0);
+    $soldeClient = (float) ($client->solde_client ?? 0);
+    $soldeBadge = $soldeClient > 0
+        ? 'from-red-500/20 to-red-500/5 border-red-400/20 text-red-200'
+        : ($soldeClient < 0
+            ? 'from-emerald-500/20 to-emerald-500/5 border-emerald-400/20 text-emerald-200'
+            : 'from-slate-500/20 to-slate-500/5 border-white/10 text-white');
+@endphp
 <div class="space-y-4">
     <div class="flex items-center justify-between">
         <div>
@@ -14,10 +24,54 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-3xl border border-sky-400/20 bg-gradient-to-br from-sky-500/20 to-sky-500/5 p-5 shadow-lg shadow-sky-950/10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/80">Achat Client</div>
+                    <div class="mt-2 text-3xl font-extrabold text-sky-100">{{ number_format($achatClient, 2, '.', ' ') }}</div>
+                </div>
+                <div class="h-12 w-12 rounded-2xl bg-sky-500/15 text-sky-200 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+            </div>
+            <div class="mt-3 text-xs text-sky-100/70">Total des achats du client chez ce fournisseur.</div>
+        </div>
+
+        <div class="rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-5 shadow-lg shadow-emerald-950/10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200/80">Versement Client</div>
+                    <div class="mt-2 text-3xl font-extrabold text-emerald-100">{{ number_format($versementClient, 2, '.', ' ') }}</div>
+                </div>
+                <div class="h-12 w-12 rounded-2xl bg-emerald-500/15 text-emerald-200 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+            <div class="mt-3 text-xs text-emerald-100/70">Montant total verse par le client.</div>
+        </div>
+
+        <div class="rounded-3xl border bg-gradient-to-br p-5 shadow-lg {{ $soldeBadge }}">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Solde Client</div>
+                    <div class="mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
+                </div>
+                <div class="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+            </div>
+            <div class="mt-3 text-xs text-white/70">
+                {{ $soldeClient > 0 ? 'Solde a recouvrer.' : ($soldeClient < 0 ? 'Client crediteur.' : 'Compte equilibre.') }}
+            </div>
+        </div>
+    </div>
+
         <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
             <div class="text-sm text-white/60">Code client</div>
             <div class="font-extrabold mt-1">{{ $client->code_client ?? '-' }}</div>
         </div>
+        <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
         <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] p-5">
             <div class="text-sm text-white/60">Téléphone</div>
             <div class="font-extrabold mt-1">{{ $client->telephone ?? '-' }}</div>

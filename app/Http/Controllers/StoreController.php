@@ -848,25 +848,39 @@ class StoreController extends Controller
         ]);
 
         $associatedFournisseurs = collect();
+        $financialTotals = [
+            'achat_client' => (float) ($client->achat_client ?? 0),
+            'versement_client' => (float) ($client->versement_client ?? 0),
+            'solde_client' => (float) ($client->solde_client ?? 0),
+        ];
         $email = trim((string) ($client->email ?? ''));
         if ($email !== '') {
-            $associatedFournisseurs = Client::query()
+            $relatedClients = Client::query()
                 ->with('fournisseur:id,nom_frs')
                 ->where('email', $email)
+                ->where('actif', 1)
+                ->get();
+
+            $associatedFournisseurs = $relatedClients
                 ->whereNotNull('id_frs')
                 ->where('type_client', 'abonne')
-                ->where('actif', 1)
-                ->get()
                 ->pluck('fournisseur')
                 ->filter()
                 ->unique('id')
                 ->values();
+
+            $financialTotals = [
+                'achat_client' => (float) $relatedClients->sum(fn (Client $item) => (float) ($item->achat_client ?? 0)),
+                'versement_client' => (float) $relatedClients->sum(fn (Client $item) => (float) ($item->versement_client ?? 0)),
+                'solde_client' => (float) $relatedClients->sum(fn (Client $item) => (float) ($item->solde_client ?? 0)),
+            ];
         }
 
         return view('store.profil', [
             'title' => 'Mon profil',
             'client' => $client,
             'associated_fournisseurs' => $associatedFournisseurs,
+            'financial_totals' => $financialTotals,
         ]);
     }
 

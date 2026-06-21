@@ -34,6 +34,9 @@ class Client extends Authenticatable
         'id_commune',
         'type_client',
         'tarif',
+        'achat_client',
+        'versement_client',
+        'solde_client',
         'id_frs',
         'synced_pme',
         'actif',
@@ -46,6 +49,9 @@ class Client extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'email_verification_expires_at' => 'datetime',
+        'achat_client' => 'float',
+        'versement_client' => 'float',
+        'solde_client' => 'float',
         'synced_pme' => 'integer',
     ];
 

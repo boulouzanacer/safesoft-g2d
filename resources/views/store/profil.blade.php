@@ -1,6 +1,16 @@
 @extends('store.layout')
 
 @section('content')
+@php
+    $achatClient = (float) (($financial_totals['achat_client'] ?? null) ?? ($client->achat_client ?? 0));
+    $versementClient = (float) (($financial_totals['versement_client'] ?? null) ?? ($client->versement_client ?? 0));
+    $soldeClient = (float) (($financial_totals['solde_client'] ?? null) ?? ($client->solde_client ?? 0));
+    $soldeCard = $soldeClient > 0
+        ? 'border-red-200 bg-gradient-to-br from-red-50 to-white text-red-700'
+        : ($soldeClient < 0
+            ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-white text-emerald-700'
+            : 'border-slate-200 bg-gradient-to-br from-slate-50 to-white text-slate-700');
+@endphp
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -21,6 +31,49 @@
                 <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold {{ (int)($client->actif ?? 0) === 1 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
                     {{ (int)($client->actif ?? 0) === 1 ? 'Actif' : 'Inactif' }}
                 </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="rounded-3xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-500">Achat Client</div>
+                    <div class="mt-2 text-3xl font-extrabold text-sky-700">{{ number_format($achatClient, 2, '.', ' ') }}</div>
+                </div>
+                <div class="h-12 w-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+            </div>
+            <div class="mt-3 text-sm text-sky-700/80">Montant cumule de vos achats.</div>
+        </div>
+
+        <div class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-500">Versement Client</div>
+                    <div class="mt-2 text-3xl font-extrabold text-emerald-700">{{ number_format($versementClient, 2, '.', ' ') }}</div>
+                </div>
+                <div class="h-12 w-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+            </div>
+            <div class="mt-3 text-sm text-emerald-700/80">Total deja verse sur votre compte.</div>
+        </div>
+
+        <div class="rounded-3xl border p-6 shadow-sm {{ $soldeCard }}">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-[0.2em]">Solde Client</div>
+                    <div class="mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
+                </div>
+                <div class="h-12 w-12 rounded-2xl bg-white/70 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+            </div>
+            <div class="mt-3 text-sm opacity-80">
+                {{ $soldeClient > 0 ? 'Solde restant a regler.' : ($soldeClient < 0 ? 'Vous avez un credit disponible.' : 'Votre compte est equilibre.') }}
             </div>
         </div>
     </div>
