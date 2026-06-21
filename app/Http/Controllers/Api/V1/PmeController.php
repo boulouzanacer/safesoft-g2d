@@ -127,6 +127,15 @@ class PmeController extends Controller
                     ->where('code_client', $item['code_client'])
                     ->first();
 
+                if (! $existing) {
+                    $existing = Client::query()
+                        ->where('id_frs', $frs->id)
+                        ->where('email', $item['email'])
+                        ->orderByRaw("CASE WHEN type_client = 'simple' THEN 0 ELSE 1 END")
+                        ->orderByDesc('id')
+                        ->first();
+                }
+
                 $data = [
                     'code_client' => $item['code_client'],
                     'nom' => $item['nom'],
