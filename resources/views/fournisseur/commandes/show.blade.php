@@ -75,11 +75,30 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div class="xl:col-span-2 rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
-            <div class="font-extrabold tracking-wide">Client & Livraison</div>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div class="font-extrabold tracking-wide">Client & Livraison</div>
+                @if((int)($client?->id ?? 0) > 0)
+                    <a href="{{ url('/fournisseur/clients/'.$client->id) }}"
+                       class="inline-flex items-center gap-2 text-sm font-bold text-[var(--frs-primary)] hover:opacity-90">
+                        <span>Ouvrir fiche client</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                @endif
+            </div>
             <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Nom</div>
-                    <div class="mt-2 font-extrabold break-words">{{ $client?->prenom }} {{ $client?->nom }}</div>
+                    <div class="mt-2 font-extrabold break-words">
+                        @if((int)($client?->id ?? 0) > 0)
+                            <a href="{{ url('/fournisseur/clients/'.$client->id) }}"
+                               class="inline-flex items-center gap-2 text-[var(--frs-primary)] hover:opacity-90">
+                                <span>{{ $client?->prenom }} {{ $client?->nom }}</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        @else
+                            {{ $client?->prenom }} {{ $client?->nom }}
+                        @endif
+                    </div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Email</div>

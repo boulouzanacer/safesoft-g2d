@@ -17,18 +17,19 @@
         </div>
     </div>
 
-    <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
+    <a href="{{ url('/admin/clients') }}" class="block rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)] hover:bg-white/5">
         <div class="flex items-center justify-between">
             <div>
                 <div class="text-sm text-white/60">Total Clients</div>
                 <div class="text-3xl font-extrabold mt-1">{{ $nb_clients }}</div>
+                <div class="mt-2 text-xs text-white/50">Ouvrir la liste clients</div>
             </div>
             <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
                  style="background: linear-gradient(135deg, #22c55e, #16a34a);">
                 <i class="fa-solid fa-users text-white text-lg"></i>
             </div>
         </div>
-    </div>
+    </a>
 
     <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
         <div class="flex items-center justify-between">

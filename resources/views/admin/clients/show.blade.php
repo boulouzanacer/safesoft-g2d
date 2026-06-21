@@ -117,10 +117,16 @@
                     @if(($associated_accounts ?? collect())->isNotEmpty())
                         <div class="mt-3 space-y-2">
                             @foreach($associated_accounts as $account)
-                                <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                                    <div class="font-extrabold break-words">#{{ $account->id }} · {{ $account->type_client }}</div>
-                                    <div class="text-white/60 break-words">{{ $account->fournisseur?->nom_frs ?: 'Sans fournisseur' }}</div>
-                                </div>
+                                <a href="{{ url('/admin/clients/'.$account->id) }}"
+                                   class="block rounded-xl border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <div class="font-extrabold break-words">#{{ $account->id }} · {{ $account->type_client }}</div>
+                                            <div class="text-white/60 break-words">{{ $account->fournisseur?->nom_frs ?: 'Sans fournisseur' }}</div>
+                                        </div>
+                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-sky-300 mt-1"></i>
+                                    </div>
+                                </a>
                             @endforeach
                         </div>
                     @else
