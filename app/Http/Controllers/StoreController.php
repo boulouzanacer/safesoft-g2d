@@ -847,12 +847,7 @@ class StoreController extends Controller
             'commune:ID_COMMUNE,COMMUNE',
         ]);
 
-        $associatedFournisseurs = collect();
-        $financialTotals = [
-            'achat_client' => (float) ($client->achat_client ?? 0),
-            'versement_client' => (float) ($client->versement_client ?? 0),
-            'solde_client' => (float) ($client->solde_client ?? 0),
-        ];
+        $profileTabs = collect();
         $email = trim((string) ($client->email ?? ''));
         if ($email !== '') {
             $relatedClients = Client::query()
@@ -861,26 +856,51 @@ class StoreController extends Controller
                 ->where('actif', 1)
                 ->get();
 
-            $associatedFournisseurs = $relatedClients
+            $profileTabs = $relatedClients
                 ->whereNotNull('id_frs')
-                ->where('type_client', 'abonne')
-                ->pluck('fournisseur')
-                ->filter()
-                ->unique('id')
-                ->values();
+                ->groupBy(fn (Client $item) => (int) $item->id_frs)
+                ->map(function ($group, $frsId) {
+                    /** @var \Illuminate\Support\Collection<int, Client> $group */
+                    $representative = $group
+                        ->sortByDesc(fn (Client $item) => [
+                            (string) $item->type_client === 'abonne' ? 1 : 0,
+                            (int) $item->id,
+                        ])
+                        ->first();
 
-            $financialTotals = [
-                'achat_client' => (float) $relatedClients->sum(fn (Client $item) => (float) ($item->achat_client ?? 0)),
-                'versement_client' => (float) $relatedClients->sum(fn (Client $item) => (float) ($item->versement_client ?? 0)),
-                'solde_client' => (float) $relatedClients->sum(fn (Client $item) => (float) ($item->solde_client ?? 0)),
-            ];
+                    return [
+                        'key' => 'frs-'.$frsId,
+                        'fournisseur_name' => $representative?->fournisseur?->nom_frs ?: ('Fournisseur #'.$frsId),
+                        'type_client' => (string) ($representative->type_client ?? 'simple'),
+                        'tarif' => max(1, min(3, (int) ($representative->tarif ?? 1))),
+                        'code_client' => (string) ($representative->code_client ?? ''),
+                        'synced_pme' => (int) ($representative->synced_pme ?? 0),
+                        'achat_client' => (float) $group->sum(fn (Client $item) => (float) ($item->achat_client ?? 0)),
+                        'versement_client' => (float) $group->sum(fn (Client $item) => (float) ($item->versement_client ?? 0)),
+                        'solde_client' => (float) $group->sum(fn (Client $item) => (float) ($item->solde_client ?? 0)),
+                    ];
+                })
+                ->values();
+        }
+
+        if ($profileTabs->isEmpty()) {
+            $profileTabs = collect([[
+                'key' => 'default',
+                'fournisseur_name' => $client->fournisseur?->nom_frs ?: 'Compte principal',
+                'type_client' => (string) ($client->type_client ?? 'simple'),
+                'tarif' => max(1, min(3, (int) ($client->tarif ?? 1))),
+                'code_client' => (string) ($client->code_client ?? ''),
+                'synced_pme' => (int) ($client->synced_pme ?? 0),
+                'achat_client' => (float) ($client->achat_client ?? 0),
+                'versement_client' => (float) ($client->versement_client ?? 0),
+                'solde_client' => (float) ($client->solde_client ?? 0),
+            ]]);
         }
 
         return view('store.profil', [
             'title' => 'Mon profil',
             'client' => $client,
-            'associated_fournisseurs' => $associatedFournisseurs,
-            'financial_totals' => $financialTotals,
+            'profile_tabs' => $profileTabs,
         ]);
     }
 
