@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form id="clientsFiltersForm" method="GET" action="{{ url('/admin/clients') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+    <form id="clientsFiltersForm" method="GET" action="{{ url('/admin/clients') }}" class="grid grid-cols-1 md:grid-cols-5 gap-3">
         <div class="md:col-span-2">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
@@ -29,6 +29,7 @@
         <div>
             <select id="clientsFournisseurSelect"
                     name="fournisseur"
+                    @disabled($without_fournisseur)
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
                 <option value="">Tous les fournisseurs</option>
                 @foreach($fournisseurs as $f)
@@ -36,6 +37,16 @@
                 @endforeach
             </select>
         </div>
+
+        <label class="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 cursor-pointer">
+            <input id="clientsWithoutFournisseurCheckbox"
+                   type="checkbox"
+                   name="without_fournisseur"
+                   value="1"
+                   @checked($without_fournisseur)
+                   class="h-4 w-4 rounded border-white/20 bg-transparent text-[var(--admin-primary)] focus:ring-[var(--admin-primary)]">
+            <span class="text-sm text-white/85">Sans fournisseur</span>
+        </label>
 
         <button type="submit" class="hidden">Filtrer</button>
     </form>
@@ -109,7 +120,8 @@
     const form = document.getElementById('clientsFiltersForm');
     const input = document.getElementById('clientsSearchInput');
     const select = document.getElementById('clientsFournisseurSelect');
-    if (!form || !input || !select) return;
+    const withoutFournisseur = document.getElementById('clientsWithoutFournisseurCheckbox');
+    if (!form || !input || !select || !withoutFournisseur) return;
 
     let t = null;
     const submit = () => {
@@ -121,6 +133,7 @@
     };
 
     select.addEventListener('change', () => submit());
+    withoutFournisseur.addEventListener('change', () => submit());
 
     input.addEventListener('input', () => {
         if (t) clearTimeout(t);

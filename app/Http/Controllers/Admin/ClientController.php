@@ -15,6 +15,7 @@ class ClientController extends Controller
     {
         $fournisseurId = $request->query('fournisseur');
         $q = trim((string) $request->query('q', ''));
+        $withoutFournisseur = (string) $request->query('without_fournisseur', '') === '1';
 
         $clients = Client::query()
             ->leftJoin('frs', 'frs.id', '=', 'client.id_frs')
@@ -22,7 +23,8 @@ class ClientController extends Controller
                 'client.*',
                 'frs.nom_frs as frs_nom',
             ])
-            ->when($fournisseurId, fn ($query) => $query->where('client.id_frs', $fournisseurId))
+            ->when($withoutFournisseur, fn ($query) => $query->whereNull('client.id_frs'))
+            ->when($fournisseurId && ! $withoutFournisseur, fn ($query) => $query->where('client.id_frs', $fournisseurId))
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('client.nom', 'like', "%{$q}%")
@@ -42,6 +44,7 @@ class ClientController extends Controller
             'fournisseurs' => $fournisseurs,
             'selected_fournisseur' => $fournisseurId,
             'q' => $q,
+            'without_fournisseur' => $withoutFournisseur,
         ]);
     }
 
