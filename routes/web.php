@@ -39,6 +39,7 @@ Route::post('/panier/clear', [StoreController::class, 'panierClear']);
 Route::get('/checkout', [StoreController::class, 'checkout']);
 Route::post('/checkout', [StoreController::class, 'checkoutStore']);
 
+Route::get('/profil', [StoreController::class, 'profil']);
 Route::get('/mes-commandes', [StoreController::class, 'mesCommandes']);
 Route::get('/mes-commandes/{id}', [StoreController::class, 'commandeShow']);
 

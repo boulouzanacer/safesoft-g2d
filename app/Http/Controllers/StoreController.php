@@ -833,6 +833,26 @@ class StoreController extends Controller
         return redirect()->to('/mes-commandes/'.$result->id)->with('success', 'Commande créée.');
     }
 
+    public function profil(): RedirectResponse|View
+    {
+        $client = $this->currentClient();
+        if (! $client) {
+            session(['url.intended' => url('/profil')]);
+            return redirect()->to('/login')->with('error', 'Connectez-vous pour continuer.');
+        }
+
+        $client->loadMissing([
+            'fournisseur:id,nom_frs',
+            'wilaya:ID_WILAYA,WILAYA',
+            'commune:ID_COMMUNE,COMMUNE',
+        ]);
+
+        return view('store.profil', [
+            'title' => 'Mon profil',
+            'client' => $client,
+        ]);
+    }
+
     public function mesCommandes(): RedirectResponse|View
     {
         $client = $this->currentClient();

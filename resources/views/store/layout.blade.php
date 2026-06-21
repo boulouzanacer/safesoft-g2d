@@ -53,6 +53,12 @@
                 </a>
 
                 @if(($client ?? null))
+                    <a href="{{ url('/profil') }}"
+                       class="inline-flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 bg-white hover:bg-slate-50"
+                       title="Mon profil"
+                       aria-label="Mon profil">
+                        <i class="fa-solid fa-user-circle text-lg text-[var(--store-primary)]"></i>
+                    </a>
                     <a href="{{ url('/mes-commandes') }}"
                        class="hidden sm:inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
                         <i class="fa-solid fa-receipt text-[var(--store-primary)]"></i>
