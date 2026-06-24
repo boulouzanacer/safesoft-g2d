@@ -842,7 +842,7 @@ class StoreController extends Controller
         }
 
         $client->loadMissing([
-            'fournisseur:id,nom_frs',
+            'fournisseur:id,nom_frs,logo_path',
             'wilaya:ID_WILAYA,WILAYA',
             'commune:ID_COMMUNE,COMMUNE',
         ]);
@@ -851,7 +851,7 @@ class StoreController extends Controller
         $email = trim((string) ($client->email ?? ''));
         if ($email !== '') {
             $relatedClients = Client::query()
-                ->with('fournisseur:id,nom_frs')
+                ->with('fournisseur:id,nom_frs,logo_path')
                 ->where('email', $email)
                 ->where('actif', 1)
                 ->get();
@@ -871,6 +871,7 @@ class StoreController extends Controller
                     return [
                         'key' => 'frs-'.$frsId,
                         'fournisseur_name' => $representative?->fournisseur?->nom_frs ?: ('Fournisseur #'.$frsId),
+                        'fournisseur_logo_url' => (string) ($representative?->fournisseur?->logo_url ?? ''),
                         'type_client' => (string) ($representative->type_client ?? 'simple'),
                         'tarif' => max(1, min(3, (int) ($representative->tarif ?? 1))),
                         'code_client' => (string) ($representative->code_client ?? ''),
@@ -887,6 +888,7 @@ class StoreController extends Controller
             $profileTabs = collect([[
                 'key' => 'default',
                 'fournisseur_name' => $client->fournisseur?->nom_frs ?: 'Compte principal',
+                'fournisseur_logo_url' => (string) ($client->fournisseur?->logo_url ?? ''),
                 'type_client' => (string) ($client->type_client ?? 'simple'),
                 'tarif' => max(1, min(3, (int) ($client->tarif ?? 1))),
                 'code_client' => (string) ($client->code_client ?? ''),

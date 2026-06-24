@@ -41,14 +41,33 @@
         </div>
 
         @if($hasMultipleTabs)
-            <div class="mt-5 flex flex-wrap gap-2" id="profileTabsNav">
+            <div class="mt-5 -mx-2 px-2 overflow-x-auto [scrollbar-width:none]" id="profileTabsNav">
+                <div class="flex gap-3 min-w-max snap-x snap-mandatory pb-1">
                 @foreach($profileTabs as $index => $tab)
                     <button type="button"
                             data-profile-tab-button="{{ $tab['key'] }}"
-                            class="rounded-2xl border px-4 py-2 text-sm font-bold transition {{ $index === 0 ? 'border-[var(--store-primary)] bg-blue-50 text-[var(--store-primary)]' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50' }}">
-                        {{ $tab['fournisseur_name'] }}
+                            class="snap-start group min-w-[220px] max-w-[280px] rounded-3xl border px-4 py-3 text-left transition shadow-sm {{ $index === 0 ? 'border-[var(--store-primary)] bg-gradient-to-br from-blue-50 to-white text-[var(--store-primary)] shadow-blue-100' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50' }}">
+                        <div class="flex items-center gap-3">
+                            <div class="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border {{ $index === 0 ? 'border-blue-200 bg-white' : 'border-slate-200 bg-slate-50' }}">
+                                @if(trim((string) ($tab['fournisseur_logo_url'] ?? '')) !== '')
+                                    <img src="{{ $tab['fournisseur_logo_url'] }}" alt="{{ $tab['fournisseur_name'] }}" class="h-full w-full object-cover">
+                                @else
+                                    <div class="h-full w-full flex items-center justify-center text-sm font-extrabold {{ $index === 0 ? 'text-[var(--store-primary)]' : 'text-slate-500' }}">
+                                        {{ strtoupper(substr((string) $tab['fournisseur_name'], 0, 2)) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <div class="truncate text-sm font-extrabold">{{ $tab['fournisseur_name'] }}</div>
+                                <div class="mt-1 text-xs {{ $index === 0 ? 'text-blue-600/80' : 'text-slate-500' }}">
+                                    {{ (string)($tab['type_client'] ?? '') === 'abonne' ? 'Compte abonne' : 'Compte simple' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 h-1.5 rounded-full {{ $index === 0 ? 'bg-gradient-to-r from-[var(--store-primary)] to-sky-400' : 'bg-slate-100 group-hover:bg-slate-200' }}"></div>
                     </button>
                 @endforeach
+                </div>
             </div>
         @endif
 
@@ -205,11 +224,42 @@
                 buttons.forEach((button) => {
                     const active = button.getAttribute('data-profile-tab-button') === key;
                     button.classList.toggle('border-[var(--store-primary)]', active);
-                    button.classList.toggle('bg-blue-50', active);
+                    button.classList.toggle('from-blue-50', active);
+                    button.classList.toggle('to-white', active);
+                    button.classList.toggle('bg-gradient-to-br', active);
                     button.classList.toggle('text-[var(--store-primary)]', active);
+                    button.classList.toggle('shadow-blue-100', active);
                     button.classList.toggle('border-slate-200', !active);
                     button.classList.toggle('bg-white', !active);
                     button.classList.toggle('text-slate-600', !active);
+                    button.classList.toggle('bg-gradient-to-br', !active ? false : true);
+
+                    const logoWrap = button.querySelector('div.h-12.w-12');
+                    if (logoWrap) {
+                        logoWrap.classList.toggle('border-blue-200', active);
+                        logoWrap.classList.toggle('bg-white', active);
+                        logoWrap.classList.toggle('border-slate-200', !active);
+                        logoWrap.classList.toggle('bg-slate-50', !active);
+                    }
+
+                    const subtitle = button.querySelector('.mt-1.text-xs');
+                    if (subtitle) {
+                        subtitle.classList.toggle('text-blue-600/80', active);
+                        subtitle.classList.toggle('text-slate-500', !active);
+                    }
+
+                    const indicator = button.querySelector('.mt-3.h-1\\.5');
+                    if (indicator) {
+                        indicator.classList.toggle('bg-gradient-to-r', active);
+                        indicator.classList.toggle('from-[var(--store-primary)]', active);
+                        indicator.classList.toggle('to-sky-400', active);
+                        indicator.classList.toggle('bg-slate-100', !active);
+                        indicator.classList.toggle('group-hover:bg-slate-200', !active);
+                    }
+
+                    if (active) {
+                        button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }
                 });
 
                 panels.forEach((panel) => {

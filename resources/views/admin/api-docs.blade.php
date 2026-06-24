@@ -510,11 +510,13 @@
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                         Cree un client unitaire depuis le logiciel PME.
                                         Si vous n'envoyez pas certains champs, les valeurs par defaut sont:
-                                        <span class="font-mono">type_client=simple</span>,
+                                        <span class="font-mono">type_client=abonne</span>,
                                         <span class="font-mono">tarif=1</span>,
                                         <span class="font-mono">synced_pme=1</span>,
                                         <span class="font-mono">actif=1</span>.
                                         Le mot de passe peut etre envoye en clair; l'API le hash automatiquement.
+                                        Le logiciel PME cree toujours des clients
+                                        <span class="font-mono">abonne</span>.
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">
                                         Cas d'usage: ajout manuel d'un nouveau client.
@@ -540,9 +542,12 @@
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                         Met a jour un client existant appartenant au fournisseur du token. Vous pouvez envoyer uniquement les champs modifies.
                                         Si <span class="font-mono">password</span> est envoye, il sera remplace; sinon il reste inchangé.
+                                        Le type client reste toujours
+                                        <span class="font-mono">abonne</span>
+                                        pour les clients venant du logiciel PME.
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">
-                                        Cas d'usage: mise a jour telephone, tarif, statut synchronisation ou type client.
+                                        Cas d'usage: mise a jour telephone, tarif ou statut de synchronisation.
                                     </div>
                                     <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
   "telephone": "0550123456",

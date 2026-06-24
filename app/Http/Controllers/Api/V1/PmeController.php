@@ -72,9 +72,11 @@ class PmeController extends Controller
                 : Hash::make($validated['password']);
         }
 
+        // Clients created or updated from the PME integration are always abonnés.
+        $payload['type_client'] = 'abonne';
+
         if (! $existing) {
             $payload['adresse'] = $payload['adresse'] ?? '';
-            $payload['type_client'] = $payload['type_client'] ?? 'simple';
             $payload['tarif'] = (int) ($payload['tarif'] ?? 1);
             $payload['synced_pme'] = (int) ($payload['synced_pme'] ?? 1);
             $payload['actif'] = (int) ($payload['actif'] ?? 1);
