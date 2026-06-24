@@ -164,10 +164,13 @@ class StoreController extends Controller
         }
     }
 
-    private function resolveOrderClient(Client $client, int $frsId): Client
+    private function resolveOrderClient(Client $client, int $frsId): array
     {
         if ((string) $client->type_client === 'abonne' && (int) ($client->id_frs ?? 0) === $frsId) {
-            return $client;
+            return [
+                'client' => $client,
+                'session_client_id' => (int) $client->id,
+            ];
         }
 
         $supplierClient = Client::findForFournisseurByEmail($frsId, (string) $client->email);
@@ -185,18 +188,41 @@ class StoreController extends Controller
             'actif' => 1,
         ];
 
+        $isSimpleRoot = (string) $client->type_client === 'simple' && (int) ($client->id_frs ?? 0) === 0;
+
         if ($supplierClient) {
             $supplierClient->update($payload);
 
-            return $supplierClient->fresh();
+            if ($isSimpleRoot && (int) $supplierClient->id !== (int) $client->id) {
+                $client->delete();
+            }
+
+            return [
+                'client' => $supplierClient->fresh(),
+                'session_client_id' => (int) $supplierClient->id,
+            ];
         }
 
-        return Client::create($payload + [
+        if ($isSimpleRoot) {
+            $client->update($payload);
+
+            return [
+                'client' => $client->fresh(),
+                'session_client_id' => (int) $client->id,
+            ];
+        }
+
+        $created = Client::create($payload + [
             'type_client' => 'simple',
             'tarif' => 1,
             'synced_pme' => 0,
             'email_verified_at' => $client->email_verified_at ?? now(),
         ]);
+
+        return [
+            'client' => $created,
+            'session_client_id' => (int) $client->id,
+        ];
     }
 
     private function cartSummary(): array
@@ -800,7 +826,9 @@ class StoreController extends Controller
                 $pdb->update(['stock' => (int) $pdb->stock - $qty]);
             }
 
-            $orderClient = $this->resolveOrderClient($client, (int) $frs->id);
+            $orderClientResult = $this->resolveOrderClient($client, (int) $frs->id);
+            /** @var Client $orderClient */
+            $orderClient = $orderClientResult['client'];
 
             $cmd = Cmd1::create([
                 'id_client' => (int) $orderClient->id,
@@ -825,12 +853,16 @@ class StoreController extends Controller
                 ]);
             }
 
-            return $cmd;
+            return [
+                'commande' => $cmd,
+                'session_client_id' => (int) ($orderClientResult['session_client_id'] ?? $client->id),
+            ];
         });
 
         session()->forget(['cart', 'cart_frs_id']);
+        session(['client_id' => (int) ($result['session_client_id'] ?? $client->id)]);
 
-        return redirect()->to('/mes-commandes/'.$result->id)->with('success', 'Commande créée.');
+        return redirect()->to('/mes-commandes/'.$result['commande']->id)->with('success', 'Commande créée.');
     }
 
     public function profil(): RedirectResponse|View
