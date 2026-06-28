@@ -2,8 +2,12 @@
 
 use App\Models\Client;
 use App\Models\Cmd1;
+use App\Models\VisitPlan;
+use App\Services\VisitPlanningService;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -82,3 +86,23 @@ Artisan::command('clients:cleanup-root-duplicates {--execute : Apply the cleanup
 
     $this->info("Cleanup completed. Deleted {$deleted} duplicate root client(s).");
 })->purpose('Remove duplicate root website clients once supplier-linked client records already exist');
+
+Artisan::command('visits:generate {--frs=} {--days=60}', function (VisitPlanningService $service) {
+    $days = max(1, (int) $this->option('days'));
+    $from = Carbon::today();
+    $to = Carbon::today()->addDays($days);
+    $frsId = $this->option('frs');
+
+    $plans = VisitPlan::query()
+        ->where('is_active', 1)
+        ->when($frsId, fn ($query) => $query->where('id_frs', (int) $frsId))
+        ->get();
+
+    foreach ($plans as $plan) {
+        $service->regenerateForPlan($plan, $from, $to);
+    }
+
+    $this->info('Planning de visite régénéré avec succès.');
+})->purpose('Generate visit cache for the next days');
+
+Schedule::command('visits:generate --days=60')->dailyAt('01:00');

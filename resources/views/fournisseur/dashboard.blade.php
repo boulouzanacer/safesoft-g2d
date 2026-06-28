@@ -55,6 +55,82 @@
             </div>
         </div>
     </div>
+
+    <a href="{{ url('/fournisseur/visites/planning') }}"
+       class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)] hover:bg-white/5 transition">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white/60">Visites du jour</div>
+                <div class="text-3xl font-extrabold mt-1">{{ $visites_du_jour }}</div>
+            </div>
+            <div class="h-12 w-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #14b8a6, #0f766e);">
+                <i class="fa-solid fa-route text-white text-lg"></i>
+            </div>
+        </div>
+    </a>
+
+    <div class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)]">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white/60">Plans actifs</div>
+                <div class="text-3xl font-extrabold mt-1">{{ $plans_actifs }}</div>
+            </div>
+            <div class="h-12 w-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #38bdf8, #2563eb);">
+                <i class="fa-solid fa-calendar-days text-white text-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)]">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white/60">Clients sans planning</div>
+                <div class="text-3xl font-extrabold mt-1">{{ $clients_sans_planning }}</div>
+            </div>
+            <div class="h-12 w-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">
+                <i class="fa-solid fa-triangle-exclamation text-white text-lg"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+    <div class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)] xl:col-span-2">
+        <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+                <div class="font-extrabold tracking-wide">Planning de visite du jour</div>
+                <div class="text-sm text-white/60">Clients calcules depuis le cache journalier genere.</div>
+            </div>
+            <a href="{{ url('/fournisseur/visites/planning') }}" class="text-sm text-[var(--frs-primary)] hover:opacity-90">Gerer le planning</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            @forelse($clients_a_visiter as $visite)
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="font-bold">{{ trim(($visite->prenom ?? '').' '.($visite->nom ?? '')) }}</div>
+                    <div class="text-xs text-white/60 mt-1">Code: {{ $visite->code_client ?: '-' }}</div>
+                </div>
+            @empty
+                <div class="text-white/60">Aucune visite generee pour aujourd'hui.</div>
+            @endforelse
+        </div>
+    </div>
+
+    <div class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)]">
+        <div class="flex items-center justify-between mb-4">
+            <div class="font-extrabold tracking-wide">Charge sur 7 jours</div>
+            <span class="text-xs text-white/50">Projection</span>
+        </div>
+        <div class="space-y-3">
+            @forelse($prochaines_visites as $item)
+                <div class="flex items-center justify-between text-sm rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    <span>{{ \Illuminate\Support\Carbon::parse($item->visit_date)->format('d/m/Y') }}</span>
+                    <span class="font-extrabold">{{ $item->total }} visite(s)</span>
+                </div>
+            @empty
+                <div class="text-white/60">Aucune visite planifiee sur les 7 prochains jours.</div>
+            @endforelse
+        </div>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
@@ -138,4 +214,3 @@
     </div>
 </div>
 @endsection
-

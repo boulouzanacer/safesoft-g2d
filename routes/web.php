@@ -15,6 +15,7 @@ use App\Http\Controllers\Fournisseur\ClientController as FrsClientController;
 use App\Http\Controllers\Fournisseur\CommandeController as FrsCommandeController;
 use App\Http\Controllers\Fournisseur\TokenController as FrsTokenController;
 use App\Http\Controllers\Fournisseur\ProfileController as FrsProfileController;
+use App\Http\Controllers\Fournisseur\VisitPlanningController as FrsVisitPlanningController;
 use App\Http\Controllers\StoreController;
 
 Route::get('/', [StoreController::class, 'index']);
@@ -110,6 +111,12 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
     Route::put('/commandes/{id}/statut', [FrsCommandeController::class, 'updateStatut']);
 
     Route::get('/token', [FrsTokenController::class, 'index']);
+
+    Route::get('/visites/planning', [FrsVisitPlanningController::class, 'index']);
+    Route::post('/visites/planning', [FrsVisitPlanningController::class, 'store']);
+    Route::put('/visites/planning/{id}', [FrsVisitPlanningController::class, 'update']);
+    Route::post('/visites/planning/{id}/toggle', [FrsVisitPlanningController::class, 'toggle']);
+    Route::post('/visites/planning/regenerate', [FrsVisitPlanningController::class, 'regenerate']);
 
     Route::get('/profil', [FrsProfileController::class, 'edit']);
     Route::put('/profil', [FrsProfileController::class, 'update']);

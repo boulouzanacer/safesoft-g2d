@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Cmd1;
 use App\Models\Client;
 use App\Models\Produit;
+use App\Models\VisitDaily;
+use App\Models\VisitPlan;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 
@@ -57,6 +59,41 @@ class DashboardController extends Controller
             ->limit(5)
             ->get(['id', 'reference', 'designation', 'stock', 'pv_1', 'actif', 'image_principale']);
 
+        $visitesDuJour = VisitDaily::query()
+            ->where('id_frs', $frsId)
+            ->whereDate('visit_date', Carbon::today())
+            ->count();
+
+        $plansActifs = VisitPlan::query()
+            ->where('id_frs', $frsId)
+            ->where('is_active', 1)
+            ->count();
+
+        $clientsSansPlanning = Client::query()
+            ->where('id_frs', $frsId)
+            ->whereNotIn('id', VisitPlan::query()
+                ->select('client_id')
+                ->where('id_frs', $frsId)
+                ->where('is_active', 1))
+            ->count();
+
+        $clientsAVisiter = VisitDaily::query()
+            ->leftJoin('client', 'client.id', '=', 'visit_daily.client_id')
+            ->select(['visit_daily.visit_date', 'client.id', 'client.nom', 'client.prenom', 'client.code_client'])
+            ->where('visit_daily.id_frs', $frsId)
+            ->whereDate('visit_daily.visit_date', Carbon::today())
+            ->orderBy('client.nom')
+            ->limit(8)
+            ->get();
+
+        $prochainesVisites = VisitDaily::query()
+            ->selectRaw('visit_date, COUNT(*) as total')
+            ->where('id_frs', $frsId)
+            ->whereBetween('visit_date', [Carbon::today()->toDateString(), Carbon::today()->copy()->addDays(6)->toDateString()])
+            ->groupBy('visit_date')
+            ->orderBy('visit_date')
+            ->get();
+
         return view('fournisseur.dashboard', [
             'title' => 'Mon Dashboard',
             'cmd_en_attente' => $cmdEnAttente,
@@ -65,6 +102,11 @@ class DashboardController extends Controller
             'produits_actifs' => $produitsActifs,
             'dernieres_commandes' => $dernieresCommandes,
             'rupture_stock' => $ruptureStock,
+            'visites_du_jour' => $visitesDuJour,
+            'plans_actifs' => $plansActifs,
+            'clients_sans_planning' => $clientsSansPlanning,
+            'clients_a_visiter' => $clientsAVisiter,
+            'prochaines_visites' => $prochainesVisites,
         ]);
     }
 }

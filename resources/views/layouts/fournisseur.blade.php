@@ -116,6 +116,13 @@
                 <span>Mes Commandes</span>
             </a>
 
+            <a href="{{ url('/fournisseur/visites/planning') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/visites/planning*') ? 'bg-white/10' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
+                <i class="fa-solid fa-route w-5 text-[var(--frs-primary)]"></i>
+                <span>Planning de visite</span>
+            </a>
+
             <a href="{{ url('/fournisseur/token') }}"
                class="flex items-center gap-3 rounded-xl px-4 py-3 {{ request()->is('fournisseur/token') ? 'bg-white/10' : '' }}"
                :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">

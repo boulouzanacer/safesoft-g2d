@@ -128,7 +128,13 @@
                     @endphp
                     <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                         <div class="h-9 w-9 rounded-xl flex items-center justify-center border shrink-0"
-                             style="{{ $done ? 'background: linear-gradient(135deg, var(--frs-primary), #0A3D7A); border-color: transparent;' : 'background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10);' }}">
+                             @if($done)
+                                 style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A); border-color: transparent;"
+                             @else
+                                 style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10);"
+                             @endif>
+
+
                             <i class="fa-solid {{ $done ? 'fa-check' : 'fa-circle' }} text-white text-xs"></i>
                         </div>
                         <div class="{{ $isCurrent ? 'font-extrabold text-white' : 'font-semibold text-white/80' }}">
