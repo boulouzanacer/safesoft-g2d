@@ -15,6 +15,7 @@ use App\Http\Controllers\Fournisseur\ClientController as FrsClientController;
 use App\Http\Controllers\Fournisseur\CommandeController as FrsCommandeController;
 use App\Http\Controllers\Fournisseur\TokenController as FrsTokenController;
 use App\Http\Controllers\Fournisseur\ProfileController as FrsProfileController;
+use App\Http\Controllers\Fournisseur\PrevendeurController as FrsPrevendeurController;
 use App\Http\Controllers\Fournisseur\VisitPlanningController as FrsVisitPlanningController;
 use App\Http\Controllers\StoreController;
 
@@ -105,10 +106,16 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
 
     Route::get('/clients', [FrsClientController::class, 'index']);
     Route::get('/clients/{id}', [FrsClientController::class, 'show']);
+    Route::put('/clients/{id}/prevendeur', [FrsClientController::class, 'updatePrevendeur']);
 
     Route::get('/commandes', [FrsCommandeController::class, 'index']);
     Route::get('/commandes/{id}', [FrsCommandeController::class, 'show']);
     Route::put('/commandes/{id}/statut', [FrsCommandeController::class, 'updateStatut']);
+
+    Route::get('/prevendeurs', [FrsPrevendeurController::class, 'index']);
+    Route::post('/prevendeurs', [FrsPrevendeurController::class, 'store']);
+    Route::put('/prevendeurs/{id}', [FrsPrevendeurController::class, 'update']);
+    Route::post('/prevendeurs/{id}/toggle', [FrsPrevendeurController::class, 'toggle']);
 
     Route::get('/token', [FrsTokenController::class, 'index']);
 

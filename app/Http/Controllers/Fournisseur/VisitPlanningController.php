@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Fournisseur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
+use App\Models\Prevendeur;
 use App\Models\VisitDaily;
 use App\Models\VisitPlan;
 use App\Services\VisitPlanningService;
@@ -25,19 +26,26 @@ class VisitPlanningController extends Controller
         $editingPlan = null;
         if ($request->filled('edit')) {
             $editingPlan = VisitPlan::query()
-                ->with('days')
+                ->with(['days', 'client.prevendeur', 'prevendeur'])
                 ->where('id_frs', $frsId)
                 ->findOrFail((int) $request->query('edit'));
         }
 
         $clients = Client::query()
             ->where('id_frs', $frsId)
+            ->with('prevendeur:id,nom')
             ->orderBy('prenom')
             ->orderBy('nom')
-            ->get(['id', 'code_client', 'nom', 'prenom']);
+            ->get(['id', 'code_client', 'nom', 'prenom', 'prevendeur_id']);
+
+        $prevendeurs = Prevendeur::query()
+            ->where('id_frs', $frsId)
+            ->where('actif', 1)
+            ->orderBy('nom')
+            ->get(['id', 'nom']);
 
         $plans = VisitPlan::query()
-            ->with(['client:id,code_client,nom,prenom', 'days'])
+            ->with(['client:id,code_client,nom,prenom,prevendeur_id', 'client.prevendeur:id,nom', 'days', 'prevendeur:id,nom'])
             ->where('id_frs', $frsId)
             ->orderByDesc('is_active')
             ->orderBy('client_id')
@@ -45,9 +53,10 @@ class VisitPlanningController extends Controller
             ->withQueryString();
 
         $todayVisits = VisitDaily::query()
-            ->with('client:id,code_client,nom,prenom')
+            ->with(['client:id,code_client,nom,prenom', 'prevendeur:id,nom'])
             ->where('id_frs', $frsId)
             ->whereDate('visit_date', $today)
+            ->orderBy('prevendeur_id')
             ->orderBy('client_id')
             ->get();
 
@@ -70,6 +79,7 @@ class VisitPlanningController extends Controller
         return view('fournisseur.visites.index', [
             'title' => 'Planning de visite',
             'clients' => $clients,
+            'prevendeurs' => $prevendeurs,
             'plans' => $plans,
             'editing_plan' => $editingPlan,
             'today_visits' => $todayVisits,
@@ -77,6 +87,7 @@ class VisitPlanningController extends Controller
             'active_plans_count' => VisitPlan::query()->where('id_frs', $frsId)->where('is_active', 1)->count(),
             'today_visits_count' => $todayVisits->count(),
             'clients_without_plan' => $clientsWithoutPlan,
+            'clients_without_prevendeur' => Client::query()->where('id_frs', $frsId)->whereNull('prevendeur_id')->count(),
         ]);
     }
 
@@ -145,10 +156,14 @@ class VisitPlanningController extends Controller
     protected function persistPlan(VisitPlan $plan, array $data, int $frsId): VisitPlan
     {
         $otherPlanIds = collect();
+        $client = Client::query()
+            ->where('id_frs', $frsId)
+            ->findOrFail((int) $data['client_id']);
 
         $plan->fill([
             'client_id' => (int) $data['client_id'],
             'id_frs' => $frsId,
+            'prevendeur_id' => (int) $client->prevendeur_id,
             'frequency_type' => $data['frequency_type'],
             'interval_value' => (int) $data['interval_value'],
             'month_occurrence' => $data['frequency_type'] === 'monthly' ? $data['month_occurrence'] : null,
@@ -220,7 +235,27 @@ class VisitPlanningController extends Controller
         if ($data['frequency_type'] === 'daily') {
             $data['weekdays'] = [];
 
+            $client = Client::query()
+                ->where('id_frs', $frsId)
+                ->find((int) $data['client_id']);
+
+            if (! $client || ! $client->prevendeur_id) {
+                throw ValidationException::withMessages([
+                    'client_id' => 'Veuillez affecter ce client a un prevendeur avant de definir son planning.',
+                ]);
+            }
+
             return $data;
+        }
+
+        $client = Client::query()
+            ->where('id_frs', $frsId)
+            ->find((int) $data['client_id']);
+
+        if (! $client || ! $client->prevendeur_id) {
+            throw ValidationException::withMessages([
+                'client_id' => 'Veuillez affecter ce client a un prevendeur avant de definir son planning.',
+            ]);
         }
 
         if (count($data['weekdays']) === 0) {

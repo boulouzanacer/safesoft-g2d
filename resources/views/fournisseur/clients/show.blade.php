@@ -5,6 +5,29 @@
     $achatClient = (float) ($client->achat_client ?? 0);
     $versementClient = (float) ($client->versement_client ?? 0);
     $soldeClient = (float) ($client->solde_client ?? 0);
+    $activePlan = $active_plan;
+    $dayLabels = [
+        0 => 'Dimanche',
+        1 => 'Lundi',
+        2 => 'Mardi',
+        3 => 'Mercredi',
+        4 => 'Jeudi',
+        5 => 'Vendredi',
+        6 => 'Samedi',
+    ];
+    $occurrenceLabels = [
+        'first' => 'Premier',
+        'second' => 'Deuxieme',
+        'third' => 'Troisieme',
+        'fourth' => 'Quatrieme',
+        'last' => 'Dernier',
+    ];
+    $planningDays = $activePlan
+        ? $activePlan->days
+            ->sortBy('day_of_week')
+            ->map(fn ($day) => $dayLabels[(int) $day->day_of_week] ?? (string) $day->day_of_week)
+            ->implode(', ')
+        : '';
     $soldeBadge = $soldeClient > 0
         ? 'border-red-400/20 from-red-500/20 to-red-500/5 text-red-200'
         : ($soldeClient < 0
@@ -121,6 +144,10 @@
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Tarif</div>
                     <div class="mt-2 font-extrabold">PV {{ (int) ($client->tarif ?? 1) }}</div>
                 </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Prevendeur</div>
+                    <div class="mt-2 font-extrabold">{{ $client->prevendeur?->nom ?: '-' }}</div>
+                </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4 md:col-span-2">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Adresse</div>
                     <div class="mt-2 font-semibold text-white/85 break-words">{{ trim((string) $client->adresse) !== '' ? $client->adresse : '-' }}</div>
@@ -129,8 +156,31 @@
         </div>
 
         <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
-            <div class="font-extrabold tracking-wide">Quick Summary</div>
-            <div class="mt-5 space-y-3 text-sm">
+            <div class="font-extrabold tracking-wide">Affectation Prevendeur</div>
+            <form method="POST" action="{{ url('/fournisseur/clients/'.$client->id.'/prevendeur') }}" class="mt-5 space-y-4">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Choisir un prevendeur</label>
+                    <select name="prevendeur_id" class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                        <option value="">Sans prevendeur</option>
+                        @foreach($prevendeurs as $prevendeur)
+                            <option value="{{ $prevendeur->id }}" @selected((int) old('prevendeur_id', $client->prevendeur_id) === (int) $prevendeur->id)>
+                                {{ $prevendeur->nom }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('prevendeur_id') <div class="mt-1 text-sm text-red-300">{{ $message }}</div> @enderror
+                </div>
+                <button type="submit"
+                        class="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white"
+                        style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                    Enregistrer l'affectation
+                </button>
+            </form>
+
+            <div class="mt-6 font-extrabold tracking-wide">Quick Summary</div>
+            <div class="mt-4 space-y-3 text-sm">
                 <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                     <span class="text-white/60">Client ID</span>
                     <span class="font-extrabold">#{{ $client->id }}</span>
@@ -149,6 +199,44 @@
                     <span class="text-white/60">Email</span>
                     <span class="font-extrabold truncate max-w-[12rem] text-right">{{ $client->email ?: '-' }}</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <div class="font-extrabold tracking-wide">Planning de visite du client</div>
+                <div class="text-sm text-white/50">Les visites regenerees sur 60 jours suivent toujours ces details.</div>
+            </div>
+            <a href="{{ url('/fournisseur/visites/planning'.($activePlan ? '?edit='.$activePlan->id : '')) }}"
+               class="rounded-2xl px-4 py-3 text-sm font-bold border border-white/10 hover:bg-white/10">
+                {{ $activePlan ? 'Modifier planning' : 'Creer planning' }}
+            </a>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Type</div>
+                <div class="mt-2 font-extrabold">{{ $activePlan?->frequency_type ?: '-' }}</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Intervalle</div>
+                <div class="mt-2 font-extrabold">{{ $activePlan?->interval_value ?: '-' }}</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Occurrence mensuelle</div>
+                <div class="mt-2 font-extrabold">
+                    {{ $activePlan?->month_occurrence ? ($occurrenceLabels[$activePlan->month_occurrence] ?? $activePlan->month_occurrence) : '-' }}
+                </div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Jours de visite</div>
+                <div class="mt-2 font-extrabold">{{ $planningDays !== '' ? $planningDays : '-' }}</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Prevendeur</div>
+                <div class="mt-2 font-extrabold">{{ $activePlan?->prevendeur?->nom ?: ($client->prevendeur?->nom ?: '-') }}</div>
             </div>
         </div>
     </div>

@@ -46,6 +46,10 @@
             <div class="text-sm text-white/60">Clients sans planning</div>
             <div class="mt-2 text-3xl font-extrabold">{{ $clients_without_plan }}</div>
         </div>
+        <div class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)]">
+            <div class="text-sm text-white/60">Clients sans prevendeur</div>
+            <div class="mt-2 text-3xl font-extrabold">{{ $clients_without_prevendeur }}</div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -90,7 +94,7 @@
                             <option value="">Selectionner</option>
                             @foreach($clients as $client)
                                 <option value="{{ $client->id }}" @selected((int) old('client_id', $editing?->client_id) === (int) $client->id)>
-                                    {{ trim(($client->prenom ?? '').' '.($client->nom ?? '')) }}{{ $client->code_client ? ' - '.$client->code_client : '' }}
+                                    {{ trim(($client->prenom ?? '').' '.($client->nom ?? '')) }}{{ $client->code_client ? ' - '.$client->code_client : '' }}{{ $client->prevendeur?->nom ? ' - '.$client->prevendeur->nom : ' - sans prevendeur' }}
                                 </option>
                             @endforeach
                         </select>
@@ -190,6 +194,7 @@
                     <div class="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                         <div class="font-bold">{{ trim(($visit->client->prenom ?? '').' '.($visit->client->nom ?? '')) }}</div>
                         <div class="text-xs text-white/60 mt-1">{{ $visit->client->code_client ?: 'Sans code' }}</div>
+                        <div class="text-xs text-white/50 mt-1">Prevendeur: {{ $visit->prevendeur?->nom ?: '-' }}</div>
                     </div>
                 @empty
                     <div class="text-white/60">Aucune visite prevue aujourd'hui.</div>
@@ -223,6 +228,7 @@
                 <thead class="text-white/60">
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">Client</th>
+                        <th class="text-left py-3 px-4 font-semibold">Prevendeur</th>
                         <th class="text-left py-3 px-4 font-semibold">Regle</th>
                         <th class="text-left py-3 px-4 font-semibold">Jours</th>
                         <th class="text-left py-3 px-4 font-semibold">Periode</th>
@@ -250,6 +256,7 @@
                                 <div class="font-bold">{{ trim(($plan->client->prenom ?? '').' '.($plan->client->nom ?? '')) }}</div>
                                 <div class="text-xs text-white/60">{{ $plan->client->code_client ?: '-' }}</div>
                             </td>
+                            <td class="py-3 px-4 text-white/80">{{ $plan->prevendeur?->nom ?: ($plan->client->prevendeur?->nom ?: '-') }}</td>
                             <td class="py-3 px-4">
                                 <div class="font-semibold">{{ $rule }}</div>
                                 @if($plan->frequency_type === 'monthly' && $plan->month_occurrence)
@@ -286,7 +293,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-10 text-center text-white/60">Aucun planning enregistre.</td>
+                            <td colspan="7" class="py-10 text-center text-white/60">Aucun planning enregistre.</td>
                         </tr>
                     @endforelse
                 </tbody>

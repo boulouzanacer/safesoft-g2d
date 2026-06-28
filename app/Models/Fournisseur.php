@@ -75,6 +75,11 @@ class Fournisseur extends Authenticatable
         return $this->hasMany(Client::class, 'id_frs', 'id');
     }
 
+    public function prevendeurs(): HasMany
+    {
+        return $this->hasMany(Prevendeur::class, 'id_frs', 'id');
+    }
+
     public function produits(): HasMany
     {
         return $this->hasMany(Produit::class, 'id_frs', 'id');

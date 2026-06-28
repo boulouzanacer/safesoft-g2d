@@ -13,6 +13,7 @@ class VisitDaily extends Model
         'visit_date',
         'client_id',
         'id_frs',
+        'prevendeur_id',
         'visit_plan_id',
         'status',
         'source',
@@ -31,6 +32,11 @@ class VisitDaily extends Model
     public function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class, 'id_frs', 'id');
+    }
+
+    public function prevendeur(): BelongsTo
+    {
+        return $this->belongsTo(Prevendeur::class, 'prevendeur_id', 'id');
     }
 
     public function plan(): BelongsTo

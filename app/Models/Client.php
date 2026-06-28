@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +39,7 @@ class Client extends Authenticatable
         'versement_client',
         'solde_client',
         'id_frs',
+        'prevendeur_id',
         'synced_pme',
         'actif',
     ];
@@ -53,6 +55,7 @@ class Client extends Authenticatable
         'versement_client' => 'float',
         'solde_client' => 'float',
         'synced_pme' => 'integer',
+        'prevendeur_id' => 'integer',
     ];
 
     public function scopeSimpleRoot(Builder $query): Builder
@@ -86,6 +89,11 @@ class Client extends Authenticatable
         return $this->belongsTo(Fournisseur::class, 'id_frs', 'id');
     }
 
+    public function prevendeur(): BelongsTo
+    {
+        return $this->belongsTo(Prevendeur::class, 'prevendeur_id', 'id');
+    }
+
     public function wilaya(): BelongsTo
     {
         return $this->belongsTo(Wilaya::class, 'id_wilaya', 'ID_WILAYA');
@@ -94,5 +102,10 @@ class Client extends Authenticatable
     public function commune(): BelongsTo
     {
         return $this->belongsTo(Commune::class, 'id_commune', 'ID_COMMUNE');
+    }
+
+    public function visitPlans(): HasMany
+    {
+        return $this->hasMany(VisitPlan::class, 'client_id', 'id');
     }
 }

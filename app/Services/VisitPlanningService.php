@@ -11,7 +11,7 @@ class VisitPlanningService
     public function regenerateForFournisseur(int $frsId, ?Carbon $from = null, ?Carbon $to = null): int
     {
         $plans = VisitPlan::query()
-            ->with('days')
+            ->with(['days', 'client:id,prevendeur_id'])
             ->where('id_frs', $frsId)
             ->get();
 
@@ -24,7 +24,7 @@ class VisitPlanningService
 
     public function regenerateForPlan(VisitPlan $plan, ?Carbon $from = null, ?Carbon $to = null): void
     {
-        $plan->loadMissing('days');
+        $plan->loadMissing(['days', 'client:id,prevendeur_id']);
 
         $from = ($from ?? Carbon::today())->copy()->startOfDay();
         $to = ($to ?? Carbon::today()->addDays(60))->copy()->startOfDay();
@@ -37,6 +37,15 @@ class VisitPlanningService
 
         if (! $plan->is_active) {
             return;
+        }
+
+        $prevendeurId = (int) ($plan->client?->prevendeur_id ?? $plan->prevendeur_id ?? 0);
+        if ($prevendeurId <= 0) {
+            return;
+        }
+
+        if ((int) ($plan->prevendeur_id ?? 0) !== $prevendeurId) {
+            $plan->forceFill(['prevendeur_id' => $prevendeurId])->save();
         }
 
         $startDate = Carbon::parse($plan->start_date)->startOfDay();
@@ -67,6 +76,7 @@ class VisitPlanningService
                     'id_frs' => $plan->id_frs,
                 ],
                 [
+                    'prevendeur_id' => $prevendeurId,
                     'visit_plan_id' => $plan->id,
                     'status' => 'planned',
                     'source' => 'generated',

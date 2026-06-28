@@ -27,6 +27,7 @@
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">Code</th>
                         <th class="text-left py-3 px-4 font-semibold">Nom</th>
+                        <th class="text-left py-3 px-4 font-semibold">Prevendeur</th>
                         <th class="text-left py-3 px-4 font-semibold">Email</th>
                         <th class="text-left py-3 px-4 font-semibold">Téléphone</th>
                         <th class="text-left py-3 px-4 font-semibold">Type</th>
@@ -41,6 +42,7 @@
                             onclick="window.location='{{ url('/fournisseur/clients/'.$c->id) }}'">
                             <td class="py-3 px-4 font-semibold">{{ $c->code_client ?? '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->prenom }} {{ $c->nom }}</td>
+                            <td class="py-3 px-4 text-white/80">{{ $c->prevendeur_nom ?? '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->email }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->telephone }}</td>
                             <td class="py-3 px-4">
@@ -58,7 +60,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-10 text-center text-white/60">Aucun client</td>
+                            <td colspan="9" class="py-10 text-center text-white/60">Aucun client</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -13,6 +13,7 @@ class VisitPlan extends Model
     protected $fillable = [
         'client_id',
         'id_frs',
+        'prevendeur_id',
         'frequency_type',
         'interval_value',
         'month_occurrence',
@@ -36,6 +37,11 @@ class VisitPlan extends Model
     public function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class, 'id_frs', 'id');
+    }
+
+    public function prevendeur(): BelongsTo
+    {
+        return $this->belongsTo(Prevendeur::class, 'prevendeur_id', 'id');
     }
 
     public function days(): HasMany
