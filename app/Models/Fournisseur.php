@@ -89,4 +89,9 @@ class Fournisseur extends Authenticatable
     {
         return $this->hasMany(Cmd1::class, 'id_frs', 'id');
     }
+
+    public function visitTours(): HasMany
+    {
+        return $this->hasMany(VisitTour::class, 'id_frs', 'id');
+    }
 }

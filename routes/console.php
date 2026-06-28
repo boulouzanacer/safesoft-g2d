@@ -93,16 +93,17 @@ Artisan::command('visits:generate {--frs=} {--days=60}', function (VisitPlanning
     $to = Carbon::today()->addDays($days);
     $frsId = $this->option('frs');
 
-    $plans = VisitPlan::query()
+    $fournisseurIds = VisitPlan::query()
         ->where('is_active', 1)
         ->when($frsId, fn ($query) => $query->where('id_frs', (int) $frsId))
-        ->get();
+        ->distinct()
+        ->pluck('id_frs');
 
-    foreach ($plans as $plan) {
-        $service->regenerateForPlan($plan, $from, $to);
+    foreach ($fournisseurIds as $supplierId) {
+        $service->regenerateForFournisseur((int) $supplierId, $from, $to);
     }
 
-    $this->info('Planning de visite régénéré avec succès.');
+    $this->info('Planning de visite et tournees regeneres avec succes.');
 })->purpose('Generate visit cache for the next days');
 
-Schedule::command('visits:generate --days=60')->dailyAt('01:00');
+Schedule::command('visits:generate --days=60')->dailyAt('00:00');

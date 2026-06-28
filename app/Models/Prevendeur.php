@@ -42,4 +42,9 @@ class Prevendeur extends Model
     {
         return $this->hasMany(VisitDaily::class, 'prevendeur_id', 'id');
     }
+
+    public function visitTours(): HasMany
+    {
+        return $this->hasMany(VisitTour::class, 'prevendeur_id', 'id');
+    }
 }

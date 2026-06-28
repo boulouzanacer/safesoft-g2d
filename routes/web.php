@@ -107,6 +107,7 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
     Route::get('/clients', [FrsClientController::class, 'index']);
     Route::get('/clients/{id}', [FrsClientController::class, 'show']);
     Route::put('/clients/{id}/prevendeur', [FrsClientController::class, 'updatePrevendeur']);
+    Route::put('/clients/{id}/planning', [FrsClientController::class, 'updatePlanning']);
 
     Route::get('/commandes', [FrsCommandeController::class, 'index']);
     Route::get('/commandes/{id}', [FrsCommandeController::class, 'show']);
@@ -120,9 +121,11 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
     Route::get('/token', [FrsTokenController::class, 'index']);
 
     Route::get('/visites/planning', [FrsVisitPlanningController::class, 'index']);
+    Route::get('/visites/planning/tournees/{id}', [FrsVisitPlanningController::class, 'show']);
     Route::post('/visites/planning', [FrsVisitPlanningController::class, 'store']);
     Route::put('/visites/planning/{id}', [FrsVisitPlanningController::class, 'update']);
     Route::post('/visites/planning/{id}/toggle', [FrsVisitPlanningController::class, 'toggle']);
+    Route::post('/visites/planning/tournees/{id}/status', [FrsVisitPlanningController::class, 'updateTourStatus']);
     Route::post('/visites/planning/regenerate', [FrsVisitPlanningController::class, 'regenerate']);
 
     Route::get('/profil', [FrsProfileController::class, 'edit']);

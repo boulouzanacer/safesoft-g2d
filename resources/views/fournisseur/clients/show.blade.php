@@ -22,6 +22,10 @@
         'fourth' => 'Quatrieme',
         'last' => 'Dernier',
     ];
+    $programmeTourneeActif = (int) old('programme_tournee_actif', $activePlan?->is_active ?? 0) === 1;
+    $selectedWeekdays = collect(old('weekdays', $activePlan ? $activePlan->days->pluck('day_of_week')->all() : []))
+        ->map(fn ($value) => (int) $value)
+        ->all();
     $planningDays = $activePlan
         ? $activePlan->days
             ->sortBy('day_of_week')
@@ -41,6 +45,12 @@
         : 'border-red-400/20 bg-red-500/15 text-red-200';
 @endphp
 <div class="max-w-7xl space-y-6">
+    @if(session('success'))
+        <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div class="flex items-start gap-4">
@@ -206,39 +216,86 @@
     <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] p-5 md:p-6">
         <div class="flex items-center justify-between gap-3">
             <div>
-                <div class="font-extrabold tracking-wide">Planning de visite du client</div>
-                <div class="text-sm text-white/50">Les visites regenerees sur 60 jours suivent toujours ces details.</div>
+                <div class="font-extrabold tracking-wide">Programme tournee du client</div>
+                <div class="text-sm text-white/50">Si active, la generation automatique de minuit remplira les 60 prochains jours pour ce client.</div>
             </div>
-            <a href="{{ url('/fournisseur/visites/planning'.($activePlan ? '?edit='.$activePlan->id : '')) }}"
+            <a href="{{ url('/fournisseur/visites/planning') }}"
                class="rounded-2xl px-4 py-3 text-sm font-bold border border-white/10 hover:bg-white/10">
-                {{ $activePlan ? 'Modifier planning' : 'Creer planning' }}
+                Voir les tournees
             </a>
         </div>
 
-        <div class="mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Type</div>
-                <div class="mt-2 font-extrabold">{{ $activePlan?->frequency_type ?: '-' }}</div>
-            </div>
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Intervalle</div>
-                <div class="mt-2 font-extrabold">{{ $activePlan?->interval_value ?: '-' }}</div>
-            </div>
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Occurrence mensuelle</div>
-                <div class="mt-2 font-extrabold">
-                    {{ $activePlan?->month_occurrence ? ($occurrenceLabels[$activePlan->month_occurrence] ?? $activePlan->month_occurrence) : '-' }}
+        <form method="POST" action="{{ url('/fournisseur/clients/'.$client->id.'/planning') }}" class="mt-5 space-y-5">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <label for="programme_tournee_actif" class="text-xs font-bold uppercase tracking-wide text-white/50">Programme tournee</label>
+                    <div class="mt-3 flex items-center gap-3">
+                        <input id="programme_tournee_actif" type="checkbox" name="programme_tournee_actif" value="1"
+                               @checked($programmeTourneeActif)
+                               class="h-4 w-4 rounded border-white/10 bg-black/20">
+                        <span class="font-extrabold">{{ $programmeTourneeActif ? 'Active' : 'Desactive' }}</span>
+                    </div>
+                    @error('programme_tournee_actif') <div class="mt-2 text-sm text-red-300">{{ $message }}</div> @enderror
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <label class="text-xs font-bold uppercase tracking-wide text-white/50">Type</label>
+                    <select name="frequency_type" class="mt-3 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                        <option value="daily" @selected(old('frequency_type', $activePlan?->frequency_type) === 'daily')>Quotidien</option>
+                        <option value="weekly" @selected(old('frequency_type', $activePlan?->frequency_type) === 'weekly')>Hebdomadaire</option>
+                        <option value="monthly" @selected(old('frequency_type', $activePlan?->frequency_type) === 'monthly')>Mensuel</option>
+                    </select>
+                    @error('frequency_type') <div class="mt-2 text-sm text-red-300">{{ $message }}</div> @enderror
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <label class="text-xs font-bold uppercase tracking-wide text-white/50">Intervalle</label>
+                    <input type="number" min="1" max="90" name="interval_value"
+                           value="{{ old('interval_value', $activePlan?->interval_value ?? 1) }}"
+                           class="mt-3 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    @error('interval_value') <div class="mt-2 text-sm text-red-300">{{ $message }}</div> @enderror
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <label class="text-xs font-bold uppercase tracking-wide text-white/50">Occurrence mensuelle</label>
+                    <select name="month_occurrence" class="mt-3 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                        <option value="">Aucune</option>
+                        @foreach($occurrenceLabels as $value => $label)
+                            <option value="{{ $value }}" @selected(old('month_occurrence', $activePlan?->month_occurrence) === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('month_occurrence') <div class="mt-2 text-sm text-red-300">{{ $message }}</div> @enderror
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Prevendeur</div>
+                    <div class="mt-3 font-extrabold">{{ $client->prevendeur?->nom ?: '-' }}</div>
                 </div>
             </div>
+
             <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                 <div class="text-xs font-bold uppercase tracking-wide text-white/50">Jours de visite</div>
-                <div class="mt-2 font-extrabold">{{ $planningDays !== '' ? $planningDays : '-' }}</div>
+                <div class="mt-4 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
+                    @foreach($dayLabels as $key => $label)
+                        <label class="rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 text-sm flex items-center gap-3">
+                            <input type="checkbox" name="weekdays[]" value="{{ $key }}" @checked(in_array($key, $selectedWeekdays, true)) class="h-4 w-4">
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                @error('weekdays') <div class="mt-2 text-sm text-red-300">{{ $message }}</div> @enderror
             </div>
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div class="text-xs font-bold uppercase tracking-wide text-white/50">Prevendeur</div>
-                <div class="mt-2 font-extrabold">{{ $activePlan?->prevendeur?->nom ?: ($client->prevendeur?->nom ?: '-') }}</div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="text-sm text-white/60">
+                    Details actuels: {{ $activePlan?->frequency_type ?: '-' }} | intervalle {{ $activePlan?->interval_value ?: '-' }} | jours {{ $planningDays !== '' ? $planningDays : '-' }}
+                </div>
+                <button type="submit"
+                        class="rounded-2xl px-5 py-3 font-bold text-white"
+                        style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                    Enregistrer le programme tournee
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 
     <div class="rounded-3xl border border-white/10 bg-[var(--frs-card)] overflow-hidden">

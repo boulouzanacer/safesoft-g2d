@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Prevendeur;
 use App\Models\VisitDaily;
 use App\Models\VisitPlan;
+use App\Models\VisitTour;
 use App\Services\VisitPlanningService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -23,72 +24,83 @@ class VisitPlanningController extends Controller
         $frsId = (int) session('frs_id');
         $today = Carbon::today();
 
-        $editingPlan = null;
-        if ($request->filled('edit')) {
-            $editingPlan = VisitPlan::query()
-                ->with(['days', 'client.prevendeur', 'prevendeur'])
-                ->where('id_frs', $frsId)
-                ->findOrFail((int) $request->query('edit'));
-        }
-
-        $clients = Client::query()
-            ->where('id_frs', $frsId)
-            ->with('prevendeur:id,nom')
-            ->orderBy('prenom')
-            ->orderBy('nom')
-            ->get(['id', 'code_client', 'nom', 'prenom', 'prevendeur_id']);
-
-        $prevendeurs = Prevendeur::query()
-            ->where('id_frs', $frsId)
-            ->where('actif', 1)
-            ->orderBy('nom')
-            ->get(['id', 'nom']);
-
-        $plans = VisitPlan::query()
-            ->with(['client:id,code_client,nom,prenom,prevendeur_id', 'client.prevendeur:id,nom', 'days', 'prevendeur:id,nom'])
-            ->where('id_frs', $frsId)
-            ->orderByDesc('is_active')
-            ->orderBy('client_id')
-            ->paginate(15)
-            ->withQueryString();
-
-        $todayVisits = VisitDaily::query()
-            ->with(['client:id,code_client,nom,prenom', 'prevendeur:id,nom'])
-            ->where('id_frs', $frsId)
-            ->whereDate('visit_date', $today)
-            ->orderBy('prevendeur_id')
-            ->orderBy('client_id')
-            ->get();
-
-        $upcomingVisits = VisitDaily::query()
-            ->selectRaw('visit_date, COUNT(*) as total')
-            ->where('id_frs', $frsId)
-            ->whereBetween('visit_date', [$today->toDateString(), $today->copy()->addDays(14)->toDateString()])
-            ->groupBy('visit_date')
-            ->orderBy('visit_date')
-            ->get();
-
-        $clientsWithoutPlan = Client::query()
-            ->where('id_frs', $frsId)
-            ->whereNotIn('id', VisitPlan::query()
-                ->select('client_id')
-                ->where('id_frs', $frsId)
-                ->where('is_active', 1))
-            ->count();
-
         return view('fournisseur.visites.index', [
             'title' => 'Planning de visite',
-            'clients' => $clients,
-            'prevendeurs' => $prevendeurs,
-            'plans' => $plans,
-            'editing_plan' => $editingPlan,
-            'today_visits' => $todayVisits,
-            'upcoming_visits' => $upcomingVisits,
+            'tours' => VisitTour::query()
+                ->with('prevendeur:id,nom')
+                ->where('id_frs', $frsId)
+                ->orderBy('tour_date')
+                ->orderBy('prevendeur_id')
+                ->paginate(20)
+                ->withQueryString(),
+            'today_tours' => VisitTour::query()
+                ->with('prevendeur:id,nom')
+                ->where('id_frs', $frsId)
+                ->whereDate('tour_date', $today)
+                ->orderBy('prevendeur_id')
+                ->get(),
+            'upcoming_dates' => VisitTour::query()
+                ->selectRaw('tour_date, COUNT(*) as tours_count, SUM(clients_count) as clients_count')
+                ->where('id_frs', $frsId)
+                ->whereBetween('tour_date', [$today->toDateString(), $today->copy()->addDays(14)->toDateString()])
+                ->groupBy('tour_date')
+                ->orderBy('tour_date')
+                ->get(),
             'active_plans_count' => VisitPlan::query()->where('id_frs', $frsId)->where('is_active', 1)->count(),
-            'today_visits_count' => $todayVisits->count(),
-            'clients_without_plan' => $clientsWithoutPlan,
+            'today_visits_count' => VisitDaily::query()->where('id_frs', $frsId)->whereDate('visit_date', $today)->count(),
+            'clients_without_plan' => Client::query()
+                ->where('id_frs', $frsId)
+                ->whereNotIn('id', VisitPlan::query()
+                    ->select('client_id')
+                    ->where('id_frs', $frsId)
+                    ->where('is_active', 1))
+                ->count(),
             'clients_without_prevendeur' => Client::query()->where('id_frs', $frsId)->whereNull('prevendeur_id')->count(),
+            'open_tours_count' => VisitTour::query()->where('id_frs', $frsId)->where('status', 'open')->count(),
         ]);
+    }
+
+    public function show(int $id): View
+    {
+        $frsId = (int) session('frs_id');
+
+        $tour = VisitTour::query()
+            ->with('prevendeur:id,nom')
+            ->where('id_frs', $frsId)
+            ->findOrFail($id);
+
+        $visits = VisitDaily::query()
+            ->with('client:id,code_client,nom,prenom,telephone,adresse')
+            ->where('id_frs', $frsId)
+            ->whereDate('visit_date', $tour->tour_date)
+            ->where('prevendeur_id', $tour->prevendeur_id)
+            ->orderBy('client_id')
+            ->get();
+
+        return view('fournisseur.visites.show', [
+            'title' => 'Detail Tournee',
+            'tour' => $tour,
+            'visits' => $visits,
+        ]);
+    }
+
+    public function updateTourStatus(Request $request, int $id): RedirectResponse
+    {
+        $frsId = (int) session('frs_id');
+
+        $data = $request->validate([
+            'status' => ['required', Rule::in(['pending', 'open', 'closed'])],
+        ]);
+
+        $tour = VisitTour::query()
+            ->where('id_frs', $frsId)
+            ->findOrFail($id);
+
+        $tour->update([
+            'status' => $data['status'],
+        ]);
+
+        return back()->with('success', 'Etat de la tournee mis a jour.');
     }
 
     public function store(Request $request, VisitPlanningService $service): RedirectResponse

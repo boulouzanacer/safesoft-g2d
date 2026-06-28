@@ -13,6 +13,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ClientController extends Controller
 {
@@ -84,7 +86,7 @@ class ClientController extends Controller
             ->with(['days', 'prevendeur:id,nom'])
             ->where('id_frs', $frsId)
             ->where('client_id', $client->id)
-            ->where('is_active', 1)
+            ->latest('is_active')
             ->latest('updated_at')
             ->first();
 
@@ -132,11 +134,12 @@ class ClientController extends Controller
             ]);
 
         if ($prevendeurId === null) {
-            VisitDaily::query()
+            VisitPlan::query()
                 ->where('id_frs', $frsId)
                 ->where('client_id', $client->id)
-                ->where('source', 'generated')
-                ->delete();
+                ->update(['is_active' => 0]);
+
+            $service->clearClientProgram($frsId, $client->id);
 
             return back()->with('success', 'Prevendeur retire. Les visites generees de ce client ont ete nettoyees.');
         }
@@ -148,9 +151,133 @@ class ClientController extends Controller
             ->get();
 
         foreach ($plans as $plan) {
-            $service->regenerateForPlan($plan);
+            $service->syncClientProgram($plan);
         }
 
         return back()->with('success', 'Prevendeur affecte au client et planning regenere selon ses details.');
+    }
+
+    public function updatePlanning(Request $request, int $id, VisitPlanningService $service): RedirectResponse
+    {
+        $frsId = (int) session('frs_id');
+
+        $client = Client::query()
+            ->where('id_frs', $frsId)
+            ->with('visitPlans.days')
+            ->findOrFail($id);
+
+        $data = $this->validatedPlanningData($request, $client);
+
+        $plan = VisitPlan::query()
+            ->where('id_frs', $frsId)
+            ->where('client_id', $client->id)
+            ->latest('updated_at')
+            ->first();
+
+        if (! $data['programme_tournee_actif']) {
+            VisitPlan::query()
+                ->where('id_frs', $frsId)
+                ->where('client_id', $client->id)
+                ->update(['is_active' => 0]);
+
+            $service->clearClientProgram($frsId, $client->id);
+
+            return back()->with('success', 'Programme tournee desactive pour ce client.');
+        }
+
+        if (! $plan) {
+            $plan = new VisitPlan();
+        }
+
+        $plan->fill([
+            'client_id' => $client->id,
+            'id_frs' => $frsId,
+            'prevendeur_id' => (int) $client->prevendeur_id,
+            'frequency_type' => $data['frequency_type'],
+            'interval_value' => (int) $data['interval_value'],
+            'month_occurrence' => $data['frequency_type'] === 'monthly' ? $data['month_occurrence'] : null,
+            'start_date' => $plan->start_date?->format('Y-m-d') ?? now()->toDateString(),
+            'end_date' => null,
+            'label' => 'Programme client '.$client->id,
+            'is_active' => 1,
+        ]);
+        $plan->save();
+
+        VisitPlan::query()
+            ->where('id_frs', $frsId)
+            ->where('client_id', $client->id)
+            ->where('id', '!=', $plan->id)
+            ->update(['is_active' => 0]);
+
+        $plan->days()->delete();
+        foreach ($data['weekdays'] as $dayOfWeek) {
+            $plan->days()->create([
+                'day_of_week' => (int) $dayOfWeek,
+            ]);
+        }
+
+        $service->syncClientProgram($plan->fresh(['days', 'client']));
+
+        return back()->with('success', 'Programme tournee enregistre et regenere pour ce client.');
+    }
+
+    protected function validatedPlanningData(Request $request, Client $client): array
+    {
+        $data = $request->validate([
+            'programme_tournee_actif' => ['nullable', 'boolean'],
+            'frequency_type' => ['required', Rule::in(['daily', 'weekly', 'monthly'])],
+            'interval_value' => ['required', 'integer', 'min:1', 'max:90'],
+            'month_occurrence' => ['nullable', Rule::in(['first', 'second', 'third', 'fourth', 'last'])],
+            'weekdays' => ['nullable', 'array'],
+            'weekdays.*' => ['integer', 'between:0,6'],
+        ]);
+
+        $data['programme_tournee_actif'] = (int) ($data['programme_tournee_actif'] ?? 0) === 1;
+        $data['weekdays'] = collect($data['weekdays'] ?? [])
+            ->map(fn ($value) => (int) $value)
+            ->unique()
+            ->values()
+            ->all();
+
+        if (! $data['programme_tournee_actif']) {
+            return $data;
+        }
+
+        if (! $client->prevendeur_id) {
+            throw ValidationException::withMessages([
+                'programme_tournee_actif' => 'Veuillez d abord affecter ce client a un prevendeur.',
+            ]);
+        }
+
+        if ($data['frequency_type'] === 'daily') {
+            $data['weekdays'] = [];
+            $data['month_occurrence'] = null;
+
+            return $data;
+        }
+
+        if (count($data['weekdays']) === 0) {
+            throw ValidationException::withMessages([
+                'weekdays' => 'Veuillez selectionner au moins un jour de visite.',
+            ]);
+        }
+
+        if ($data['frequency_type'] === 'monthly') {
+            if (($data['month_occurrence'] ?? null) === null) {
+                throw ValidationException::withMessages([
+                    'month_occurrence' => 'Veuillez choisir l occurrence mensuelle.',
+                ]);
+            }
+
+            if (count($data['weekdays']) !== 1) {
+                throw ValidationException::withMessages([
+                    'weekdays' => 'Le mode mensuel accepte un seul jour de visite.',
+                ]);
+            }
+        } else {
+            $data['month_occurrence'] = null;
+        }
+
+        return $data;
     }
 }

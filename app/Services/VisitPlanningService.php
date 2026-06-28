@@ -4,20 +4,35 @@ namespace App\Services;
 
 use App\Models\VisitDaily;
 use App\Models\VisitPlan;
+use App\Models\VisitTour;
 use Illuminate\Support\Carbon;
-
 class VisitPlanningService
 {
     public function regenerateForFournisseur(int $frsId, ?Carbon $from = null, ?Carbon $to = null): int
     {
+        $from = ($from ?? Carbon::today())->copy()->startOfDay();
+        $to = ($to ?? Carbon::today()->addDays(60))->copy()->startOfDay();
+
+        VisitDaily::query()
+            ->where('id_frs', $frsId)
+            ->where('source', 'generated')
+            ->delete();
+
+        VisitTour::query()
+            ->where('id_frs', $frsId)
+            ->delete();
+
         $plans = VisitPlan::query()
             ->with(['days', 'client:id,prevendeur_id'])
             ->where('id_frs', $frsId)
+            ->where('is_active', 1)
             ->get();
 
         foreach ($plans as $plan) {
             $this->regenerateForPlan($plan, $from, $to);
         }
+
+        $this->rebuildTours($frsId, $from, $to);
 
         return $plans->count();
     }
@@ -83,6 +98,87 @@ class VisitPlanningService
                 ]
             );
         }
+    }
+
+    public function syncClientProgram(VisitPlan $plan, ?Carbon $from = null, ?Carbon $to = null): void
+    {
+        $from = ($from ?? Carbon::today())->copy()->startOfDay();
+        $to = ($to ?? Carbon::today()->addDays(60))->copy()->startOfDay();
+
+        VisitDaily::query()
+            ->where('id_frs', $plan->id_frs)
+            ->where('client_id', $plan->client_id)
+            ->where('source', 'generated')
+            ->whereBetween('visit_date', [$from->toDateString(), $to->toDateString()])
+            ->delete();
+
+        $this->regenerateForPlan($plan->fresh(['days', 'client']), $from, $to);
+        $this->rebuildTours($plan->id_frs, $from, $to);
+    }
+
+    public function clearClientProgram(int $frsId, int $clientId, ?Carbon $from = null, ?Carbon $to = null): void
+    {
+        $from = ($from ?? Carbon::today())->copy()->startOfDay();
+        $to = ($to ?? Carbon::today()->addDays(60))->copy()->startOfDay();
+
+        VisitDaily::query()
+            ->where('id_frs', $frsId)
+            ->where('client_id', $clientId)
+            ->where('source', 'generated')
+            ->whereBetween('visit_date', [$from->toDateString(), $to->toDateString()])
+            ->delete();
+
+        $this->rebuildTours($frsId, $from, $to);
+    }
+
+    public function rebuildTours(int $frsId, ?Carbon $from = null, ?Carbon $to = null): void
+    {
+        $from = ($from ?? Carbon::today())->copy()->startOfDay();
+        $to = ($to ?? Carbon::today()->addDays(60))->copy()->startOfDay();
+
+        VisitTour::query()
+            ->where('id_frs', $frsId)
+            ->whereBetween('tour_date', [$from->toDateString(), $to->toDateString()])
+            ->delete();
+
+        $groups = VisitDaily::query()
+            ->selectRaw('visit_date, prevendeur_id, COUNT(*) as clients_count')
+            ->where('id_frs', $frsId)
+            ->whereNotNull('prevendeur_id')
+            ->whereBetween('visit_date', [$from->toDateString(), $to->toDateString()])
+            ->groupBy('visit_date', 'prevendeur_id')
+            ->get();
+
+        foreach ($groups as $group) {
+            $tourDate = Carbon::parse($group->visit_date)->startOfDay();
+
+            VisitTour::query()->updateOrCreate(
+                [
+                    'id_frs' => $frsId,
+                    'prevendeur_id' => (int) $group->prevendeur_id,
+                    'tour_date' => $tourDate->toDateString(),
+                ],
+                [
+                    'status' => $this->resolveTourStatus($tourDate),
+                    'clients_count' => (int) $group->clients_count,
+                ]
+            );
+        }
+    }
+
+    protected function resolveTourStatus(Carbon $tourDate): string
+    {
+        $today = Carbon::today();
+
+        if ($tourDate->lt($today)) {
+            return 'closed';
+        }
+
+        if ($tourDate->equalTo($today)) {
+            return 'open';
+        }
+
+        return 'pending';
     }
 
     protected function generateDates(VisitPlan $plan, Carbon $from, Carbon $to): array
