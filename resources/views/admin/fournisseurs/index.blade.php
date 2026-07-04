@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="{ tokenOpen: false, tokenValue: '' }" class="space-y-4">
+<div x-data="{ tokenOpen: false, tokenValue: '', createOpen: {{ ($create_open || old('modal_context') === 'create') ? 'true' : 'false' }}, editOpen: {{ ($editing_fournisseur || old('modal_context') === 'edit') ? 'true' : 'false' }} }" class="space-y-4">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <form id="fournisseursFiltersForm" method="GET" action="{{ url('/admin/fournisseurs') }}" class="flex items-center gap-2 w-full md:w-auto">
             <div class="relative w-full md:w-[340px]">
@@ -15,7 +15,7 @@
             <button type="submit" class="hidden">Filtrer</button>
         </form>
 
-        <a href="{{ url('/admin/fournisseurs/create') }}"
+        <a href="{{ url('/admin/fournisseurs?create=1') }}"
            class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white"
            style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
             <i class="fa-solid fa-plus"></i>
@@ -115,7 +115,7 @@
                                         </button>
                                     </form>
 
-                                    <a href="{{ url('/admin/fournisseurs/'.$f->id.'/edit') }}"
+                                    <a href="{{ url('/admin/fournisseurs?edit='.$f->id) }}"
                                        class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
                                        title="Éditer"
                                        aria-label="Éditer">
@@ -149,6 +149,77 @@
     <div>
         {{ $fournisseurs->links() }}
     </div>
+
+    <div x-show="createOpen" x-transition class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+        <div class="absolute inset-0 bg-black/60" @click="window.location='{{ url('/admin/fournisseurs') }}'"></div>
+        <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <div class="text-2xl font-extrabold tracking-wide">Créer un fournisseur</div>
+                    <div class="text-sm text-white/60">Le token sera généré automatiquement.</div>
+                </div>
+                <button type="button" class="text-white/60 hover:text-white" @click="window.location='{{ url('/admin/fournisseurs') }}'">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ url('/admin/fournisseurs') }}" enctype="multipart/form-data">
+                <input type="hidden" name="modal_context" value="create">
+                @include('admin.fournisseurs._form', [
+                    'isEdit' => false,
+                    'frs' => null,
+                    'wilayas' => $wilayas,
+                    'communes' => collect(),
+                    'formPrefix' => 'create_frs',
+                ])
+
+                <div class="mt-6 flex justify-end">
+                    <button type="submit"
+                            class="rounded-2xl px-6 py-3 font-extrabold text-white"
+                            style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
+                        Créer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if($editing_fournisseur)
+        <div x-show="editOpen" x-transition class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+            <div class="absolute inset-0 bg-black/60" @click="window.location='{{ url('/admin/fournisseurs') }}'"></div>
+            <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-2xl font-extrabold tracking-wide">Éditer fournisseur</div>
+                        <div class="text-sm text-white/60">{{ $editing_fournisseur->nom_frs }}</div>
+                    </div>
+                    <button type="button" class="text-white/60 hover:text-white" @click="window.location='{{ url('/admin/fournisseurs') }}'">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ url('/admin/fournisseurs/'.$editing_fournisseur->id) }}" enctype="multipart/form-data">
+                    @method('PUT')
+                    <input type="hidden" name="modal_context" value="edit">
+                    @include('admin.fournisseurs._form', [
+                        'isEdit' => true,
+                        'frs' => $editing_fournisseur,
+                        'wilayas' => $wilayas,
+                        'communes' => $edit_communes,
+                        'formPrefix' => 'edit_frs',
+                    ])
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit"
+                                class="rounded-2xl px-6 py-3 font-extrabold text-white"
+                                style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
 
     <div x-show="tokenOpen" x-transition class="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-black/60" @click="tokenOpen=false"></div>

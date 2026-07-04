@@ -23,12 +23,25 @@ class FournisseurController extends Controller
     public function index(Request $request): View
     {
         $q = trim((string) $request->query('q', ''));
+        $editId = (int) $request->query('edit', 0);
+        $createOpen = (int) $request->query('create', 0) === 1;
 
         Fournisseur::query()
             ->whereNotNull('expires_at')
             ->whereDate('expires_at', '<', Carbon::today()->toDateString())
             ->where('actif', 1)
             ->update(['actif' => 0]);
+
+        $editingFournisseur = null;
+        $editCommunes = collect();
+
+        if ($editId > 0) {
+            $editingFournisseur = Fournisseur::query()->findOrFail($editId);
+            $editCommunes = Commune::query()
+                ->where('ID_WILAYA', $editingFournisseur->id_wilaya)
+                ->orderBy('COMMUNE')
+                ->get();
+        }
 
         $fournisseurs = Fournisseur::query()
             ->leftJoin('wilaya', 'wilaya.ID_WILAYA', '=', 'frs.id_wilaya')
@@ -50,16 +63,16 @@ class FournisseurController extends Controller
             'title' => 'Fournisseurs',
             'q' => $q,
             'fournisseurs' => $fournisseurs,
+            'wilayas' => Wilaya::query()->orderBy('ID_WILAYA')->get(),
+            'create_open' => $createOpen,
+            'editing_fournisseur' => $editingFournisseur,
+            'edit_communes' => $editCommunes,
         ]);
     }
 
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('admin.fournisseurs.create', [
-            'title' => 'Créer Fournisseur',
-            'wilayas' => Wilaya::query()->orderBy('ID_WILAYA')->get(),
-            'communes' => collect(),
-        ]);
+        return redirect()->to('/admin/fournisseurs?create=1');
     }
 
     public function store(StoreFournisseurRequest $request): RedirectResponse
@@ -97,25 +110,15 @@ class FournisseurController extends Controller
         }
 
         return redirect()
-            ->to("/admin/fournisseurs/{$frs->id}/edit")
+            ->to("/admin/fournisseurs?edit={$frs->id}")
             ->with('created_token', $token);
     }
 
-    public function edit(int $id): View
+    public function edit(int $id): RedirectResponse
     {
-        $frs = Fournisseur::query()->findOrFail($id);
-        $wilayas = Wilaya::query()->orderBy('ID_WILAYA')->get();
-        $communes = Commune::query()
-            ->where('ID_WILAYA', $frs->id_wilaya)
-            ->orderBy('COMMUNE')
-            ->get();
+        Fournisseur::query()->findOrFail($id);
 
-        return view('admin.fournisseurs.edit', [
-            'title' => 'Éditer Fournisseur',
-            'frs' => $frs,
-            'wilayas' => $wilayas,
-            'communes' => $communes,
-        ]);
+        return redirect()->to("/admin/fournisseurs?edit={$id}");
     }
 
     public function update(UpdateFournisseurRequest $request, int $id): RedirectResponse

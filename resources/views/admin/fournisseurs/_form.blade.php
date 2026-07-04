@@ -1,5 +1,9 @@
 @php
     $frs = $frs ?? null;
+    $formPrefix = $formPrefix ?? 'frs';
+    $wilayaSelectId = $formPrefix.'_wilayaSelect';
+    $communeSelectId = $formPrefix.'_communeSelect';
+    $selectedCommuneId = (int) old('id_commune', $frs?->id_commune ?? 0);
 @endphp
 
 @csrf
@@ -122,7 +126,7 @@
     <div>
         <label class="block text-sm font-semibold text-white/70 mb-1">Wilaya</label>
         <select name="id_wilaya"
-                id="wilayaSelect"
+                id="{{ $wilayaSelectId }}"
                 class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                 required>
             <option value="">Choisir...</option>
@@ -138,7 +142,7 @@
     <div>
         <label class="block text-sm font-semibold text-white/70 mb-1">Commune</label>
         <select name="id_commune"
-                id="communeSelect"
+                id="{{ $communeSelectId }}"
                 class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                 required>
             <option value="">Choisir...</option>
@@ -165,8 +169,8 @@
 
 <script>
     (function () {
-        const wilayaSelect = document.getElementById('wilayaSelect');
-        const communeSelect = document.getElementById('communeSelect');
+        const wilayaSelect = document.getElementById(@json($wilayaSelectId));
+        const communeSelect = document.getElementById(@json($communeSelectId));
         if (!wilayaSelect || !communeSelect) return;
 
         async function loadCommunes(wilayaId) {
@@ -178,7 +182,7 @@
 
             const res = await fetch('{{ url('/admin/wilayas') }}/' + wilayaId + '/communes');
             const rows = await res.json();
-            const current = '{{ (int)old('id_commune', $frs?->id_commune ?? 0) }}';
+            const current = @json($selectedCommuneId);
 
             communeSelect.innerHTML = '<option value="">Choisir...</option>';
             rows.forEach(r => {
