@@ -16,6 +16,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:auth');
         Route::post('/auth/resend-email-code', [AuthController::class, 'resendEmailCode'])->middleware('throttle:auth');
         Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:auth');
+        Route::post('/pme/fournisseurs', [PmeController::class, 'storeFournisseur']);
 
         Route::middleware(['auth:sanctum', 'throttle:auth'])->group(function () {
             Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -61,4 +62,5 @@ Route::prefix('v1')->group(function () {
         Route::get('/commandes/export-csv', [PmeController::class, 'exportCommandesCsv']);
         Route::put('/commandes/{id}/sync', [PmeController::class, 'markSynced']);
     });
+
 });

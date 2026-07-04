@@ -167,37 +167,74 @@
     </div>
 </div>
 
-<script>
-    (function () {
-        const wilayaSelect = document.getElementById(@json($wilayaSelectId));
-        const communeSelect = document.getElementById(@json($communeSelectId));
-        if (!wilayaSelect || !communeSelect) return;
+<div class="hidden js-fournisseur-location-config"
+     data-wilaya-select-id="{{ $wilayaSelectId }}"
+     data-commune-select-id="{{ $communeSelectId }}"
+     data-selected-commune-id="{{ $selectedCommuneId }}"
+     data-base-url="{{ url('/admin/wilayas') }}"></div>
 
-        async function loadCommunes(wilayaId) {
+<script>
+    window.initFournisseurLocationForm = window.initFournisseurLocationForm || function (config) {
+        const wilayaSelect = document.getElementById(config.wilayaSelectId);
+        const communeSelect = document.getElementById(config.communeSelectId);
+
+        if (!wilayaSelect || !communeSelect || wilayaSelect.dataset.locationInit === '1') {
+            return;
+        }
+
+        wilayaSelect.dataset.locationInit = '1';
+
+        async function loadCommunes(wilayaId, selectedCommuneId) {
             communeSelect.innerHTML = '<option value="">Chargement...</option>';
+
             if (!wilayaId) {
                 communeSelect.innerHTML = '<option value="">Choisir...</option>';
                 return;
             }
 
-            const res = await fetch('{{ url('/admin/wilayas') }}/' + wilayaId + '/communes');
-            const rows = await res.json();
-            const current = @json($selectedCommuneId);
+            const response = await fetch(config.baseUrl + '/' + wilayaId + '/communes', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
 
+            const rows = await response.json();
             communeSelect.innerHTML = '<option value="">Choisir...</option>';
-            rows.forEach(r => {
-                const opt = document.createElement('option');
-                opt.value = r.ID_COMMUNE;
-                opt.textContent = r.COMMUNE;
-                if (String(r.ID_COMMUNE) === String(current)) opt.selected = true;
-                communeSelect.appendChild(opt);
+
+            rows.forEach(function (row) {
+                const option = document.createElement('option');
+                option.value = row.ID_COMMUNE;
+                option.textContent = row.COMMUNE;
+
+                if (String(row.ID_COMMUNE) === String(selectedCommuneId || '')) {
+                    option.selected = true;
+                }
+
+                communeSelect.appendChild(option);
             });
         }
 
-        wilayaSelect.addEventListener('change', (e) => loadCommunes(e.target.value));
+        wilayaSelect.addEventListener('change', function (event) {
+            loadCommunes(event.target.value, null);
+        });
 
         if (wilayaSelect.value && communeSelect.options.length <= 1) {
-            loadCommunes(wilayaSelect.value);
+            loadCommunes(wilayaSelect.value, config.selectedCommuneId);
         }
+    };
+
+    (function () {
+        const configElement = document.currentScript.previousElementSibling;
+        if (!configElement || !configElement.classList.contains('js-fournisseur-location-config')) {
+            return;
+        }
+
+        window.initFournisseurLocationForm({
+            wilayaSelectId: configElement.dataset.wilayaSelectId || '',
+            communeSelectId: configElement.dataset.communeSelectId || '',
+            selectedCommuneId: configElement.dataset.selectedCommuneId || '',
+            baseUrl: configElement.dataset.baseUrl || '',
+        });
     })();
 </script>

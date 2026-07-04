@@ -787,6 +787,47 @@
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /fournisseurs</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Cree un nouveau fournisseur depuis le systeme PME.
+                                    Cet endpoint est public.
+                                    Champs requis:
+                                    <span class="font-mono">nom_boutique</span>,
+                                    <span class="font-mono">telephone</span>,
+                                    <span class="font-mono">code_wilaya</span>,
+                                    <span class="font-mono">code_commune</span>.
+                                    Valeurs automatiques:
+                                    mot de passe <span class="font-mono">12345678</span>,
+                                    <span class="font-mono">actif=1</span>,
+                                    expiration demo a <span class="font-mono">+1 mois</span>,
+                                    email derive du nom de boutique et rendu unique,
+                                    token PME genere automatiquement.
+                                </div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "nom_boutique": "Boutique Ahmed",
+  "telephone": "0550123456",
+  "code_wilaya": 16,
+  "code_commune": 1601
+}</pre>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 12,
+    "nom_boutique": "Boutique Ahmed",
+    "email": "boutique.ahmed@g2d-dz.com",
+    "telephone": "0550123456",
+    "code_wilaya": 16,
+    "code_commune": 1601,
+    "actif": 1,
+    "date_expiration": "2026-08-04",
+    "password_par_defaut": "12345678",
+    "pme_token": "uuid-token"
+  },
+  "message": "Fournisseur cree"
+}</pre>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">POST /sync-fournisseur</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Met a jour le fournisseur du token PME.

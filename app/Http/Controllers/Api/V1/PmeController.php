@@ -4,21 +4,52 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\PmeClientUpsertRequest;
+use App\Http\Requests\Api\V1\PmeStoreFournisseurRequest;
 use App\Http\Requests\Api\V1\PmeSyncClientsRequest;
 use App\Http\Requests\Api\V1\PmeSyncProduitsRequest;
 use App\Models\Client;
 use App\Models\Cmd1;
 use App\Models\Cmd2;
+use App\Models\Fournisseur;
 use App\Models\Produit;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PmeController extends Controller
 {
     use ApiResponseTrait;
+
+    private function generateUniqueFournisseurEmail(string $boutiqueName): string
+    {
+        $base = Str::of($boutiqueName)
+            ->ascii()
+            ->lower()
+            ->replaceMatches('/[^a-z0-9]+/', '.')
+            ->trim('.')
+            ->value();
+
+        if ($base === '') {
+            $base = 'boutique';
+        }
+
+        $host = parse_url(config('app.url'), PHP_URL_HOST);
+        $host = is_string($host) && trim($host) !== '' ? trim($host) : 'g2d.local';
+        $host = preg_replace('/^www\./i', '', $host) ?: 'g2d.local';
+
+        $candidate = $base.'@'.$host;
+        $suffix = 1;
+
+        while (Fournisseur::query()->where('email', $candidate)->exists()) {
+            $candidate = $base.'.'.$suffix.'@'.$host;
+            $suffix++;
+        }
+
+        return $candidate;
+    }
 
     private function formatClient(Client $client): array
     {
@@ -105,6 +136,38 @@ class PmeController extends Controller
         $client = Client::create($this->resolveClientData($request->validated(), (int) $frs->id));
 
         return $this->success($this->formatClient($client), 'Client cree', 201);
+    }
+
+    public function storeFournisseur(PmeStoreFournisseurRequest $request)
+    {
+        $validated = $request->validated();
+        $email = $this->generateUniqueFournisseurEmail((string) $validated['nom_boutique']);
+        $defaultPassword = '12345678';
+
+        $fournisseur = Fournisseur::query()->create([
+            'nom_frs' => $validated['nom_boutique'],
+            'email' => $email,
+            'password' => Hash::make($defaultPassword),
+            'telephone' => $validated['telephone'],
+            'adresse' => '',
+            'id_wilaya' => (int) $validated['code_wilaya'],
+            'id_commune' => (int) $validated['code_commune'],
+            'actif' => 1,
+            'expires_at' => now()->addMonth()->toDateString(),
+        ]);
+
+        return $this->success([
+            'id' => (int) $fournisseur->id,
+            'nom_boutique' => $fournisseur->nom_frs,
+            'email' => $fournisseur->email,
+            'telephone' => $fournisseur->telephone,
+            'code_wilaya' => (int) $fournisseur->id_wilaya,
+            'code_commune' => (int) $fournisseur->id_commune,
+            'actif' => (int) $fournisseur->actif,
+            'date_expiration' => optional($fournisseur->expires_at)?->format('Y-m-d'),
+            'password_par_defaut' => $defaultPassword,
+            'pme_token' => $fournisseur->token,
+        ], 'Fournisseur cree', 201);
     }
 
     public function showClient(Request $request, int $id)
