@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class PmeStoreFournisseurRequest extends FormRequest
@@ -16,6 +17,12 @@ class PmeStoreFournisseurRequest extends FormRequest
     {
         return [
             'nom_boutique' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('frs', 'email')->whereNull('deleted_at'),
+            ],
             'telephone' => ['required', 'string', 'max:255'],
             'code_wilaya' => ['required', 'integer', 'exists:wilaya,ID_WILAYA'],
             'code_commune' => ['required', 'integer', 'exists:commune,ID_COMMUNE'],

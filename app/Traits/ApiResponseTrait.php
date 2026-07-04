@@ -36,9 +36,13 @@ trait ApiResponseTrait
         return $this->error($message, null, 401);
     }
 
+    protected function forbidden(string $message = 'Accès interdit'): JsonResponse
+    {
+        return $this->error($message, null, 403);
+    }
+
     protected function serverError(string $message = 'Erreur serveur'): JsonResponse
     {
         return $this->error($message, null, 500);
     }
 }
-

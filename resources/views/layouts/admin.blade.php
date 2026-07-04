@@ -130,6 +130,13 @@
                 <span>API Doc</span>
             </a>
 
+            <a href="{{ url('/admin/api-keys') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 border border-transparent {{ request()->is('admin/api-keys*') ? 'border-[var(--admin-primary)] bg-[color:rgba(30,111,217,0.12)]' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
+                <i class="fa-solid fa-key w-5 text-[var(--admin-primary)]"></i>
+                <span>Api Keys</span>
+            </a>
+
             <a href="{{ url('/admin/parametres') }}"
                class="flex items-center gap-3 rounded-xl px-4 py-3 border border-transparent {{ request()->is('admin/parametres*') ? 'border-[var(--admin-primary)] bg-[color:rgba(30,111,217,0.12)]' : '' }}"
                :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">

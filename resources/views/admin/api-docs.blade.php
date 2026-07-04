@@ -34,6 +34,7 @@
                     Accept: application/json<br>
                     Content-Type: application/json<br>
                     Authorization: Bearer &lt;TOKEN&gt; (required for protected endpoints)<br>
+                    X-API-KEY: &lt;API_KEY&gt; (required for POST /pme/fournisseurs and /pme/fournisseurs/info)<br>
                     Authorization: Bearer &lt;TOKEN&gt; (optional for catalog endpoints to show abonnee pricing/visibility)
                 </div>
             </div>
@@ -406,6 +407,18 @@
                     </div>
                     <div class="mt-3 text-xs text-white/65 leading-relaxed">
                         Each fournisseur only sees and modifies its own PME data. All client, product and order endpoints are automatically restricted by the fournisseur token.
+                    </div>
+                </div>
+
+                <div class="mt-4 rounded-xl border border-sky-400/20 bg-sky-500/10 p-4 text-sm text-sky-100">
+                    <div class="font-bold">Api key create fournisseur</div>
+                    <div class="mt-2 text-xs leading-relaxed">
+                        Les endpoints publics <span class="font-mono">POST /api/v1/pme/fournisseurs</span> et
+                        <span class="font-mono">POST /api/v1/pme/fournisseurs/info</span> exigent maintenant une Api Key active de type
+                        <span class="font-mono">create_fournisseur</span>.
+                    </div>
+                    <div class="mt-2 font-mono text-xs leading-relaxed break-all">
+                        X-API-KEY: &lt;create_fournisseur_api_key&gt;
                     </div>
                 </div>
 
@@ -790,9 +803,11 @@
                                 <div class="font-bold">POST /fournisseurs</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Cree un nouveau fournisseur depuis le systeme PME.
-                                    Cet endpoint est public.
+                                    Cet endpoint est public mais protege par une Api Key de type
+                                    <span class="font-mono">create_fournisseur</span>.
                                     Champs requis:
                                     <span class="font-mono">nom_boutique</span>,
+                                    <span class="font-mono">email</span>,
                                     <span class="font-mono">telephone</span>,
                                     <span class="font-mono">code_wilaya</span>,
                                     <span class="font-mono">code_commune</span>.
@@ -800,11 +815,14 @@
                                     mot de passe <span class="font-mono">12345678</span>,
                                     <span class="font-mono">actif=1</span>,
                                     expiration demo a <span class="font-mono">+1 mois</span>,
-                                    email derive du nom de boutique et rendu unique,
                                     token PME genere automatiquement.
+                                </div>
+                                <div class="mt-2 font-mono text-xs leading-relaxed break-all">
+                                    Header requis: X-API-KEY: &lt;create_fournisseur_api_key&gt;
                                 </div>
                                 <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
   "nom_boutique": "Boutique Ahmed",
+  "email": "boutique.ahmed@gmail.com",
   "telephone": "0550123456",
   "code_wilaya": 16,
   "code_commune": 1601
@@ -824,6 +842,43 @@
     "pme_token": "uuid-token"
   },
   "message": "Fournisseur cree"
+}</pre>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /fournisseurs/info</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Retourne les informations du fournisseur a partir de
+                                    <span class="font-mono">email</span> et
+                                    <span class="font-mono">password</span>.
+                                    Cet endpoint exige aussi une Api Key de type
+                                    <span class="font-mono">create_fournisseur</span>.
+                                    Si le compte est expire ou desactive, une erreur est retournee.
+                                </div>
+                                <div class="mt-2 font-mono text-xs leading-relaxed break-all">
+                                    Header requis: X-API-KEY: &lt;create_fournisseur_api_key&gt;
+                                </div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "email": "boutique.ahmed@gmail.com",
+  "password": "12345678"
+}</pre>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 12,
+    "nom_boutique": "Boutique Ahmed",
+    "email": "boutique.ahmed@gmail.com",
+    "telephone": "0550123456",
+    "adresse": "",
+    "code_wilaya": 16,
+    "code_commune": 1601,
+    "actif": 1,
+    "date_expiration": "2026-08-04",
+    "pme_token": "uuid-token",
+    "logo_url": "",
+    "is_visible": 1
+  },
+  "message": "Fournisseur trouve"
 }</pre>
                             </div>
 

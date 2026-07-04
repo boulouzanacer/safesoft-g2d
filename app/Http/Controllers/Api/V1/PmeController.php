@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\PmeClientUpsertRequest;
+use App\Http\Requests\Api\V1\PmeFournisseurInfoRequest;
 use App\Http\Requests\Api\V1\PmeStoreFournisseurRequest;
 use App\Http\Requests\Api\V1\PmeSyncClientsRequest;
 use App\Http\Requests\Api\V1\PmeSyncProduitsRequest;
@@ -17,39 +18,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PmeController extends Controller
 {
     use ApiResponseTrait;
-
-    private function generateUniqueFournisseurEmail(string $boutiqueName): string
-    {
-        $base = Str::of($boutiqueName)
-            ->ascii()
-            ->lower()
-            ->replaceMatches('/[^a-z0-9]+/', '.')
-            ->trim('.')
-            ->value();
-
-        if ($base === '') {
-            $base = 'boutique';
-        }
-
-        $host = parse_url(config('app.url'), PHP_URL_HOST);
-        $host = is_string($host) && trim($host) !== '' ? trim($host) : 'g2d.local';
-        $host = preg_replace('/^www\./i', '', $host) ?: 'g2d.local';
-
-        $candidate = $base.'@'.$host;
-        $suffix = 1;
-
-        while (Fournisseur::query()->where('email', $candidate)->exists()) {
-            $candidate = $base.'.'.$suffix.'@'.$host;
-            $suffix++;
-        }
-
-        return $candidate;
-    }
 
     private function formatClient(Client $client): array
     {
@@ -141,12 +113,11 @@ class PmeController extends Controller
     public function storeFournisseur(PmeStoreFournisseurRequest $request)
     {
         $validated = $request->validated();
-        $email = $this->generateUniqueFournisseurEmail((string) $validated['nom_boutique']);
         $defaultPassword = '12345678';
 
         $fournisseur = Fournisseur::query()->create([
             'nom_frs' => $validated['nom_boutique'],
-            'email' => $email,
+            'email' => mb_strtolower(trim((string) $validated['email'])),
             'password' => Hash::make($defaultPassword),
             'telephone' => $validated['telephone'],
             'adresse' => '',
@@ -168,6 +139,45 @@ class PmeController extends Controller
             'password_par_defaut' => $defaultPassword,
             'pme_token' => $fournisseur->token,
         ], 'Fournisseur cree', 201);
+    }
+
+    public function fournisseurInfo(PmeFournisseurInfoRequest $request)
+    {
+        $validated = $request->validated();
+        $email = mb_strtolower(trim((string) $validated['email']));
+
+        $fournisseur = Fournisseur::query()
+            ->where('email', $email)
+            ->first();
+
+        if (! $fournisseur || ! Hash::check($validated['password'], $fournisseur->password)) {
+            return $this->unauthorized('Identifiants invalides');
+        }
+
+        $fournisseur->syncExpirationStatus();
+
+        if ($fournisseur->isExpired()) {
+            return $this->forbidden('Compte expire. Veuillez contacter l administrateur.');
+        }
+
+        if ((int) $fournisseur->actif !== 1) {
+            return $this->forbidden('Compte desactive');
+        }
+
+        return $this->success([
+            'id' => (int) $fournisseur->id,
+            'nom_boutique' => $fournisseur->nom_frs,
+            'email' => $fournisseur->email,
+            'telephone' => $fournisseur->telephone,
+            'adresse' => $fournisseur->adresse,
+            'code_wilaya' => (int) $fournisseur->id_wilaya,
+            'code_commune' => (int) $fournisseur->id_commune,
+            'actif' => (int) $fournisseur->actif,
+            'date_expiration' => optional($fournisseur->expires_at)?->format('Y-m-d'),
+            'pme_token' => $fournisseur->token,
+            'logo_url' => $fournisseur->logo_url,
+            'is_visible' => (int) ($fournisseur->is_visible ?? 1),
+        ], 'Fournisseur trouve');
     }
 
     public function showClient(Request $request, int $id)

@@ -16,7 +16,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:auth');
         Route::post('/auth/resend-email-code', [AuthController::class, 'resendEmailCode'])->middleware('throttle:auth');
         Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:auth');
-        Route::post('/pme/fournisseurs', [PmeController::class, 'storeFournisseur']);
+        Route::post('/pme/fournisseurs', [PmeController::class, 'storeFournisseur'])
+            ->middleware('auth.api_key:create_fournisseur');
+        Route::post('/pme/fournisseurs/info', [PmeController::class, 'fournisseurInfo'])
+            ->middleware('auth.api_key:create_fournisseur');
 
         Route::middleware(['auth:sanctum', 'throttle:auth'])->group(function () {
             Route::post('/auth/logout', [AuthController::class, 'logout']);

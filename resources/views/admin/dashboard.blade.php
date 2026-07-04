@@ -3,7 +3,7 @@
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
     <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
         <div class="flex items-center justify-between">
             <div>
@@ -27,6 +27,20 @@
             <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
                  style="background: linear-gradient(135deg, #22c55e, #16a34a);">
                 <i class="fa-solid fa-users text-white text-lg"></i>
+            </div>
+        </div>
+    </a>
+
+    <a href="{{ url('/admin/api-keys') }}" class="block rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)] hover:bg-white/5">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="text-sm text-white/60">Api Keys actives</div>
+                <div class="text-3xl font-extrabold mt-1">{{ $nb_api_keys_actives }}</div>
+                <div class="mt-2 text-xs text-white/50">Gérer les accès API</div>
+            </div>
+            <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
+                 style="background: linear-gradient(135deg, #06b6d4, #0284c7);">
+                <i class="fa-solid fa-key text-white text-lg"></i>
             </div>
         </div>
     </a>

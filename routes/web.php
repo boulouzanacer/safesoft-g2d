@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\ApiKeyController;
 use App\Http\Controllers\Auth\ClientAuthController;
 use App\Http\Controllers\Auth\FrsAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -78,6 +79,11 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
     Route::delete('/clients/{id}', [AdminClientController::class, 'destroy']);
     Route::get('/produits', [AdminProduitController::class, 'index']);
     Route::get('/commandes', [AdminCommandeController::class, 'index']);
+
+    Route::get('/api-keys', [ApiKeyController::class, 'index']);
+    Route::post('/api-keys', [ApiKeyController::class, 'store']);
+    Route::post('/api-keys/{id}/toggle', [ApiKeyController::class, 'toggle']);
+    Route::delete('/api-keys/{id}', [ApiKeyController::class, 'destroy']);
 
     Route::get('/api-docs', function () {
         return view('admin.api-docs', ['title' => 'API Doc']);

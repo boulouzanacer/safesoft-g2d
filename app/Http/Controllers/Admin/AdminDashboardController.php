@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApiKey;
 use App\Models\Cmd1;
 use App\Models\Fournisseur;
 use App\Models\Client;
@@ -16,6 +17,9 @@ class AdminDashboardController extends Controller
     {
         $nbFournisseurs = Fournisseur::query()->count();
         $nbClients = Client::query()->count();
+        $nbApiKeysActives = ApiKey::query()
+            ->where('actif', true)
+            ->count();
 
         $today = Carbon::today();
         $nbCommandesDuJour = Cmd1::query()
@@ -68,6 +72,7 @@ class AdminDashboardController extends Controller
             'title' => 'Dashboard',
             'nb_fournisseurs' => $nbFournisseurs,
             'nb_clients' => $nbClients,
+            'nb_api_keys_actives' => $nbApiKeysActives,
             'nb_commandes' => $nbCommandesDuJour,
             'ca_total' => $caTotal,
             'chart_labels' => $labels,
