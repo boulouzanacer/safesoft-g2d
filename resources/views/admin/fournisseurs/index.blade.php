@@ -49,6 +49,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Email</th>
                         <th class="text-left py-3 px-4 font-semibold">Tel</th>
                         <th class="text-left py-3 px-4 font-semibold">Wilaya</th>
+                        <th class="text-left py-3 px-4 font-semibold">Expiration</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
                         <th class="text-left py-3 px-4 font-semibold">Token</th>
                         <th class="text-right py-3 px-4 font-semibold">Actions</th>
@@ -61,6 +62,14 @@
                             <td class="py-3 px-4 text-white/80">{{ $f->email }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $f->telephone }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $f->wilaya_nom }}</td>
+                            <td class="py-3 px-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-white/80">{{ $f->expires_at ? $f->expires_at->format('d/m/Y') : '-' }}</span>
+                                    <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $f->isExpired() ? 'bg-red-500/15 text-red-300 border border-red-400/20' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' }}">
+                                        {{ $f->isExpired() ? 'Expire' : 'Valide' }}
+                                    </span>
+                                </div>
+                            </td>
                             <td class="py-3 px-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$f->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
@@ -129,7 +138,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-10 text-center text-white/60">Aucun fournisseur</td>
+                            <td colspan="8" class="py-10 text-center text-white/60">Aucun fournisseur</td>
                         </tr>
                     @endforelse
                 </tbody>

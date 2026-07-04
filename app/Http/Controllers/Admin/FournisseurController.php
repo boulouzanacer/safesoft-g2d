@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class FournisseurController extends Controller
@@ -22,6 +23,12 @@ class FournisseurController extends Controller
     public function index(Request $request): View
     {
         $q = trim((string) $request->query('q', ''));
+
+        Fournisseur::query()
+            ->whereNotNull('expires_at')
+            ->whereDate('expires_at', '<', Carbon::today()->toDateString())
+            ->where('actif', 1)
+            ->update(['actif' => 0]);
 
         $fournisseurs = Fournisseur::query()
             ->leftJoin('wilaya', 'wilaya.ID_WILAYA', '=', 'frs.id_wilaya')
@@ -72,7 +79,8 @@ class FournisseurController extends Controller
             'latitude' => isset($data['latitude']) ? (float) $data['latitude'] : null,
             'longitude' => isset($data['longitude']) ? (float) $data['longitude'] : null,
             'token' => $token,
-            'actif' => (int) ($data['actif'] ?? 0) === 1 ? 1 : 0,
+            'actif' => $this->resolveActifFromExpiration($data),
+            'expires_at' => $data['expires_at'],
         ]);
 
         if ($request->hasFile('logo')) {
@@ -124,7 +132,8 @@ class FournisseurController extends Controller
             'id_commune' => (int) $data['id_commune'],
             'latitude' => isset($data['latitude']) ? (float) $data['latitude'] : null,
             'longitude' => isset($data['longitude']) ? (float) $data['longitude'] : null,
-            'actif' => (int) ($data['actif'] ?? 0) === 1 ? 1 : 0,
+            'actif' => $this->resolveActifFromExpiration($data),
+            'expires_at' => $data['expires_at'],
         ];
 
         if (! empty($data['password'] ?? null)) {
@@ -170,7 +179,13 @@ class FournisseurController extends Controller
     public function toggleActif(int $id): RedirectResponse
     {
         $frs = Fournisseur::query()->findOrFail($id);
-        $frs->actif = (int) $frs->actif === 1 ? 0 : 1;
+        $nextStatus = (int) $frs->actif === 1 ? 0 : 1;
+
+        if ($nextStatus === 1 && $frs->isExpired()) {
+            return back()->with('success', 'Impossible d activer ce fournisseur tant que sa date d expiration n a pas ete prolongee.');
+        }
+
+        $frs->actif = $nextStatus;
         $frs->save();
 
         return back()->with('success', 'Statut mis à jour.');
@@ -194,5 +209,17 @@ class FournisseurController extends Controller
             ->get(['ID_COMMUNE', 'COMMUNE']);
 
         return response()->json($rows);
+    }
+
+    protected function resolveActifFromExpiration(array $data): int
+    {
+        $isActive = (int) ($data['actif'] ?? 0) === 1 ? 1 : 0;
+        $expiresAt = Carbon::parse($data['expires_at'])->startOfDay();
+
+        if ($expiresAt->lt(Carbon::today()->startOfDay())) {
+            return 0;
+        }
+
+        return $isActive;
     }
 }

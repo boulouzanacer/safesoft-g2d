@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -31,6 +32,7 @@ class Fournisseur extends Authenticatable
         'longitude',
         'token',
         'actif',
+        'expires_at',
         'is_visible',
     ];
 
@@ -40,6 +42,10 @@ class Fournisseur extends Authenticatable
 
     protected $hidden = [
         'password',
+    ];
+
+    protected $casts = [
+        'expires_at' => 'date',
     ];
 
     public function getLogoUrlAttribute(): string
@@ -68,6 +74,26 @@ class Fournisseur extends Authenticatable
                 $model->token = (string) Str::uuid();
             }
         });
+    }
+
+    public function isExpired(): bool
+    {
+        if (! $this->expires_at) {
+            return false;
+        }
+
+        return $this->expires_at->startOfDay()->lt(Carbon::today()->startOfDay());
+    }
+
+    public function syncExpirationStatus(): bool
+    {
+        if ($this->isExpired() && (int) $this->actif === 1) {
+            $this->forceFill(['actif' => 0])->save();
+
+            return true;
+        }
+
+        return false;
     }
 
     public function clients(): HasMany

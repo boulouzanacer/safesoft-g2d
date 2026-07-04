@@ -25,6 +25,14 @@ class FrsAuthController extends Controller
                 ->withErrors(['email' => 'Identifiants invalides.']);
         }
 
+        $frs->syncExpirationStatus();
+
+        if ($frs->isExpired()) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'Compte expire. Veuillez contacter l administrateur pour prolonger la date expiration.']);
+        }
+
         if ((int) $frs->actif !== 1) {
             return back()
                 ->withInput($request->only('email'))

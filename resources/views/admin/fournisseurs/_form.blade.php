@@ -60,6 +60,16 @@
     </div>
 
     <div>
+        <label class="block text-sm font-semibold text-white/70 mb-1">Date expiration</label>
+        <input type="date"
+               name="expires_at"
+               value="{{ old('expires_at', $frs?->expires_at?->format('Y-m-d')) }}"
+               class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
+               required>
+        <div class="mt-1 text-xs text-white/50">L admin peut prolonger cette date plus tard pour reactiver l acces.</div>
+    </div>
+
+    <div>
         <label class="block text-sm font-semibold text-white/70 mb-1">Logo (optionnel)</label>
         <input type="file"
                name="logo"

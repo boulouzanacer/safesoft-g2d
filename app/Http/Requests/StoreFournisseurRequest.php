@@ -25,6 +25,7 @@ class StoreFournisseurRequest extends FormRequest
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'actif' => ['nullable', 'boolean'],
+            'expires_at' => ['required', 'date'],
         ];
     }
 }

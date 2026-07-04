@@ -2,6 +2,7 @@
 
 use App\Models\Client;
 use App\Models\Cmd1;
+use App\Models\Fournisseur;
 use App\Models\VisitPlan;
 use App\Services\VisitPlanningService;
 use Illuminate\Foundation\Inspiring;
@@ -106,4 +107,21 @@ Artisan::command('visits:generate {--frs=} {--days=60}', function (VisitPlanning
     $this->info('Planning de visite et tournees regeneres avec succes.');
 })->purpose('Generate visit cache for the next days');
 
+Artisan::command('fournisseurs:sync-expiration', function () {
+    $expired = Fournisseur::query()
+        ->whereNotNull('expires_at')
+        ->whereDate('expires_at', '<', Carbon::today()->toDateString())
+        ->where('actif', 1)
+        ->get();
+
+    $count = 0;
+    foreach ($expired as $fournisseur) {
+        $fournisseur->update(['actif' => 0]);
+        $count++;
+    }
+
+    $this->info("{$count} fournisseur(s) expire(s) ont ete desactive(s).");
+})->purpose('Disable expired fournisseurs automatically');
+
 Schedule::command('visits:generate --days=60')->dailyAt('00:00');
+Schedule::command('fournisseurs:sync-expiration')->dailyAt('00:00');
