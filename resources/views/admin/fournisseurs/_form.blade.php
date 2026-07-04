@@ -1,3 +1,7 @@
+@php
+    $frs = $frs ?? null;
+@endphp
+
 @csrf
 
 @if($errors->any())
