@@ -183,6 +183,42 @@
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                        <span class="font-bold">GET /boutiques/categories</span>
+                                        <span class="text-xs text-white/60">Public (token optional)</span>
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Retourne la liste des catégories boutiques utilisées par les boutiques visibles et actives.
+                                        Si un token client abonné est envoyé, la liste peut être restreinte à la catégorie de sa boutique.
+                                        Cet endpoint est utile pour alimenter les filtres catégories dans l'application mobile.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Champs retournés :
+                                        <span class="font-mono">id</span>,
+                                        <span class="font-mono">name</span>,
+                                        <span class="font-mono">slug</span>,
+                                        <span class="font-mono">image_path</span>,
+                                        <span class="font-mono">image_url</span>,
+                                        <span class="font-mono">nb_boutiques</span>.
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/boutiques/categories') }}</div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": [
+    {
+      "id": 2,
+      "name": "Cosmétique",
+      "slug": "cosmetique",
+      "image_path": "boutique-categories/2/categorie.jpg",
+      "image_url": "https://g2d-dz.com/storage/boutique-categories/2/categorie.jpg",
+      "nb_boutiques": 5
+    }
+  ],
+  "message": "Liste des categories boutiques",
+  "errors": null
+}</pre>
+                                </div>
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /boutiques</span>
                                         <span class="text-xs text-white/60">Public (token optional)</span>
                                     </div>

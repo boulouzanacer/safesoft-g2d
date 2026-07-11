@@ -40,6 +40,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::middleware(['auth.optional'])->group(function () {
+            Route::get('/boutiques/categories', [BoutiqueController::class, 'categories']);
             Route::get('/boutiques', [BoutiqueController::class, 'index']);
             Route::get('/boutiques/{id}', [BoutiqueController::class, 'show']);
 

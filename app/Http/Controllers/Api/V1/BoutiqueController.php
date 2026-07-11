@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\BoutiqueCategory;
 use App\Models\Client;
 use App\Models\Fournisseur;
 use App\Traits\ApiResponseTrait;
@@ -11,6 +12,28 @@ use Illuminate\Support\Facades\DB;
 class BoutiqueController extends Controller
 {
     use ApiResponseTrait;
+
+    public function categories()
+    {
+        $client = request()->user();
+        $isAbonne = $client instanceof Client && (string) $client->type_client === 'abonne';
+        $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
+
+        $rows = BoutiqueCategory::query()
+            ->withCount([
+                'fournisseurs as nb_boutiques' => function ($query) use ($forcedFrsId) {
+                    $query->where('actif', 1)
+                        ->whereNull('deleted_at')
+                        ->when(! $forcedFrsId, fn ($sub) => $sub->where('is_visible', 1))
+                        ->when($forcedFrsId, fn ($sub) => $sub->where('id', $forcedFrsId));
+                },
+            ])
+            ->having('nb_boutiques', '>', 0)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'image_path']);
+
+        return $this->success($rows, 'Liste des categories boutiques');
+    }
 
     public function index()
     {
