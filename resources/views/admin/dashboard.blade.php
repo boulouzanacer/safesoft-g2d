@@ -207,14 +207,19 @@
                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
                                     title="Éditer"
                                     aria-label="Éditer"
-                                    @click="openCategoryEdit({ id: {{ $category->id }}, name: @js($category->name) })">
+                                    data-category-id="{{ $category->id }}"
+                                    data-category-name="{{ e($category->name) }}"
+                                    @click="openCategoryEditFromButton($event)">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             <button type="button"
                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
                                     title="Supprimer"
                                     aria-label="Supprimer"
-                                    @click="openCategoryDelete('{{ url('/admin/boutique-categories/'.$category->id) }}', @js($category->name), {{ (int) $category->fournisseurs_count }})">
+                                    data-delete-action="{{ url('/admin/boutique-categories/'.$category->id) }}"
+                                    data-category-name="{{ e($category->name) }}"
+                                    data-category-count="{{ (int) $category->fournisseurs_count }}"
+                                    @click="openCategoryDeleteFromButton($event)">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -412,11 +417,26 @@
                     this.categoryEditName = category.name || '';
                     this.categoryEditOpen = true;
                 },
+                openCategoryEditFromButton(event) {
+                    const target = event.currentTarget;
+                    this.openCategoryEdit({
+                        id: target.dataset.categoryId || '',
+                        name: target.dataset.categoryName || '',
+                    });
+                },
                 openCategoryDelete(action, name, count) {
                     this.categoryDeleteAction = action || '';
                     this.categoryDeleteName = name || '';
                     this.categoryDeleteCount = Number(count || 0);
                     this.categoryDeleteOpen = true;
+                },
+                openCategoryDeleteFromButton(event) {
+                    const target = event.currentTarget;
+                    this.openCategoryDelete(
+                        target.dataset.deleteAction || '',
+                        target.dataset.categoryName || '',
+                        target.dataset.categoryCount || 0
+                    );
                 },
             };
         };

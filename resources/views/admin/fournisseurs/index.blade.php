@@ -1,7 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="{ tokenOpen: false, tokenValue: '', createOpen: {{ ($create_open || old('modal_context') === 'create') ? 'true' : 'false' }}, editOpen: {{ ($editing_fournisseur || old('modal_context') === 'edit') ? 'true' : 'false' }} }" class="space-y-4">
+<div class="hidden js-admin-fournisseurs-config"
+     data-create-open="{{ ($create_open || old('modal_context') === 'create') ? '1' : '0' }}"
+     data-edit-open="{{ ($editing_fournisseur || old('modal_context') === 'edit') ? '1' : '0' }}"
+     data-close-url="{{ url('/admin/fournisseurs') }}"
+     data-regenerated-token="{{ e(session('regenerated_token', '')) }}"></div>
+
+<div x-data="adminFournisseursPage()" class="space-y-4">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <form id="fournisseursFiltersForm" method="GET" action="{{ url('/admin/fournisseurs') }}" class="flex items-center gap-2 w-full md:w-auto">
             <div class="relative w-full md:w-[340px]">
@@ -34,7 +40,8 @@
             Token régénéré.
             <button type="button"
                     class="ml-2 underline"
-                    @click="tokenValue='{{ session('regenerated_token') }}'; tokenOpen=true">
+                    data-token="{{ e(session('regenerated_token', '')) }}"
+                    @click="openTokenFromButton($event)">
                 Voir token
             </button>
         </div>
@@ -87,7 +94,8 @@
                                     <span class="text-white/60">***</span>
                                     <button type="button"
                                             class="text-[var(--admin-primary)] hover:opacity-90 text-sm font-semibold"
-                                            @click="tokenValue='{{ $f->token }}'; tokenOpen=true">
+                                            data-token="{{ e($f->token) }}"
+                                            @click="openTokenFromButton($event)">
                                         Voir Token
                                     </button>
                                 </div>
@@ -153,14 +161,14 @@
     </div>
 
     <div x-show="createOpen" x-transition class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-        <div class="absolute inset-0 bg-black/60" @click="window.location='{{ url('/admin/fournisseurs') }}'"></div>
+        <div class="absolute inset-0 bg-black/60" @click="closeModal()"></div>
         <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <div class="text-2xl font-extrabold tracking-wide">Créer une boutique</div>
                     <div class="text-sm text-white/60">Le token sera généré automatiquement.</div>
                 </div>
-                <button type="button" class="text-white/60 hover:text-white" @click="window.location='{{ url('/admin/fournisseurs') }}'">
+                <button type="button" class="text-white/60 hover:text-white" @click="closeModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -188,14 +196,14 @@
 
     @if($editing_fournisseur)
         <div x-show="editOpen" x-transition class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-            <div class="absolute inset-0 bg-black/60" @click="window.location='{{ url('/admin/fournisseurs') }}'"></div>
+            <div class="absolute inset-0 bg-black/60" @click="closeModal()"></div>
             <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <div class="text-2xl font-extrabold tracking-wide">Éditer boutique</div>
                         <div class="text-sm text-white/60">{{ $editing_fournisseur->nom_frs }}</div>
                     </div>
-                    <button type="button" class="text-white/60 hover:text-white" @click="window.location='{{ url('/admin/fournisseurs') }}'">
+                    <button type="button" class="text-white/60 hover:text-white" @click="closeModal()">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -252,31 +260,65 @@
     </div>
 </div>
 <script>
-(() => {
-    const form = document.getElementById('fournisseursFiltersForm');
-    const input = document.getElementById('fournisseursSearchInput');
-    if (!form || !input) return;
+    window.adminFournisseursPage = window.adminFournisseursPage || function () {
+        const configElement = document.querySelector('.js-admin-fournisseurs-config');
+        const closeUrl = configElement ? (configElement.dataset.closeUrl || '') : '';
+        const regeneratedToken = configElement ? (configElement.dataset.regeneratedToken || '') : '';
 
-    let t = null;
-    const submit = () => {
-        if (typeof form.requestSubmit === 'function') {
-            form.requestSubmit();
-            return;
-        }
-        form.submit();
+        return {
+            tokenOpen: false,
+            tokenValue: '',
+            createOpen: configElement ? (configElement.dataset.createOpen || '0') === '1' : false,
+            editOpen: configElement ? (configElement.dataset.editOpen || '0') === '1' : false,
+            openToken(value) {
+                this.tokenValue = value || '';
+                this.tokenOpen = true;
+            },
+            openTokenFromButton(event) {
+                this.openToken(event.currentTarget.dataset.token || regeneratedToken || '');
+            },
+            closeModal() {
+                if (closeUrl) {
+                    window.location = closeUrl;
+                }
+            },
+        };
     };
 
-    input.addEventListener('input', () => {
-        if (t) clearTimeout(t);
-        t = setTimeout(() => submit(), 400);
-    });
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            if (t) clearTimeout(t);
-            submit();
+    (() => {
+        const form = document.getElementById('fournisseursFiltersForm');
+        const input = document.getElementById('fournisseursSearchInput');
+        if (!form || !input) {
+            return;
         }
-    });
-})();
+
+        let t = null;
+        const submit = () => {
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+                return;
+            }
+
+            form.submit();
+        };
+
+        input.addEventListener('input', () => {
+            if (t) {
+                clearTimeout(t);
+            }
+
+            t = setTimeout(() => submit(), 400);
+        });
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                if (t) {
+                    clearTimeout(t);
+                }
+
+                submit();
+            }
+        });
+    })();
 </script>
 @endsection

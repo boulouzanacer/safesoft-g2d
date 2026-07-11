@@ -1,7 +1,11 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="{ createdTokenOpen: {{ session('created_token') ? 'true' : 'false' }}, createdToken: '{{ session('created_token') }}' }" class="max-w-3xl">
+<div class="hidden js-admin-fournisseur-edit-config"
+     data-created-token-open="{{ session('created_token') ? '1' : '0' }}"
+     data-created-token="{{ e(session('created_token', '')) }}"></div>
+
+<div x-data="adminFournisseurEditPage()" class="max-w-3xl">
     <div class="flex items-center justify-between mb-4">
         <div>
             <div class="text-2xl font-extrabold tracking-wide">Éditer boutique</div>
@@ -59,4 +63,15 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.adminFournisseurEditPage = window.adminFournisseurEditPage || function () {
+        const configElement = document.querySelector('.js-admin-fournisseur-edit-config');
+
+        return {
+            createdTokenOpen: configElement ? (configElement.dataset.createdTokenOpen || '0') === '1' : false,
+            createdToken: configElement ? (configElement.dataset.createdToken || '') : '',
+        };
+    };
+</script>
 @endsection

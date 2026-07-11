@@ -1,6 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
+<div class="hidden js-api-keys-config"
+     data-create-open="{{ ($create_open || old('modal_context') === 'create' || $errors->any()) ? '1' : '0' }}"
+     data-initial-type="{{ old('type', array_key_first($type_options)) }}"
+     data-initial-api-key="{{ old('api_key', '') }}"
+     data-close-url="{{ url('/admin/api-keys') }}"
+     data-created-api-key="{{ e(session('created_api_key', '')) }}"></div>
+
 <div x-data="apiKeysPage()" class="space-y-4">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <form method="GET" action="{{ url('/admin/api-keys') }}" class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
@@ -42,7 +49,8 @@
             Api key créée.
             <button type="button"
                     class="ml-2 underline"
-                    @click="openView(@js(session('created_api_key')))">
+                    data-api-key="{{ e(session('created_api_key', '')) }}"
+                    @click="openViewFromButton($event)">
                 Voir la clé
             </button>
         </div>
@@ -95,7 +103,8 @@
                                             class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
                                             title="Voir"
                                             aria-label="Voir"
-                                            @click="openView(@js($apiKey->api_key))">
+                                            data-api-key="{{ e($apiKey->api_key) }}"
+                                            @click="openViewFromButton($event)">
                                         <i class="fa-solid fa-eye"></i>
                                     </button>
 
@@ -115,7 +124,9 @@
                                             class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
                                             title="Supprimer"
                                             aria-label="Supprimer"
-                                            @click="openDelete('{{ url('/admin/api-keys/'.$apiKey->id) }}', @js($apiKey->masked_key))">
+                                            data-delete-action="{{ url('/admin/api-keys/'.$apiKey->id) }}"
+                                            data-delete-label="{{ e($apiKey->masked_key) }}"
+                                            @click="openDeleteFromButton($event)">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -262,58 +273,74 @@
 </div>
 
 <script>
-function apiKeysPage() {
-    return {
-        createOpen: {{ ($create_open || old('modal_context') === 'create' || $errors->any()) ? 'true' : 'false' }},
-        viewOpen: false,
-        deleteOpen: false,
-        currentKey: '',
-        deleteAction: '',
-        deleteLabel: '',
-        form: {
-            type: @js(old('type', array_key_first($type_options))),
-            apiKey: @js(old('api_key', '')),
-        },
-        openCreate() {
-            this.createOpen = true;
-            if (!this.form.apiKey) {
-                this.generateKey();
-            }
-        },
-        closeCreate() {
-            window.location = '{{ url('/admin/api-keys') }}';
-        },
-        openView(value) {
-            this.currentKey = value || '';
-            this.viewOpen = true;
-        },
-        openDelete(action, label) {
-            this.deleteAction = action || '';
-            this.deleteLabel = label || '';
-            this.deleteOpen = true;
-        },
-        copyCurrentKey() {
-            if (!this.currentKey || !navigator.clipboard) {
-                return;
-            }
+    window.apiKeysPage = window.apiKeysPage || function () {
+        const configElement = document.querySelector('.js-api-keys-config');
+        const initialType = configElement ? (configElement.dataset.initialType || '') : '';
+        const initialApiKey = configElement ? (configElement.dataset.initialApiKey || '') : '';
+        const closeUrl = configElement ? (configElement.dataset.closeUrl || '') : '';
+        const createdApiKey = configElement ? (configElement.dataset.createdApiKey || '') : '';
 
-            navigator.clipboard.writeText(this.currentKey);
-        },
-        generateKey() {
-            const bytes = new Uint8Array(24);
+        return {
+            createOpen: configElement ? (configElement.dataset.createOpen || '0') === '1' : false,
+            viewOpen: false,
+            deleteOpen: false,
+            currentKey: '',
+            deleteAction: '',
+            deleteLabel: '',
+            form: {
+                type: initialType,
+                apiKey: initialApiKey,
+            },
+            openCreate() {
+                this.createOpen = true;
 
-            if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
-                window.crypto.getRandomValues(bytes);
-            } else {
-                for (let index = 0; index < bytes.length; index += 1) {
-                    bytes[index] = Math.floor(Math.random() * 256);
+                if (!this.form.apiKey) {
+                    this.generateKey();
                 }
-            }
+            },
+            closeCreate() {
+                if (closeUrl) {
+                    window.location = closeUrl;
+                }
+            },
+            openView(value) {
+                this.currentKey = value || '';
+                this.viewOpen = true;
+            },
+            openViewFromButton(event) {
+                this.openView(event.currentTarget.dataset.apiKey || createdApiKey || '');
+            },
+            openDelete(action, label) {
+                this.deleteAction = action || '';
+                this.deleteLabel = label || '';
+                this.deleteOpen = true;
+            },
+            openDeleteFromButton(event) {
+                const target = event.currentTarget;
+                this.openDelete(target.dataset.deleteAction || '', target.dataset.deleteLabel || '');
+            },
+            copyCurrentKey() {
+                if (!this.currentKey || !navigator.clipboard) {
+                    return;
+                }
 
-            const suffix = Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
-            this.form.apiKey = 'g2d_' + suffix;
-        },
+                navigator.clipboard.writeText(this.currentKey);
+            },
+            generateKey() {
+                const bytes = new Uint8Array(24);
+
+                if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+                    window.crypto.getRandomValues(bytes);
+                } else {
+                    for (let index = 0; index < bytes.length; index += 1) {
+                        bytes[index] = Math.floor(Math.random() * 256);
+                    }
+                }
+
+                const suffix = Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('');
+                this.form.apiKey = 'g2d_' + suffix;
+            },
+        };
     };
-}
 </script>
 @endsection
