@@ -13,6 +13,17 @@ class PmeStoreFournisseurRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $email = mb_strtolower(trim((string) $this->input('email', '')));
+
+        $this->merge([
+            'nom_boutique' => trim((string) $this->input('nom_boutique', '')),
+            'email' => $email,
+            'telephone' => trim((string) $this->input('telephone', '')),
+        ]);
+    }
+
     public function rules(): array
     {
         return [
@@ -22,11 +33,18 @@ class PmeStoreFournisseurRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('frs', 'email')->whereNull('deleted_at'),
+                Rule::unique('frs', 'email'),
             ],
             'telephone' => ['required', 'string', 'max:255'],
             'code_wilaya' => ['required', 'integer', 'exists:wilaya,ID_WILAYA'],
             'code_commune' => ['required', 'integer', 'exists:commune,ID_COMMUNE'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'Cet email existe deja pour une boutique.',
         ];
     }
 

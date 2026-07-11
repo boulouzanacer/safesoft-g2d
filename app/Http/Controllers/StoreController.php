@@ -320,7 +320,7 @@ class StoreController extends Controller
     {
         return BoutiqueCategory::query()
             ->orderBy('name')
-            ->get(['id', 'name', 'slug']);
+            ->get(['id', 'name', 'slug', 'image_path']);
     }
 
     private function selectedBoutiqueCategoryId(Request $request): ?int

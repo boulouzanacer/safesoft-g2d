@@ -14,6 +14,7 @@ use App\Models\Cmd2;
 use App\Models\Fournisseur;
 use App\Models\Produit;
 use App\Traits\ApiResponseTrait;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -115,18 +116,24 @@ class PmeController extends Controller
         $validated = $request->validated();
         $defaultPassword = '12345678';
 
-        $fournisseur = Fournisseur::query()->create([
-            'nom_frs' => $validated['nom_boutique'],
-            'boutique_category_id' => (int) $validated['boutique_category_id'],
-            'email' => mb_strtolower(trim((string) $validated['email'])),
-            'password' => Hash::make($defaultPassword),
-            'telephone' => $validated['telephone'],
-            'adresse' => '',
-            'id_wilaya' => (int) $validated['code_wilaya'],
-            'id_commune' => (int) $validated['code_commune'],
-            'actif' => 1,
-            'expires_at' => now()->addMonth()->toDateString(),
-        ]);
+        try {
+            $fournisseur = Fournisseur::query()->create([
+                'nom_frs' => $validated['nom_boutique'],
+                'boutique_category_id' => (int) $validated['boutique_category_id'],
+                'email' => mb_strtolower(trim((string) $validated['email'])),
+                'password' => Hash::make($defaultPassword),
+                'telephone' => $validated['telephone'],
+                'adresse' => '',
+                'id_wilaya' => (int) $validated['code_wilaya'],
+                'id_commune' => (int) $validated['code_commune'],
+                'actif' => 1,
+                'expires_at' => now()->addMonth()->toDateString(),
+            ]);
+        } catch (UniqueConstraintViolationException $exception) {
+            return $this->error('Validation échouée', [
+                'email' => ['Cet email existe deja pour une boutique.'],
+            ], 422);
+        }
 
         return $this->success([
             'id' => (int) $fournisseur->id,

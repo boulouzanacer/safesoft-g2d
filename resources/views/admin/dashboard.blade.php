@@ -198,9 +198,22 @@
             @forelse($boutique_categories as $category)
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                            <div class="font-extrabold truncate">{{ $category->name }}</div>
-                            <div class="mt-1 text-xs text-white/50 font-mono">{{ $category->slug }}</div>
+                        <div class="min-w-0 flex items-start gap-3">
+                            <div class="h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                                @if($category->image_url)
+                                    <img src="{{ $category->image_url }}"
+                                         alt="{{ $category->name }}"
+                                         class="h-full w-full object-cover">
+                                @else
+                                    <div class="flex h-full w-full items-center justify-center text-white/40">
+                                        <i class="fa-solid fa-image text-lg"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-extrabold truncate">{{ $category->name }}</div>
+                                <div class="mt-1 text-xs text-white/50 font-mono">{{ $category->slug }}</div>
+                            </div>
                         </div>
                         <div class="flex items-center gap-2">
                             <button type="button"
@@ -209,6 +222,7 @@
                                     aria-label="Éditer"
                                     data-category-id="{{ $category->id }}"
                                     data-category-name="{{ e($category->name) }}"
+                                    data-category-image-url="{{ $category->image_url }}"
                                     @click="openCategoryEditFromButton($event)">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
@@ -252,8 +266,9 @@
                 </button>
             </div>
 
-            <form method="POST" action="{{ url('/admin/boutique-categories') }}" class="space-y-5">
+            <form method="POST" action="{{ url('/admin/boutique-categories') }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
+                <input type="hidden" name="modal_context" value="create">
                 <div>
                     <label class="block text-sm font-semibold text-white/70 mb-1">Nom catégorie</label>
                     <input type="text"
@@ -262,6 +277,30 @@
                            class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                            placeholder="Ex: Cosmétique"
                            required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-white/70 mb-2">Image catégorie</label>
+                    <div class="flex items-start gap-4">
+                        <div class="h-24 w-24 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                            <template x-if="categoryCreateImagePreview">
+                                <img :src="categoryCreateImagePreview" alt="Aperçu catégorie" class="h-full w-full object-cover">
+                            </template>
+                            <template x-if="!categoryCreateImagePreview">
+                                <div class="flex h-full w-full items-center justify-center text-white/40">
+                                    <i class="fa-solid fa-image text-2xl"></i>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="flex-1">
+                            <input type="file"
+                                   name="image"
+                                   accept="image/*"
+                                   class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none file:mr-4 file:rounded-xl file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-white hover:file:bg-white/20"
+                                   @change="previewCategoryImage($event, 'create')"
+                                   required>
+                            <div class="mt-1 text-xs text-white/50">Image obligatoire pour afficher la catégorie dans la plateforme.</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2">
@@ -293,9 +332,11 @@
                 </button>
             </div>
 
-            <form method="POST" :action="categoryEditAction" class="space-y-5">
+            <form method="POST" :action="categoryEditAction" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="modal_context" value="edit">
+                <input type="hidden" name="category_id" :value="categoryEditId">
                 <div>
                     <label class="block text-sm font-semibold text-white/70 mb-1">Nom catégorie</label>
                     <input type="text"
@@ -303,6 +344,29 @@
                            x-model="categoryEditName"
                            class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                            required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-white/70 mb-2">Image catégorie</label>
+                    <div class="flex items-start gap-4">
+                        <div class="h-24 w-24 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                            <template x-if="categoryEditImagePreview">
+                                <img :src="categoryEditImagePreview" alt="Aperçu catégorie" class="h-full w-full object-cover">
+                            </template>
+                            <template x-if="!categoryEditImagePreview">
+                                <div class="flex h-full w-full items-center justify-center text-white/40">
+                                    <i class="fa-solid fa-image text-2xl"></i>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="flex-1">
+                            <input type="file"
+                                   name="image"
+                                   accept="image/*"
+                                   class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none file:mr-4 file:rounded-xl file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-white hover:file:bg-white/20"
+                                   @change="previewCategoryImage($event, 'edit')">
+                            <div class="mt-1 text-xs text-white/50">Image obligatoire si la catégorie n'en a pas encore. Sinon tu peux la remplacer ici.</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-2">
@@ -358,11 +422,22 @@
     </div>
 </div>
 
+@php
+    $oldCategoryId = (int) old('category_id', 0);
+    $oldEditingCategory = $oldCategoryId > 0
+        ? $boutique_categories->firstWhere('id', $oldCategoryId)
+        : null;
+@endphp
+
 <div class="hidden js-admin-dashboard-config"
      data-chart-labels="{{ e(json_encode($chart_labels)) }}"
      data-chart-series="{{ e(json_encode($chart_series)) }}"
      data-category-base-url="{{ url('/admin/boutique-categories') }}"
-     data-category-create-open="{{ $errors->any() ? '1' : '0' }}"></div>
+     data-category-create-open="{{ old('modal_context', $errors->any() ? 'create' : '') === 'create' ? '1' : '0' }}"
+     data-category-edit-open="{{ old('modal_context') === 'edit' ? '1' : '0' }}"
+     data-category-old-id="{{ old('category_id', '') }}"
+     data-category-old-name="{{ old('name', '') }}"
+     data-category-old-image-url="{{ $oldEditingCategory?->image_url ?? '' }}"></div>
 
 <script>
     (function () {
@@ -372,18 +447,26 @@
         }
 
         window.adminDashboardPage = window.adminDashboardPage || function () {
+            const initialEditId = configElement.dataset.categoryOldId || '';
+            const initialEditOpen = (configElement.dataset.categoryEditOpen || '0') === '1';
+
             return {
                 categoryCreateOpen: (configElement.dataset.categoryCreateOpen || '0') === '1',
-                categoryEditOpen: false,
+                categoryEditOpen: initialEditOpen,
                 categoryDeleteOpen: false,
-                categoryEditAction: '',
-                categoryEditName: '',
+                categoryEditAction: initialEditId ? (configElement.dataset.categoryBaseUrl || '') + '/' + initialEditId : '',
+                categoryEditId: initialEditId,
+                categoryEditName: configElement.dataset.categoryOldName || '',
+                categoryCreateImagePreview: '',
+                categoryEditImagePreview: configElement.dataset.categoryOldImageUrl || '',
                 categoryDeleteAction: '',
                 categoryDeleteName: '',
                 categoryDeleteCount: 0,
                 openCategoryEdit(category) {
                     this.categoryEditAction = (configElement.dataset.categoryBaseUrl || '') + '/' + category.id;
+                    this.categoryEditId = category.id || '';
                     this.categoryEditName = category.name || '';
+                    this.categoryEditImagePreview = category.imageUrl || '';
                     this.categoryEditOpen = true;
                 },
                 openCategoryEditFromButton(event) {
@@ -391,7 +474,35 @@
                     this.openCategoryEdit({
                         id: target.dataset.categoryId || '',
                         name: target.dataset.categoryName || '',
+                        imageUrl: target.dataset.categoryImageUrl || '',
                     });
+                },
+                previewCategoryImage(event, mode) {
+                    const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+                    if (!file) {
+                        if (mode === 'create') {
+                            this.categoryCreateImagePreview = '';
+                            return;
+                        }
+
+                        this.categoryEditImagePreview = '';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (loadEvent) => {
+                        const result = loadEvent.target && typeof loadEvent.target.result === 'string'
+                            ? loadEvent.target.result
+                            : '';
+
+                        if (mode === 'create') {
+                            this.categoryCreateImagePreview = result;
+                            return;
+                        }
+
+                        this.categoryEditImagePreview = result;
+                    };
+                    reader.readAsDataURL(file);
                 },
                 openCategoryDelete(action, name, count) {
                     this.categoryDeleteAction = action || '';
