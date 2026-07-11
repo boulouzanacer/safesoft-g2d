@@ -213,9 +213,10 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             <button type="button"
-                                    class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
-                                    title="Supprimer"
+                                    class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                    title="{{ (int) $category->fournisseurs_count > 0 ? 'Impossible de supprimer une catégorie déjà utilisée' : 'Supprimer' }}"
                                     aria-label="Supprimer"
+                                    @disabled((int) $category->fournisseurs_count > 0)
                                     data-delete-action="{{ url('/admin/boutique-categories/'.$category->id) }}"
                                     data-category-name="{{ e($category->name) }}"
                                     data-category-count="{{ (int) $category->fournisseurs_count }}"
@@ -370,38 +371,6 @@
             return;
         }
 
-        const chartLabels = JSON.parse(configElement.dataset.chartLabels || '[]');
-        const chartSeries = JSON.parse(configElement.dataset.chartSeries || '[]');
-        const ctx = document.getElementById('ordersChart');
-
-        if (ctx) {
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Commandes',
-                        data: chartSeries,
-                        borderColor: '#1E6FD9',
-                        backgroundColor: 'rgba(30,111,217,0.15)',
-                        fill: true,
-                        tension: 0.35,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#1E6FD9'
-                    }]
-                },
-                options: {
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
-                        y: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' }, beginAtZero: true }
-                    }
-                }
-            });
-        }
-
         window.adminDashboardPage = window.adminDashboardPage || function () {
             return {
                 categoryCreateOpen: (configElement.dataset.categoryCreateOpen || '0') === '1',
@@ -440,6 +409,38 @@
                 },
             };
         };
+
+        const chartLabels = JSON.parse(configElement.dataset.chartLabels || '[]');
+        const chartSeries = JSON.parse(configElement.dataset.chartSeries || '[]');
+        const ctx = document.getElementById('ordersChart');
+
+        if (ctx && typeof window.Chart !== 'undefined') {
+            new window.Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Commandes',
+                        data: chartSeries,
+                        borderColor: '#1E6FD9',
+                        backgroundColor: 'rgba(30,111,217,0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#1E6FD9'
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+                        y: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
     })();
 </script>
 @endsection
