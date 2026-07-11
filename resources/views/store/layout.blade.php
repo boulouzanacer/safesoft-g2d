@@ -42,6 +42,19 @@
                 </div>
             </a>
 
+            <nav class="hidden lg:flex items-center gap-2">
+                <a href="{{ url('/boutiques') }}"
+                   class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                    <i class="fa-solid fa-store text-[var(--store-primary)]"></i>
+                    <span>Boutiques</span>
+                </a>
+                <a href="{{ url('/produits') }}"
+                   class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                    <i class="fa-solid fa-box-open text-[var(--store-primary)]"></i>
+                    <span>Produits</span>
+                </a>
+            </nav>
+
             <div class="flex items-center gap-2">
                 <a href="{{ url('/panier') }}"
                    class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">

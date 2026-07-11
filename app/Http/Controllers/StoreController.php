@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BoutiqueCategory;
 use App\Models\Client;
 use App\Models\Cmd1;
 use App\Models\Cmd2;
@@ -9,6 +10,7 @@ use App\Models\Commune;
 use App\Models\Fournisseur;
 use App\Models\Produit;
 use App\Models\Wilaya;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -314,24 +316,33 @@ class StoreController extends Controller
         return ['items' => $items, 'total' => $total, 'frs' => $frs];
     }
 
-    public function index(Request $request): View
+    private function publicBoutiqueCategories()
     {
-        $client = $this->currentClient();
+        return BoutiqueCategory::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug']);
+    }
+
+    private function selectedBoutiqueCategoryId(Request $request): ?int
+    {
+        $value = (int) $request->query('categorie_boutique', 0);
+
+        return $value > 0 ? $value : null;
+    }
+
+    private function publicBoutiquesQuery(?Client $client): Builder
+    {
         $abonneFournisseurIds = $this->abonneFournisseurIds($client);
         $forcedFournisseurId = ($client && $client->type_client === 'abonne' && $client->id_frs)
             ? (int) $client->id_frs
             : null;
 
-        $q = trim((string) $request->query('q', ''));
-        $f = $request->query('f');
-        $categorie = trim((string) $request->query('categorie', ''));
-
-        $fournisseurId = $forcedFournisseurId ?: (($f !== null && $f !== '') ? (int) $f : null);
-
-        $boutiques = Fournisseur::query()
+        return Fournisseur::query()
+            ->with('boutiqueCategory:id,name')
             ->where('actif', 1)
-            ->when(! $forcedFournisseurId, function ($q) use ($abonneFournisseurIds) {
-                $q->where(function ($sub) use ($abonneFournisseurIds) {
+            ->whereNull('deleted_at')
+            ->when(! $forcedFournisseurId, function ($query) use ($abonneFournisseurIds) {
+                $query->where(function ($sub) use ($abonneFournisseurIds) {
                     $sub->where('is_visible', 1);
 
                     if (count($abonneFournisseurIds) > 0) {
@@ -339,89 +350,157 @@ class StoreController extends Controller
                     }
                 });
             })
-            ->whereNull('deleted_at')
-            ->when($fournisseurId, fn ($q) => $q->where('id', $fournisseurId))
-            ->orderBy('nom_frs')
-            ->get(['id', 'nom_frs', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
+            ->when($forcedFournisseurId, fn ($query) => $query->where('id', $forcedFournisseurId));
+    }
 
-        $produitsQuery = Produit::query()
+    private function publicProductsQuery(?Client $client): Builder
+    {
+        $abonneFournisseurIds = $this->abonneFournisseurIds($client);
+        $forcedFournisseurId = ($client && $client->type_client === 'abonne' && $client->id_frs)
+            ? (int) $client->id_frs
+            : null;
+
+        return Produit::query()
             ->whereNull('deleted_at')
             ->where('actif', 1)
-            ->where(function ($q) use ($abonneFournisseurIds) {
-                $q->where('abonne_only', 0);
+            ->where(function ($query) use ($abonneFournisseurIds) {
+                $query->where('abonne_only', 0);
 
                 if (count($abonneFournisseurIds) > 0) {
-                    $q->orWhereIn('id_frs', $abonneFournisseurIds);
+                    $query->orWhereIn('id_frs', $abonneFournisseurIds);
                 }
             })
-            ->with(['fournisseur:id,nom_frs,actif,is_visible,deleted_at', 'quantityPrices'])
-            ->whereHas('fournisseur', function ($q) use ($forcedFournisseurId, $abonneFournisseurIds) {
-                $q->where('actif', 1)
+            ->with([
+                'fournisseur:id,nom_frs,boutique_category_id,actif,is_visible,deleted_at',
+                'fournisseur.boutiqueCategory:id,name',
+                'quantityPrices',
+            ])
+            ->whereHas('fournisseur', function ($query) use ($forcedFournisseurId, $abonneFournisseurIds) {
+                $query->where('actif', 1)
                     ->whereNull('deleted_at')
                     ->where(function ($sub) use ($forcedFournisseurId, $abonneFournisseurIds) {
                         $sub->where('is_visible', 1);
+
                         if ($forcedFournisseurId) {
                             $sub->orWhere('id', $forcedFournisseurId);
                         } elseif (count($abonneFournisseurIds) > 0) {
                             $sub->orWhereIn('id', $abonneFournisseurIds);
                         }
                     });
+            });
+    }
+
+    public function index(Request $request): View
+    {
+        $client = $this->currentClient();
+        $q = trim((string) $request->query('q', ''));
+        $boutiqueCategoryId = $this->selectedBoutiqueCategoryId($request);
+
+        $boutiques = $this->publicBoutiquesQuery($client)
+            ->when($boutiqueCategoryId, fn ($query) => $query->where('boutique_category_id', $boutiqueCategoryId))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('nom_frs', 'like', "%{$q}%")
+                        ->orWhere('telephone', 'like', "%{$q}%")
+                        ->orWhere('adresse', 'like', "%{$q}%");
+                });
             })
-            ->when($fournisseurId, fn ($q) => $q->where('id_frs', $fournisseurId))
-            ->when($categorie !== '', fn ($q2) => $q2->where('categorie', $categorie))
-            ->when($q !== '', function ($q2) use ($q) {
-                $q2->where(function ($sub) use ($q) {
+            ->orderBy('nom_frs')
+            ->limit(8)
+            ->get(['id', 'nom_frs', 'boutique_category_id', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
+
+        $produits = $this->publicProductsQuery($client)
+            ->when($boutiqueCategoryId, function ($query) use ($boutiqueCategoryId) {
+                $query->whereHas('fournisseur', fn ($sub) => $sub->where('boutique_category_id', $boutiqueCategoryId));
+            })
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
                     $sub->where('designation', 'like', "%{$q}%")
                         ->orWhere('reference', 'like', "%{$q}%")
-                        ->orWhere('categorie', 'like', "%{$q}%");
+                        ->orWhereHas('fournisseur', fn ($supplier) => $supplier->where('nom_frs', 'like', "%{$q}%"));
                 });
-            });
-
-        $catsQuery = Produit::query()
-            ->whereNull('deleted_at')
-            ->where('actif', 1)
-            ->where(function ($q) use ($abonneFournisseurIds) {
-                $q->where('abonne_only', 0);
-
-                if (count($abonneFournisseurIds) > 0) {
-                    $q->orWhereIn('id_frs', $abonneFournisseurIds);
-                }
             })
-            ->whereHas('fournisseur', function ($q) use ($forcedFournisseurId, $abonneFournisseurIds) {
-                $q->where('actif', 1)
-                    ->whereNull('deleted_at')
-                    ->where(function ($sub) use ($forcedFournisseurId, $abonneFournisseurIds) {
-                        $sub->where('is_visible', 1);
-                        if ($forcedFournisseurId) {
-                            $sub->orWhere('id', $forcedFournisseurId);
-                        } elseif (count($abonneFournisseurIds) > 0) {
-                            $sub->orWhereIn('id', $abonneFournisseurIds);
-                        }
-                    });
-            })
-            ->when($fournisseurId, fn ($q2) => $q2->where('id_frs', $fournisseurId))
-            ->distinct()
-            ->orderBy('categorie')
-            ->pluck('categorie')
-            ->filter()
-            ->values();
-
-        $produits = $produitsQuery
-            ->orderByDesc('created_at')
-            ->paginate(18)
-            ->withQueryString();
+            ->inRandomOrder()
+            ->limit(12)
+            ->get();
 
         $cartSummary = $this->cartSummary();
 
         return view('store.index', [
             'title' => 'Boutiques & Produits',
             'client' => $client,
-            'forced_fournisseur_id' => $forcedFournisseurId,
-            'boutiques' => $boutiques,
+            'boutiques_preview' => $boutiques,
             'produits' => $produits,
-            'categories' => $catsQuery,
-            'selected_f' => $fournisseurId,
-            'selected_categorie' => $categorie,
+            'boutique_categories' => $this->publicBoutiqueCategories(),
+            'selected_boutique_category' => $boutiqueCategoryId,
+            'q' => $q,
+            'cart_total' => $cartSummary['total'],
+            'cart_count' => count($cartSummary['items']),
+        ]);
+    }
+
+    public function boutiques(Request $request): View
+    {
+        $client = $this->currentClient();
+        $q = trim((string) $request->query('q', ''));
+        $boutiqueCategoryId = $this->selectedBoutiqueCategoryId($request);
+
+        $boutiques = $this->publicBoutiquesQuery($client)
+            ->when($boutiqueCategoryId, fn ($query) => $query->where('boutique_category_id', $boutiqueCategoryId))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('nom_frs', 'like', "%{$q}%")
+                        ->orWhere('telephone', 'like', "%{$q}%")
+                        ->orWhere('adresse', 'like', "%{$q}%");
+                });
+            })
+            ->orderBy('nom_frs')
+            ->paginate(16)
+            ->withQueryString();
+
+        $cartSummary = $this->cartSummary();
+
+        return view('store.boutiques', [
+            'title' => 'Toutes les boutiques',
+            'client' => $client,
+            'boutiques' => $boutiques,
+            'boutique_categories' => $this->publicBoutiqueCategories(),
+            'selected_boutique_category' => $boutiqueCategoryId,
+            'q' => $q,
+            'cart_total' => $cartSummary['total'],
+            'cart_count' => count($cartSummary['items']),
+        ]);
+    }
+
+    public function produits(Request $request): View
+    {
+        $client = $this->currentClient();
+        $q = trim((string) $request->query('q', ''));
+        $boutiqueCategoryId = $this->selectedBoutiqueCategoryId($request);
+
+        $produits = $this->publicProductsQuery($client)
+            ->when($boutiqueCategoryId, function ($query) use ($boutiqueCategoryId) {
+                $query->whereHas('fournisseur', fn ($sub) => $sub->where('boutique_category_id', $boutiqueCategoryId));
+            })
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('designation', 'like', "%{$q}%")
+                        ->orWhere('reference', 'like', "%{$q}%")
+                        ->orWhereHas('fournisseur', fn ($supplier) => $supplier->where('nom_frs', 'like', "%{$q}%"));
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $cartSummary = $this->cartSummary();
+
+        return view('store.produits', [
+            'title' => 'Tous les produits',
+            'client' => $client,
+            'produits' => $produits,
+            'boutique_categories' => $this->publicBoutiqueCategories(),
+            'selected_boutique_category' => $boutiqueCategoryId,
             'q' => $q,
             'cart_total' => $cartSummary['total'],
             'cart_count' => count($cartSummary['items']),
@@ -437,6 +516,7 @@ class StoreController extends Controller
         }
 
         $boutique = Fournisseur::query()
+            ->with('boutiqueCategory:id,name')
             ->where('id', $id)
             ->where('actif', 1)
             ->when(! in_array($id, $abonneFournisseurIds, true), fn ($q) => $q->where('is_visible', 1))

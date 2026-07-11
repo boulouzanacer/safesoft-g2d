@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFournisseurRequest;
 use App\Http\Requests\UpdateFournisseurRequest;
+use App\Models\BoutiqueCategory;
 use App\Models\Commune;
 use App\Models\Fournisseur;
 use App\Models\Wilaya;
@@ -44,9 +45,11 @@ class FournisseurController extends Controller
         }
 
         $fournisseurs = Fournisseur::query()
+            ->leftJoin('boutique_categories', 'boutique_categories.id', '=', 'frs.boutique_category_id')
             ->leftJoin('wilaya', 'wilaya.ID_WILAYA', '=', 'frs.id_wilaya')
             ->select([
                 'frs.*',
+                'boutique_categories.name as boutique_category_name',
                 'wilaya.WILAYA as wilaya_nom',
             ])
             ->when($q !== '', function ($query) use ($q) {
@@ -63,6 +66,7 @@ class FournisseurController extends Controller
             'title' => 'Fournisseurs',
             'q' => $q,
             'fournisseurs' => $fournisseurs,
+            'boutique_categories' => BoutiqueCategory::query()->orderBy('name')->get(),
             'wilayas' => Wilaya::query()->orderBy('ID_WILAYA')->get(),
             'create_open' => $createOpen,
             'editing_fournisseur' => $editingFournisseur,
@@ -83,6 +87,7 @@ class FournisseurController extends Controller
 
         $frs = Fournisseur::create([
             'nom_frs' => $data['nom_frs'],
+            'boutique_category_id' => (int) $data['boutique_category_id'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'telephone' => $data['telephone'] ?? null,
@@ -128,6 +133,7 @@ class FournisseurController extends Controller
 
         $payload = [
             'nom_frs' => $data['nom_frs'],
+            'boutique_category_id' => (int) $data['boutique_category_id'],
             'email' => $data['email'],
             'telephone' => $data['telephone'] ?? null,
             'adresse' => $data['adresse'],

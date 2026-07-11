@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ApiKeyController;
+use App\Http\Controllers\Admin\BoutiqueCategoryController;
 use App\Http\Controllers\Auth\ClientAuthController;
 use App\Http\Controllers\Auth\FrsAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -21,7 +22,9 @@ use App\Http\Controllers\Fournisseur\VisitPlanningController as FrsVisitPlanning
 use App\Http\Controllers\StoreController;
 
 Route::get('/', [StoreController::class, 'index']);
+Route::get('/boutiques', [StoreController::class, 'boutiques']);
 Route::get('/boutiques/{id}', [StoreController::class, 'boutique']);
+Route::get('/produits', [StoreController::class, 'produits']);
 Route::get('/produits/{id}', [StoreController::class, 'produit']);
 
 Route::get('/login', [ClientAuthController::class, 'showLogin']);
@@ -62,6 +65,9 @@ Route::post('/fournisseur/logout', [FrsAuthController::class, 'logout']);
 
 Route::prefix('admin')->middleware('auth.admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::post('/boutique-categories', [BoutiqueCategoryController::class, 'store']);
+    Route::put('/boutique-categories/{id}', [BoutiqueCategoryController::class, 'update']);
+    Route::delete('/boutique-categories/{id}', [BoutiqueCategoryController::class, 'destroy']);
 
     Route::get('/fournisseurs', [FournisseurController::class, 'index']);
     Route::get('/fournisseurs/create', [FournisseurController::class, 'create']);

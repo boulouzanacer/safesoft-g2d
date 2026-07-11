@@ -34,6 +34,21 @@
     </div>
 
     <div>
+        <label class="block text-sm font-semibold text-white/70 mb-1">Catégorie boutique</label>
+        <select name="boutique_category_id"
+                class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
+                required>
+            <option value="">Choisir...</option>
+            @foreach(($boutique_categories ?? collect()) as $category)
+                <option value="{{ $category->id }}"
+                        @selected((int) old('boutique_category_id', $frs?->boutique_category_id ?? 0) === (int) $category->id)>
+                    {{ $category->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    <div>
         <label class="block text-sm font-semibold text-white/70 mb-1">Email</label>
         <input type="email"
                name="email"

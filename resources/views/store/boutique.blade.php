@@ -22,6 +22,13 @@
                     @endif
                     <div class="min-w-0">
                         <div class="text-2xl font-extrabold tracking-wide truncate">{{ $boutique->nom_frs }}</div>
+                        @if(($boutique->boutiqueCategory?->name ?? '') !== '')
+                            <div class="mt-2">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold border border-sky-200 bg-sky-50 text-sky-700">
+                                    {{ $boutique->boutiqueCategory->name }}
+                                </span>
+                            </div>
+                        @endif
                         <div class="mt-1 text-sm text-slate-600">{{ $boutique->adresse ?? '—' }}</div>
                         <div class="mt-1 text-sm text-slate-600">{{ $boutique->telephone ?? '—' }}</div>
                         @if(($boutique->latitude ?? null) && ($boutique->longitude ?? null))
@@ -64,6 +71,21 @@
             </div>
             <button class="hidden" type="submit">Filter</button>
         </form>
+
+        @if(($categories ?? collect())->count() > 0)
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{{ url('/boutiques/'.$boutique->id).'?'.http_build_query(array_filter(['q' => $q])) }}"
+                   class="rounded-full px-3 py-1 text-xs font-bold border {{ $selected_categorie === '' ? 'border-[var(--store-primary)] bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    Toutes catégories
+                </a>
+                @foreach($categories as $category)
+                    <a href="{{ url('/boutiques/'.$boutique->id).'?'.http_build_query(array_filter(['q' => $q, 'categorie' => $category])) }}"
+                       class="rounded-full px-3 py-1 text-xs font-bold border {{ (string) $selected_categorie === (string) $category ? 'border-[var(--store-primary)] bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        {{ $category }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <div class="space-y-3">

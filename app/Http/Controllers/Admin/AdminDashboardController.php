@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApiKey;
+use App\Models\BoutiqueCategory;
 use App\Models\Cmd1;
 use App\Models\Fournisseur;
 use App\Models\Client;
@@ -68,6 +69,11 @@ class AdminDashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $boutiqueCategories = BoutiqueCategory::query()
+            ->withCount('fournisseurs')
+            ->orderBy('name')
+            ->get();
+
         return view('admin.dashboard', [
             'title' => 'Dashboard',
             'nb_fournisseurs' => $nbFournisseurs,
@@ -79,6 +85,7 @@ class AdminDashboardController extends Controller
             'chart_series' => $series,
             'dernieres_commandes' => $dernieresCommandes,
             'fournisseurs_recents' => $fournisseursRecents,
+            'boutique_categories' => $boutiqueCategories,
         ]);
     }
 }

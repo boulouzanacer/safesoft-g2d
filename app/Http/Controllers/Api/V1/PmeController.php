@@ -117,6 +117,7 @@ class PmeController extends Controller
 
         $fournisseur = Fournisseur::query()->create([
             'nom_frs' => $validated['nom_boutique'],
+            'boutique_category_id' => (int) $validated['boutique_category_id'],
             'email' => mb_strtolower(trim((string) $validated['email'])),
             'password' => Hash::make($defaultPassword),
             'telephone' => $validated['telephone'],
@@ -130,6 +131,8 @@ class PmeController extends Controller
         return $this->success([
             'id' => (int) $fournisseur->id,
             'nom_boutique' => $fournisseur->nom_frs,
+            'boutique_category_id' => (int) $fournisseur->boutique_category_id,
+            'boutique_category_name' => $fournisseur->boutiqueCategory?->name,
             'email' => $fournisseur->email,
             'telephone' => $fournisseur->telephone,
             'code_wilaya' => (int) $fournisseur->id_wilaya,
@@ -167,6 +170,8 @@ class PmeController extends Controller
         return $this->success([
             'id' => (int) $fournisseur->id,
             'nom_boutique' => $fournisseur->nom_frs,
+            'boutique_category_id' => (int) $fournisseur->boutique_category_id,
+            'boutique_category_name' => $fournisseur->boutiqueCategory?->name,
             'email' => $fournisseur->email,
             'telephone' => $fournisseur->telephone,
             'adresse' => $fournisseur->adresse,
@@ -460,6 +465,7 @@ class PmeController extends Controller
 
         $data = $request->validate([
             'nom_frs' => ['nullable', 'string', 'max:255'],
+            'boutique_category_id' => ['nullable', 'integer', 'exists:boutique_categories,id'],
             'telephone' => ['nullable', 'string', 'max:255'],
             'adresse' => ['nullable', 'string'],
             'id_wilaya' => ['nullable', 'integer', 'exists:wilaya,ID_WILAYA'],
@@ -472,7 +478,7 @@ class PmeController extends Controller
         ]);
 
         $payload = [];
-        foreach (['nom_frs', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude', 'is_visible'] as $key) {
+        foreach (['nom_frs', 'boutique_category_id', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude', 'is_visible'] as $key) {
             if (array_key_exists($key, $data)) {
                 if ($key === 'is_visible') {
                     $payload[$key] = (int) $data[$key] === 1 ? 1 : 0;
@@ -514,6 +520,8 @@ class PmeController extends Controller
         return $this->success([
             'id' => (int) $frs->id,
             'nom_frs' => $frs->nom_frs,
+            'boutique_category_id' => (int) $frs->boutique_category_id,
+            'boutique_category_name' => $frs->boutiqueCategory?->name,
             'telephone' => $frs->telephone,
             'adresse' => $frs->adresse,
             'id_wilaya' => (int) $frs->id_wilaya,

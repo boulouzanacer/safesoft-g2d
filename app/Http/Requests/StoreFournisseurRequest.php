@@ -15,6 +15,7 @@ class StoreFournisseurRequest extends FormRequest
     {
         return [
             'nom_frs' => ['required', 'string', 'max:255'],
+            'boutique_category_id' => ['required', 'integer', 'exists:boutique_categories,id'],
             'email' => ['required', 'email', 'max:255', 'unique:frs,email'],
             'password' => ['required', 'string', 'min:8'],
             'telephone' => ['nullable', 'string', 'max:255'],

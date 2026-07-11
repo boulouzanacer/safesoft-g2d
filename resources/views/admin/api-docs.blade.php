@@ -807,6 +807,7 @@
                                     <span class="font-mono">create_fournisseur</span>.
                                     Champs requis:
                                     <span class="font-mono">nom_boutique</span>,
+                                    <span class="font-mono">boutique_category_id</span>,
                                     <span class="font-mono">email</span>,
                                     <span class="font-mono">telephone</span>,
                                     <span class="font-mono">code_wilaya</span>,
@@ -822,6 +823,7 @@
                                 </div>
                                 <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
   "nom_boutique": "Boutique Ahmed",
+  "boutique_category_id": 2,
   "email": "boutique.ahmed@gmail.com",
   "telephone": "0550123456",
   "code_wilaya": 16,
@@ -832,7 +834,9 @@
   "data": {
     "id": 12,
     "nom_boutique": "Boutique Ahmed",
-    "email": "boutique.ahmed@g2d-dz.com",
+    "boutique_category_id": 2,
+    "boutique_category_name": "Cosmétique",
+    "email": "boutique.ahmed@gmail.com",
     "telephone": "0550123456",
     "code_wilaya": 16,
     "code_commune": 1601,
@@ -867,6 +871,8 @@
   "data": {
     "id": 12,
     "nom_boutique": "Boutique Ahmed",
+    "boutique_category_id": 2,
+    "boutique_category_name": "Cosmétique",
     "email": "boutique.ahmed@gmail.com",
     "telephone": "0550123456",
     "adresse": "",

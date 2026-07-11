@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Carbon;
@@ -21,6 +22,7 @@ class Fournisseur extends Authenticatable
 
     protected $fillable = [
         'nom_frs',
+        'boutique_category_id',
         'email',
         'password',
         'telephone',
@@ -99,6 +101,11 @@ class Fournisseur extends Authenticatable
     public function clients(): HasMany
     {
         return $this->hasMany(Client::class, 'id_frs', 'id');
+    }
+
+    public function boutiqueCategory(): BelongsTo
+    {
+        return $this->belongsTo(BoutiqueCategory::class, 'boutique_category_id', 'id');
     }
 
     public function prevendeurs(): HasMany

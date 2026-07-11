@@ -46,6 +46,7 @@
                 <thead class="text-white/60">
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">Nom</th>
+                        <th class="text-left py-3 px-4 font-semibold">Catégorie</th>
                         <th class="text-left py-3 px-4 font-semibold">Email</th>
                         <th class="text-left py-3 px-4 font-semibold">Tel</th>
                         <th class="text-left py-3 px-4 font-semibold">Wilaya</th>
@@ -59,6 +60,7 @@
                     @forelse($fournisseurs as $f)
                         <tr class="hover:bg-white/5">
                             <td class="py-3 px-4 font-semibold">{{ $f->nom_frs }}</td>
+                            <td class="py-3 px-4 text-white/80">{{ $f->boutique_category_name ?? '—' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $f->email }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $f->telephone }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $f->wilaya_nom }}</td>
@@ -138,7 +140,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-10 text-center text-white/60">Aucun fournisseur</td>
+                            <td colspan="9" class="py-10 text-center text-white/60">Aucun fournisseur</td>
                         </tr>
                     @endforelse
                 </tbody>

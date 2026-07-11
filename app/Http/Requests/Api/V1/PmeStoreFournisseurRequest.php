@@ -17,6 +17,7 @@ class PmeStoreFournisseurRequest extends FormRequest
     {
         return [
             'nom_boutique' => ['required', 'string', 'max:255'],
+            'boutique_category_id' => ['required', 'integer', 'exists:boutique_categories,id'],
             'email' => [
                 'required',
                 'email',
