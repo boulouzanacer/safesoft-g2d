@@ -187,8 +187,8 @@
                                         <span class="text-xs text-white/60">Public (token optional)</span>
                                     </div>
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                        Retourne la liste des catégories boutiques utilisées par les boutiques visibles et actives.
-                                        Si un token client abonné est envoyé, la liste peut être restreinte à la catégorie de sa boutique.
+                                        Retourne toute la liste des catégories boutiques définies dans l'administration,
+                                        y compris les catégories qui n'ont encore aucune boutique liée.
                                         Cet endpoint est utile pour alimenter les filtres catégories dans l'application mobile.
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">

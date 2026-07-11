@@ -15,20 +15,13 @@ class BoutiqueController extends Controller
 
     public function categories()
     {
-        $client = request()->user();
-        $isAbonne = $client instanceof Client && (string) $client->type_client === 'abonne';
-        $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
-
         $rows = BoutiqueCategory::query()
             ->withCount([
-                'fournisseurs as nb_boutiques' => function ($query) use ($forcedFrsId) {
+                'fournisseurs as nb_boutiques' => function ($query) {
                     $query->where('actif', 1)
-                        ->whereNull('deleted_at')
-                        ->when(! $forcedFrsId, fn ($sub) => $sub->where('is_visible', 1))
-                        ->when($forcedFrsId, fn ($sub) => $sub->where('id', $forcedFrsId));
+                        ->whereNull('deleted_at');
                 },
             ])
-            ->having('nb_boutiques', '>', 0)
             ->orderBy('name')
             ->get(['id', 'name', 'slug', 'image_path']);
 
