@@ -36,7 +36,7 @@ class CommandeController extends Controller
             ->whereNull('deleted_at')
             ->first();
         if (! $frs) {
-            return $this->error('Fournisseur introuvable ou inactif', null, 404);
+            return $this->error('Boutique introuvable ou inactive', null, 404);
         }
 
         $panier = $data['panier'];

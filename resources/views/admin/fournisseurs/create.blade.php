@@ -4,7 +4,7 @@
 <div class="max-w-3xl">
     <div class="flex items-center justify-between mb-4">
         <div>
-            <div class="text-2xl font-extrabold tracking-wide">Créer un fournisseur</div>
+            <div class="text-2xl font-extrabold tracking-wide">Créer une boutique</div>
             <div class="text-sm text-white/60">Le token sera généré automatiquement.</div>
         </div>
         <a href="{{ url('/admin/fournisseurs') }}"

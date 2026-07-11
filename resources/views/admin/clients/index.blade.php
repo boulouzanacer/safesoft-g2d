@@ -31,7 +31,7 @@
                     name="fournisseur"
                     @disabled($without_fournisseur)
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-                <option value="">Tous les fournisseurs</option>
+                <option value="">Toutes les boutiques</option>
                 @foreach($fournisseurs as $f)
                     <option value="{{ $f->id }}" @selected((string)$selected_fournisseur === (string)$f->id)>{{ $f->nom_frs }}</option>
                 @endforeach
@@ -45,7 +45,7 @@
                    value="1"
                    @checked($without_fournisseur)
                    class="h-4 w-4 rounded border-white/20 bg-transparent text-[var(--admin-primary)] focus:ring-[var(--admin-primary)]">
-            <span class="text-sm text-white/85">Sans fournisseur</span>
+            <span class="text-sm text-white/85">Sans boutique</span>
         </label>
 
         <button type="submit" class="hidden">Filtrer</button>
@@ -59,7 +59,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Nom</th>
                         <th class="text-left py-3 px-4 font-semibold">Email</th>
                         <th class="text-left py-3 px-4 font-semibold">Type</th>
-                        <th class="text-left py-3 px-4 font-semibold">Fournisseur</th>
+                        <th class="text-left py-3 px-4 font-semibold">Boutique</th>
                         <th class="text-left py-3 px-4 font-semibold">Synced PME</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
                         <th class="text-right py-3 px-4 font-semibold">Actions</th>
@@ -94,7 +94,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                    onclick="return confirm('Supprimer ce client sans fournisseur ?')"
+                                                    onclick="return confirm('Supprimer ce client sans boutique ?')"
                                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
                                                     title="Supprimer">
                                                 <i class="fa-solid fa-trash"></i>

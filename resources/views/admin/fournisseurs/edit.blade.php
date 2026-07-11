@@ -4,7 +4,7 @@
 <div x-data="{ createdTokenOpen: {{ session('created_token') ? 'true' : 'false' }}, createdToken: '{{ session('created_token') }}' }" class="max-w-3xl">
     <div class="flex items-center justify-between mb-4">
         <div>
-            <div class="text-2xl font-extrabold tracking-wide">Éditer fournisseur</div>
+            <div class="text-2xl font-extrabold tracking-wide">Éditer boutique</div>
             <div class="text-sm text-white/60">{{ $frs->nom_frs }}</div>
         </div>
         <a href="{{ url('/admin/fournisseurs') }}"

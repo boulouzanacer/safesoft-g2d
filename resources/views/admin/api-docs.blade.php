@@ -402,16 +402,16 @@
                     <div class="font-bold">Authentication</div>
                     <div class="mt-2 font-mono text-xs leading-relaxed break-all">
                         Base URL: {{ url('/api/v1/pme') }}<br>
-                        Authorization: Bearer &lt;fournisseur_token&gt;<br>
+                        Authorization: Bearer &lt;boutique_token&gt;<br>
                         Accept: application/json
                     </div>
                     <div class="mt-3 text-xs text-white/65 leading-relaxed">
-                        Each fournisseur only sees and modifies its own PME data. All client, product and order endpoints are automatically restricted by the fournisseur token.
+                        Each boutique only sees and modifies its own PME data. All client, product and order endpoints are automatically restricted by the boutique token.
                     </div>
                 </div>
 
                 <div class="mt-4 rounded-xl border border-sky-400/20 bg-sky-500/10 p-4 text-sm text-sky-100">
-                    <div class="font-bold">Api key create fournisseur</div>
+                    <div class="font-bold">Api key create boutique</div>
                     <div class="mt-2 text-xs leading-relaxed">
                         Les endpoints publics <span class="font-mono">POST /api/v1/pme/fournisseurs</span> et
                         <span class="font-mono">POST /api/v1/pme/fournisseurs/info</span> exigent maintenant une Api Key active de type
@@ -435,8 +435,8 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Cette rubrique permet a votre logiciel PME de lister, creer, modifier, supprimer et synchroniser en masse les clients du fournisseur authentifie.
-                                    Tous les enregistrements sont automatiquement limites au fournisseur du token PME. Les champs retournes par l'API sont:
+                                    Cette rubrique permet a votre logiciel PME de lister, creer, modifier, supprimer et synchroniser en masse les clients de la boutique authentifiee.
+                                    Tous les enregistrements sont automatiquement limites a la boutique du token PME. Les champs retournes par l'API sont:
                                     <span class="font-mono">id</span>, <span class="font-mono">code_client</span>, <span class="font-mono">nom</span>, <span class="font-mono">prenom</span>,
                                     <span class="font-mono">email</span>, <span class="font-mono">telephone</span>, <span class="font-mono">adresse</span>,
                                     <span class="font-mono">id_wilaya</span>, <span class="font-mono">id_commune</span>, <span class="font-mono">type_client</span>,
@@ -451,7 +451,7 @@
                                     <span class="text-xs text-white/60">Lister les clients</span>
                                 </div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Utilisez cet endpoint pour recuperer les clients du fournisseur connecte. Filtres supportes:
+                                    Utilisez cet endpoint pour recuperer les clients de la boutique connectee. Filtres supportes:
                                     <span class="font-mono">synced=0|1</span> et <span class="font-mono">type_client=simple|abonne</span>.
                                     Limite actuelle: 500 lignes, triees par <span class="font-mono">updated_at DESC</span>.
                                 </div>
@@ -488,8 +488,8 @@
                                     <span class="text-xs text-white/60">Detail client</span>
                                 </div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Retourne le detail d'un client unique appartenant au fournisseur du token PME.
-                                    Si l'id n'appartient pas au fournisseur, l'API retourne
+                                    Retourne le detail d'un client unique appartenant a la boutique du token PME.
+                                    Si l'id n'appartient pas a la boutique, l'API retourne
                                     <span class="font-mono">Ressource introuvable</span>.
                                 </div>
                                 <div class="mt-2 text-xs text-white/60">
@@ -553,7 +553,7 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="font-bold">PUT /clients/{id}</div>
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                        Met a jour un client existant appartenant au fournisseur du token. Vous pouvez envoyer uniquement les champs modifies.
+                                        Met a jour un client existant appartenant a la boutique du token. Vous pouvez envoyer uniquement les champs modifies.
                                         Si <span class="font-mono">password</span> est envoye, il sera remplace; sinon il reste inchangé.
                                         Le type client reste toujours
                                         <span class="font-mono">abonne</span>
@@ -591,7 +591,7 @@
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                         Synchronisation en masse des clients. C'est l'endpoint recommande pour les imports PME automatiques.
                                         Le matching se fait d'abord par <span class="font-mono">code_client</span>, puis par
-                                        <span class="font-mono">email</span> chez le meme fournisseur pour eviter les doublons.
+                                        <span class="font-mono">email</span> chez la meme boutique pour eviter les doublons.
                                         Le parametre racine <span class="font-mono">synced</span> accepte <span class="font-mono">0|1</span> et vaut <span class="font-mono">1</span> par defaut.
                                         Chaque element cree ou met a jour un client en <span class="font-mono">type_client=abonne</span>.
                                     </div>
@@ -632,7 +632,7 @@
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Cette rubrique permet d'exporter les commandes web vers le logiciel PME, soit en JSON, soit en CSV.
-                                    Les commandes sont filtrees par fournisseur et par etat de synchronisation
+                                    Les commandes sont filtrees par boutique et par etat de synchronisation
                                     <span class="font-mono">synced_pme</span>.
                                 </div>
                             </div>
@@ -641,7 +641,7 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="font-bold">GET /commandes</div>
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                        Liste les commandes du fournisseur avec leurs lignes. Parametre supporte:
+                                        Liste les commandes de la boutique avec leurs lignes. Parametre supporte:
                                         <span class="font-mono">synced=0|1</span>.
                                         Par defaut, l'API retourne uniquement les commandes non synchronisees.
                                     </div>
@@ -727,7 +727,7 @@
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     La partie produits expose pour le moment un endpoint de synchronisation en masse.
-                                    Il cree ou met a jour les produits du fournisseur connecte en matchant sur
+                                    Il cree ou met a jour les produits de la boutique connectee en matchant sur
                                     <span class="font-mono">reference</span>.
                                 </div>
                             </div>
@@ -786,7 +786,7 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-violet-500/15 border border-violet-400/20 px-2.5 py-1 text-xs font-extrabold text-violet-200">FOURNISSEUR</span>
-                                <span class="font-bold">Fournisseur PME</span>
+                                <span class="font-bold">Boutique PME</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
@@ -794,7 +794,7 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Cette rubrique sert a mettre a jour les informations du fournisseur depuis le logiciel PME:
+                                    Cette rubrique sert a mettre a jour les informations de la boutique depuis le logiciel PME:
                                     nom, telephone, adresse, geolocalisation, visibilite et logo.
                                 </div>
                             </div>
@@ -802,7 +802,7 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">POST /fournisseurs</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Cree un nouveau fournisseur depuis le systeme PME.
+                                    Cree une nouvelle boutique depuis le systeme PME.
                                     Cet endpoint est public mais protege par une Api Key de type
                                     <span class="font-mono">create_fournisseur</span>.
                                     Champs requis:
@@ -845,14 +845,14 @@
     "password_par_defaut": "12345678",
     "pme_token": "uuid-token"
   },
-  "message": "Fournisseur cree"
+  "message": "Boutique creee"
 }</pre>
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">POST /fournisseurs/info</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Retourne les informations du fournisseur a partir de
+                                    Retourne les informations de la boutique a partir de
                                     <span class="font-mono">email</span> et
                                     <span class="font-mono">password</span>.
                                     Cet endpoint exige aussi une Api Key de type
@@ -884,14 +884,14 @@
     "logo_url": "",
     "is_visible": 1
   },
-  "message": "Fournisseur trouve"
+  "message": "Boutique trouvee"
 }</pre>
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">POST /sync-fournisseur</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Met a jour le fournisseur du token PME.
+                                    Met a jour la boutique du token PME.
                                     Pour les champs texte utilisez JSON classique.
                                     Pour charger un logo, utilisez <span class="font-mono">multipart/form-data</span>.
                                     Champs supportes:
@@ -901,7 +901,7 @@
                                     <span class="font-mono">is_visible</span>, <span class="font-mono">remove_logo</span>, <span class="font-mono">logo</span>.
                                 </div>
                                 <div class="mt-2 text-xs text-white/60">
-                                    Cas d'usage: mise a jour de la fiche fournisseur ou remplacement/suppression du logo depuis PME.
+                                    Cas d'usage: mise a jour de la fiche boutique ou remplacement/suppression du logo depuis PME.
                                 </div>
                                 <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
   "telephone": "0550123456",
@@ -927,7 +927,7 @@
     "logo_url": "https://...",
     "is_visible": 1
   },
-  "message": "Sync fournisseur terminé"
+  "message": "Sync boutique termine"
 }</pre>
                             </div>
                         </div>

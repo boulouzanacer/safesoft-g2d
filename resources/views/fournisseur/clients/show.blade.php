@@ -98,7 +98,7 @@
                     <i class="fa-solid fa-cart-shopping"></i>
                 </div>
             </div>
-            <div class="mt-3 text-xs text-sky-100/70">Total purchases for this client with this fournisseur.</div>
+            <div class="mt-3 text-xs text-sky-100/70">Total purchases for this client with this boutique.</div>
         </div>
 
         <div class="rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-5 shadow-lg shadow-emerald-950/10">

@@ -25,7 +25,7 @@ class ApiKey extends Model
     {
         return [
             self::TYPE_ADMINISTRATION => 'Administration',
-            self::TYPE_CREATE_FOURNISSEUR => 'Create fournisseur',
+            self::TYPE_CREATE_FOURNISSEUR => 'Create boutique',
         ];
     }
 

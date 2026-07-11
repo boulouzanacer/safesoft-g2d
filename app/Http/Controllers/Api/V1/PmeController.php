@@ -141,7 +141,7 @@ class PmeController extends Controller
             'date_expiration' => optional($fournisseur->expires_at)?->format('Y-m-d'),
             'password_par_defaut' => $defaultPassword,
             'pme_token' => $fournisseur->token,
-        ], 'Fournisseur cree', 201);
+        ], 'Boutique creee', 201);
     }
 
     public function fournisseurInfo(PmeFournisseurInfoRequest $request)
@@ -182,7 +182,7 @@ class PmeController extends Controller
             'pme_token' => $fournisseur->token,
             'logo_url' => $fournisseur->logo_url,
             'is_visible' => (int) ($fournisseur->is_visible ?? 1),
-        ], 'Fournisseur trouve');
+        ], 'Boutique trouvee');
     }
 
     public function showClient(Request $request, int $id)
@@ -530,7 +530,7 @@ class PmeController extends Controller
             'longitude' => $frs->longitude,
             'logo_url' => $frs->logo_url,
             'is_visible' => (int) ($frs->is_visible ?? 1),
-        ], 'Sync fournisseur terminé');
+        ], 'Sync boutique termine');
     }
 
     public function commandes(Request $request)

@@ -91,7 +91,7 @@ class ClientController extends Controller
         $client = Client::query()->findOrFail($id);
 
         if ($client->id_frs !== null) {
-            return back()->with('error', 'Seuls les clients sans fournisseur peuvent etre supprimes ici.');
+            return back()->with('error', 'Seuls les clients sans boutique peuvent etre supprimes ici.');
         }
 
         $client->delete();

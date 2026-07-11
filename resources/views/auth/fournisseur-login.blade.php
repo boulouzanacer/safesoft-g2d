@@ -6,7 +6,7 @@
     <div class="w-full max-w-md">
         <div class="text-center mb-6 text-white">
             <div class="text-3xl font-extrabold tracking-wide">SafeSoft G2D</div>
-            <div class="text-sm opacity-90 mt-1">Espace Fournisseur</div>
+            <div class="text-sm opacity-90 mt-1">Espace Boutique</div>
         </div>
 
         <div class="bg-white shadow-2xl rounded-2xl p-8">

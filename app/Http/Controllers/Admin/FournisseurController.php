@@ -63,7 +63,7 @@ class FournisseurController extends Controller
             ->withQueryString();
 
         return view('admin.fournisseurs.index', [
-            'title' => 'Fournisseurs',
+            'title' => 'Boutiques',
             'q' => $q,
             'fournisseurs' => $fournisseurs,
             'boutique_categories' => BoutiqueCategory::query()->orderBy('name')->get(),
@@ -174,7 +174,7 @@ class FournisseurController extends Controller
 
         $frs->update($payload);
 
-        return back()->with('success', 'Fournisseur mis à jour.');
+        return back()->with('success', 'Boutique mise à jour.');
     }
 
     public function destroy(int $id): RedirectResponse
@@ -182,7 +182,7 @@ class FournisseurController extends Controller
         $frs = Fournisseur::query()->findOrFail($id);
         $frs->delete();
 
-        return back()->with('success', 'Fournisseur supprimé.');
+        return back()->with('success', 'Boutique supprimée.');
     }
 
     public function toggleActif(int $id): RedirectResponse
@@ -191,7 +191,7 @@ class FournisseurController extends Controller
         $nextStatus = (int) $frs->actif === 1 ? 0 : 1;
 
         if ($nextStatus === 1 && $frs->isExpired()) {
-            return back()->with('success', 'Impossible d activer ce fournisseur tant que sa date d expiration n a pas ete prolongee.');
+            return back()->with('success', 'Impossible d activer cette boutique tant que sa date d expiration n a pas ete prolongee.');
         }
 
         $frs->actif = $nextStatus;

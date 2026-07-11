@@ -26,7 +26,7 @@
         <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm text-white/60">Total Fournisseurs</div>
+                    <div class="text-sm text-white/60">Total Boutiques</div>
                     <div class="text-3xl font-extrabold mt-1">{{ $nb_fournisseurs }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
@@ -101,7 +101,7 @@
         </div>
 
         <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
-            <div class="font-extrabold tracking-wide mb-4">Fournisseurs récents</div>
+            <div class="font-extrabold tracking-wide mb-4">Boutiques récentes</div>
             <div class="space-y-3">
                 @foreach($fournisseurs_recents as $f)
                     <div class="flex items-center justify-between gap-3">
@@ -131,7 +131,7 @@
                         <th class="text-left py-3 pr-4 font-semibold">#</th>
                         <th class="text-left py-3 pr-4 font-semibold">Date</th>
                         <th class="text-left py-3 pr-4 font-semibold">Client</th>
-                        <th class="text-left py-3 pr-4 font-semibold">Fournisseur</th>
+                        <th class="text-left py-3 pr-4 font-semibold">Boutique</th>
                         <th class="text-left py-3 pr-4 font-semibold">Statut</th>
                         <th class="text-right py-3 font-semibold">Montant</th>
                     </tr>
@@ -179,11 +179,11 @@
         </div>
     </div>
 
-    <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
+    <div id="boutique-categories-section" class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
                 <div class="font-extrabold tracking-wide">Catégories boutiques</div>
-                <div class="text-sm text-white/60">Liste prédéfinie utilisée dans la création des fournisseurs et dans le site web.</div>
+                <div class="text-sm text-white/60">Liste prédéfinie utilisée dans la création des boutiques et dans le site web.</div>
             </div>
             <button type="button"
                     class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white"
@@ -352,56 +352,74 @@
     </div>
 </div>
 
-<script>
-    const ctx = document.getElementById('ordersChart');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: @json($chart_labels),
-            datasets: [{
-                label: 'Commandes',
-                data: @json($chart_series),
-                borderColor: '#1E6FD9',
-                backgroundColor: 'rgba(30,111,217,0.15)',
-                fill: true,
-                tension: 0.35,
-                pointRadius: 4,
-                pointBackgroundColor: '#1E6FD9'
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
-                y: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' }, beginAtZero: true }
-            }
-        }
-    });
+<div class="hidden js-admin-dashboard-config"
+     data-chart-labels="{{ e(json_encode($chart_labels)) }}"
+     data-chart-series="{{ e(json_encode($chart_series)) }}"
+     data-category-base-url="{{ url('/admin/boutique-categories') }}"
+     data-category-create-open="{{ $errors->any() ? '1' : '0' }}"></div>
 
-    function adminDashboardPage() {
-        return {
-            categoryCreateOpen: {{ $errors->any() ? 'true' : 'false' }},
-            categoryEditOpen: false,
-            categoryDeleteOpen: false,
-            categoryEditAction: '',
-            categoryEditName: '',
-            categoryDeleteAction: '',
-            categoryDeleteName: '',
-            categoryDeleteCount: 0,
-            openCategoryEdit(category) {
-                this.categoryEditAction = '{{ url('/admin/boutique-categories') }}/' + category.id;
-                this.categoryEditName = category.name || '';
-                this.categoryEditOpen = true;
-            },
-            openCategoryDelete(action, name, count) {
-                this.categoryDeleteAction = action || '';
-                this.categoryDeleteName = name || '';
-                this.categoryDeleteCount = Number(count || 0);
-                this.categoryDeleteOpen = true;
-            },
+<script>
+    (function () {
+        const configElement = document.querySelector('.js-admin-dashboard-config');
+        if (! configElement) {
+            return;
+        }
+
+        const chartLabels = JSON.parse(configElement.dataset.chartLabels || '[]');
+        const chartSeries = JSON.parse(configElement.dataset.chartSeries || '[]');
+        const ctx = document.getElementById('ordersChart');
+
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Commandes',
+                        data: chartSeries,
+                        borderColor: '#1E6FD9',
+                        backgroundColor: 'rgba(30,111,217,0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#1E6FD9'
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+                        y: { ticks: { color: 'rgba(255,255,255,0.65)' }, grid: { color: 'rgba(255,255,255,0.08)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        window.adminDashboardPage = window.adminDashboardPage || function () {
+            return {
+                categoryCreateOpen: (configElement.dataset.categoryCreateOpen || '0') === '1',
+                categoryEditOpen: false,
+                categoryDeleteOpen: false,
+                categoryEditAction: '',
+                categoryEditName: '',
+                categoryDeleteAction: '',
+                categoryDeleteName: '',
+                categoryDeleteCount: 0,
+                openCategoryEdit(category) {
+                    this.categoryEditAction = (configElement.dataset.categoryBaseUrl || '') + '/' + category.id;
+                    this.categoryEditName = category.name || '';
+                    this.categoryEditOpen = true;
+                },
+                openCategoryDelete(action, name, count) {
+                    this.categoryDeleteAction = action || '';
+                    this.categoryDeleteName = name || '';
+                    this.categoryDeleteCount = Number(count || 0);
+                    this.categoryDeleteOpen = true;
+                },
+            };
         };
-    }
+    })();
 </script>
 @endsection

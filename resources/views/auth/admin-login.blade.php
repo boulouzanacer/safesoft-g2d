@@ -58,7 +58,7 @@
 
             <div class="mt-6 text-center">
                 <a href="{{ url('/fournisseur/login') }}" class="text-sm text-slate-500 hover:text-slate-700">
-                    Accès Fournisseur
+                    Accès Boutique
                 </a>
             </div>
         </div>

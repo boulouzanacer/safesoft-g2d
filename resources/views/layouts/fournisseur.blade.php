@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Espace Fournisseur' }} - {{ config('app.name') }}</title>
+    <title>{{ $title ?? 'Espace Boutique' }} - {{ config('app.name') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,7 +83,7 @@
             </div>
             <div class="leading-tight">
                 <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
-                <div class="text-xs" :class="dark ? 'text-white/60' : 'text-slate-500'">Espace Fournisseur</div>
+                <div class="text-xs" :class="dark ? 'text-white/60' : 'text-slate-500'">Espace Boutique</div>
             </div>
         </div>
 
@@ -159,7 +159,7 @@
         <header class="sticky top-0 z-40 h-16 flex items-center justify-between px-6 border-b border-white/10 backdrop-blur"
                 :class="dark ? 'bg-[color:rgba(26,26,46,0.85)]' : 'bg-white/80 border-slate-200'">
             <div class="font-extrabold tracking-wide text-lg">
-                {{ $title ?? 'Espace Fournisseur' }}
+                {{ $title ?? 'Espace Boutique' }}
             </div>
 
             <div class="flex items-center gap-4">
@@ -181,7 +181,7 @@
                             {{ strtoupper(substr($frs?->nom_frs ?? 'F', 0, 1)) }}
                         </div>
                         <div class="text-left leading-tight hidden sm:block max-w-[180px]">
-                            <div class="text-sm font-bold truncate">{{ $frs?->nom_frs ?? 'Fournisseur' }}</div>
+                            <div class="text-sm font-bold truncate">{{ $frs?->nom_frs ?? 'Boutique' }}</div>
                             <div class="text-xs opacity-70 truncate">{{ $frs?->email }}</div>
                             <div class="mt-1">
                                 <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-bold {{ (int)($frs?->actif ?? 0) === 1 ? 'border-emerald-400/20 bg-emerald-500/15 text-emerald-300' : 'border-red-400/20 bg-red-500/15 text-red-300' }}">

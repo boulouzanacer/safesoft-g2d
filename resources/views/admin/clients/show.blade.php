@@ -106,11 +106,11 @@
         </div>
 
         <div class="rounded-3xl border border-white/10 bg-[var(--admin-card)] p-5 md:p-6">
-            <div class="font-extrabold tracking-wide">Fournisseur & Comptes lies</div>
+            <div class="font-extrabold tracking-wide">Boutique & Comptes lies</div>
             <div class="mt-5 space-y-3 text-sm">
                 <div class="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Fournisseur principal</div>
-                    <div class="mt-2 font-extrabold break-words">{{ $client->fournisseur?->nom_frs ?: 'Aucun fournisseur' }}</div>
+                    <div class="text-xs font-bold uppercase tracking-wide text-white/50">Boutique principale</div>
+                    <div class="mt-2 font-extrabold break-words">{{ $client->fournisseur?->nom_frs ?: 'Aucune boutique' }}</div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Comptes lies meme email</div>
@@ -122,7 +122,7 @@
                                     <div class="flex items-start justify-between gap-3">
                                         <div class="min-w-0">
                                             <div class="font-extrabold break-words">#{{ $account->id }} · {{ $account->type_client }}</div>
-                                            <div class="text-white/60 break-words">{{ $account->fournisseur?->nom_frs ?: 'Sans fournisseur' }}</div>
+                                            <div class="text-white/60 break-words">{{ $account->fournisseur?->nom_frs ?: 'Sans boutique' }}</div>
                                         </div>
                                         <i class="fa-solid fa-arrow-up-right-from-square text-xs text-sky-300 mt-1"></i>
                                     </div>
@@ -152,7 +152,7 @@
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">#</th>
                         <th class="text-left py-3 px-4 font-semibold">Date</th>
-                        <th class="text-left py-3 px-4 font-semibold">Fournisseur</th>
+                        <th class="text-left py-3 px-4 font-semibold">Boutique</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
                         <th class="text-right py-3 px-4 font-semibold">Montant</th>
                     </tr>

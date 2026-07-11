@@ -32,11 +32,11 @@
     <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-lg font-extrabold text-slate-900">Informations commerciales par fournisseur</h2>
-                <p class="text-sm text-slate-500">Consultez vos montants et conditions commerciales pour chaque fournisseur associé.</p>
+                <h2 class="text-lg font-extrabold text-slate-900">Informations commerciales par boutique</h2>
+                <p class="text-sm text-slate-500">Consultez vos montants et conditions commerciales pour chaque boutique associée.</p>
             </div>
             @if($hasMultipleTabs)
-                <div class="text-xs font-semibold text-slate-500">{{ $profileTabs->count() }} fournisseurs associes</div>
+                <div class="text-xs font-semibold text-slate-500">{{ $profileTabs->count() }} boutiques associees</div>
             @endif
         </div>
 
@@ -131,7 +131,7 @@
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h3 class="text-lg font-extrabold text-slate-900">{{ $tab['fournisseur_name'] }}</h3>
-                                <p class="text-sm text-slate-500">Informations commerciales appliquees pour ce fournisseur.</p>
+                                <p class="text-sm text-slate-500">Informations commerciales appliquees pour cette boutique.</p>
                             </div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold {{ (string)($tab['type_client'] ?? '') === 'abonne' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-700 border border-slate-200' }}">

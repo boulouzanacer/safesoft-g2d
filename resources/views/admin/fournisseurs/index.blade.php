@@ -19,7 +19,7 @@
            class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white"
            style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
             <i class="fa-solid fa-plus"></i>
-            Nouveau fournisseur
+            Nouvelle boutique
         </a>
     </div>
 
@@ -128,7 +128,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                onclick="return confirm('Supprimer ce fournisseur ?')"
+                                                onclick="return confirm('Supprimer cette boutique ?')"
                                                 class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
                                                 title="Supprimer"
                                                 aria-label="Supprimer">
@@ -140,7 +140,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-10 text-center text-white/60">Aucun fournisseur</td>
+                            <td colspan="9" class="py-10 text-center text-white/60">Aucune boutique</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -157,7 +157,7 @@
         <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <div class="text-2xl font-extrabold tracking-wide">Créer un fournisseur</div>
+                    <div class="text-2xl font-extrabold tracking-wide">Créer une boutique</div>
                     <div class="text-sm text-white/60">Le token sera généré automatiquement.</div>
                 </div>
                 <button type="button" class="text-white/60 hover:text-white" @click="window.location='{{ url('/admin/fournisseurs') }}'">
@@ -192,7 +192,7 @@
             <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <div class="text-2xl font-extrabold tracking-wide">Éditer fournisseur</div>
+                        <div class="text-2xl font-extrabold tracking-wide">Éditer boutique</div>
                         <div class="text-sm text-white/60">{{ $editing_fournisseur->nom_frs }}</div>
                     </div>
                     <button type="button" class="text-white/60 hover:text-white" @click="window.location='{{ url('/admin/fournisseurs') }}'">
@@ -227,7 +227,7 @@
         <div class="absolute inset-0 bg-black/60" @click="tokenOpen=false"></div>
         <div class="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between">
-                <div class="font-extrabold tracking-wide">Token Fournisseur</div>
+                <div class="font-extrabold tracking-wide">Token Boutique</div>
                 <button type="button" class="text-white/60 hover:text-white" @click="tokenOpen=false">
                     <i class="fa-solid fa-xmark"></i>
                 </button>

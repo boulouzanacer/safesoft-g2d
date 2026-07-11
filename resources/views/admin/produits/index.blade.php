@@ -18,7 +18,7 @@
             <select id="produitsFournisseurSelect"
                     name="fournisseur"
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-                <option value="">Tous les fournisseurs</option>
+                <option value="">Toutes les boutiques</option>
                 @foreach($fournisseurs as $f)
                     <option value="{{ $f->id }}" @selected((string)$selected_fournisseur === (string)$f->id)>{{ $f->nom_frs }}</option>
                 @endforeach
@@ -36,7 +36,7 @@
                         <th class="text-left py-3 px-4 font-semibold">Réf</th>
                         <th class="text-left py-3 px-4 font-semibold">Désignation</th>
                         <th class="text-left py-3 px-4 font-semibold">Catégorie</th>
-                        <th class="text-left py-3 px-4 font-semibold">Fournisseur</th>
+                        <th class="text-left py-3 px-4 font-semibold">Boutique</th>
                         <th class="text-right py-3 px-4 font-semibold">PV 1</th>
                         <th class="text-right py-3 px-4 font-semibold">Stock</th>
                         <th class="text-left py-3 px-4 font-semibold">Statut</th>
