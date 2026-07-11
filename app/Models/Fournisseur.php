@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -76,6 +77,40 @@ class Fournisseur extends Authenticatable
                 $model->token = (string) Str::uuid();
             }
         });
+
+        static::deleted(function (self $model): void {
+            if ($model->isForceDeleting()) {
+                return;
+            }
+
+            $archivedEmail = self::archivedEmailValue((int) $model->id, $model->email);
+
+            if ((string) $model->email === $archivedEmail) {
+                return;
+            }
+
+            DB::table('frs')
+                ->where('id', $model->id)
+                ->update([
+                    'email' => $archivedEmail,
+                    'updated_at' => now(),
+                ]);
+
+            $model->forceFill(['email' => $archivedEmail]);
+        });
+    }
+
+    public static function archivedEmailValue(int $id, ?string $originalEmail = null): string
+    {
+        $domain = 'deleted.local';
+        $base = 'deleted+'.$id.'+'.now()->timestamp;
+
+        if ($originalEmail) {
+            $hash = substr(sha1(mb_strtolower(trim($originalEmail))), 0, 10);
+            $base .= '+'.$hash;
+        }
+
+        return $base.'@'.$domain;
     }
 
     public function isExpired(): bool
