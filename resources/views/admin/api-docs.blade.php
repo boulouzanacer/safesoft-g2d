@@ -186,9 +186,48 @@
                                         <span class="font-bold">GET /boutiques</span>
                                         <span class="text-xs text-white/60">Public (token optional)</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">
-                                        Lists fournisseurs where <span class="font-mono">actif=1</span> and <span class="font-mono">is_visible=1</span> + <span class="font-mono">nb_produits</span>.
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Retourne la liste des boutiques visibles et actives.
+                                        Si un token client abonné est envoyé, la liste peut être restreinte à sa boutique.
+                                        Cet endpoint ne demande aucun paramètre.
                                     </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Champs retournés par boutique :
+                                        <span class="font-mono">id</span>,
+                                        <span class="font-mono">nom_frs</span>,
+                                        <span class="font-mono">telephone</span>,
+                                        <span class="font-mono">logo_path</span>,
+                                        <span class="font-mono">adresse</span>,
+                                        <span class="font-mono">id_wilaya</span>,
+                                        <span class="font-mono">id_commune</span>,
+                                        <span class="font-mono">latitude</span>,
+                                        <span class="font-mono">longitude</span>,
+                                        <span class="font-mono">wilaya</span>,
+                                        <span class="font-mono">commune</span>,
+                                        <span class="font-mono">nb_produits</span>.
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/boutiques') }}</div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": [
+    {
+      "id": 3,
+      "nom_frs": "Boutique Ahmed",
+      "telephone": "0550123456",
+      "logo_path": "frs/3/logo_1720700000.jpg",
+      "adresse": "Alger centre",
+      "id_wilaya": 16,
+      "id_commune": 1601,
+      "latitude": 36.7538,
+      "longitude": 3.0588,
+      "wilaya": "ALGER",
+      "commune": "SIDI M'HAMED",
+      "nb_produits": 24
+    }
+  ],
+  "message": "Liste des boutiques",
+  "errors": null
+}</pre>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
