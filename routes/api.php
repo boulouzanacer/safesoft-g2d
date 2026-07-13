@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('pme')->middleware(['auth.pme', 'throttle:public'])->group(function () {
         Route::get('/clients', [PmeController::class, 'clients']);
         Route::get('/clients/{id}', [PmeController::class, 'showClient']);
+        Route::get('/produits', [PmeController::class, 'produits']);
         Route::post('/clients', [PmeController::class, 'storeClient']);
         Route::put('/clients/{id}', [PmeController::class, 'updateClient']);
         Route::delete('/clients/{id}', [PmeController::class, 'destroyClient']);

@@ -24,6 +24,40 @@ class PmeController extends Controller
 {
     use ApiResponseTrait;
 
+    private function formatPmeProduct(Produit $produit): array
+    {
+        return [
+            'id' => (int) $produit->id,
+            'id_frs' => (int) $produit->id_frs,
+            'reference' => $produit->reference,
+            'designation' => $produit->designation,
+            'description' => $produit->description,
+            'pv_1' => (float) $produit->pv_1,
+            'pv_2' => (float) $produit->pv_2,
+            'pv_3' => (float) $produit->pv_3,
+            'stock' => (int) $produit->stock,
+            'image_principale' => $produit->image_principale,
+            'categorie' => $produit->categorie,
+            'abonne_only' => (int) ($produit->abonne_only ?? 0),
+            'enable_tier_pricing' => $produit->isTierPricingEnabled(),
+            'quantity_prices' => $produit->quantityPrices->map(fn ($tier) => [
+                'quantity_min' => (int) $tier->quantity_min,
+                'quantity_max' => $tier->quantity_max === null ? null : (int) $tier->quantity_max,
+                'price' => (float) $tier->price,
+            ])->values(),
+            'actif' => (int) $produit->actif,
+            'images' => $produit->images->map(fn ($image) => [
+                'id' => (int) $image->id,
+                'filename' => $image->filename,
+                'url_principale' => $image->url_principale,
+                'url_thumbnail' => $image->url_thumbnail,
+                'ordre' => (int) $image->ordre,
+            ])->values(),
+            'created_at' => optional($produit->created_at)?->toISOString(),
+            'updated_at' => optional($produit->updated_at)?->toISOString(),
+        ];
+    }
+
     private function formatClient(Client $client): array
     {
         return [
@@ -419,6 +453,52 @@ class PmeController extends Controller
             ->values();
 
         return $this->success($items, 'Clients PME');
+    }
+
+    public function produits(Request $request)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        $categorie = trim((string) $request->query('categorie', ''));
+        $search = trim((string) $request->query('search', ''));
+        $actif = $request->query('actif');
+        $abonneOnly = $request->query('abonne_only');
+        $perPage = min(max((int) $request->query('per_page', 50), 1), 100);
+
+        $paginator = Produit::query()
+            ->where('id_frs', $frs->id)
+            ->whereNull('deleted_at')
+            ->with([
+                'images' => fn ($query) => $query->orderBy('ordre'),
+                'quantityPrices',
+            ])
+            ->when(in_array((string) $actif, ['0', '1'], true), fn ($query) => $query->where('actif', (int) $actif))
+            ->when(in_array((string) $abonneOnly, ['0', '1'], true), fn ($query) => $query->where('abonne_only', (int) $abonneOnly))
+            ->when($categorie !== '', fn ($query) => $query->where('categorie', $categorie))
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('designation', 'like', "%{$search}%")
+                        ->orWhere('reference', 'like', "%{$search}%")
+                        ->orWhere('categorie', 'like', "%{$search}%");
+                });
+            })
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $items = $paginator->getCollection()
+            ->map(fn (Produit $produit) => $this->formatPmeProduct($produit))
+            ->values();
+
+        return $this->success([
+            'items' => $items,
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+        ], 'Produits PME');
     }
 
     public function syncProduits(PmeSyncProduitsRequest $request)

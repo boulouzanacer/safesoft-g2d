@@ -801,10 +801,73 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    La partie produits expose pour le moment un endpoint de synchronisation en masse.
-                                    Il cree ou met a jour les produits de la boutique connectee en matchant sur
+                                    La partie produits permet maintenant de lister les produits de la boutique du token PME,
+                                    puis de les creer ou mettre a jour en masse en matchant sur
                                     <span class="font-mono">reference</span>.
                                 </div>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">GET /produits</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Retourne la liste paginee des produits appartenant a la boutique du token PME.
+                                    Filtres supportes:
+                                    <span class="font-mono">categorie</span>,
+                                    <span class="font-mono">search</span>,
+                                    <span class="font-mono">actif=0|1</span>,
+                                    <span class="font-mono">abonne_only=0|1</span>,
+                                    <span class="font-mono">per_page</span> (max 100).
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Champs retournes:
+                                    <span class="font-mono">id</span>,
+                                    <span class="font-mono">reference</span>,
+                                    <span class="font-mono">designation</span>,
+                                    <span class="font-mono">description</span>,
+                                    <span class="font-mono">pv_1</span>,
+                                    <span class="font-mono">pv_2</span>,
+                                    <span class="font-mono">pv_3</span>,
+                                    <span class="font-mono">stock</span>,
+                                    <span class="font-mono">categorie</span>,
+                                    <span class="font-mono">abonne_only</span>,
+                                    <span class="font-mono">enable_tier_pricing</span>,
+                                    <span class="font-mono">quantity_prices</span>,
+                                    <span class="font-mono">actif</span>,
+                                    <span class="font-mono">images</span>.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/produits?actif=1&search=gel&per_page=20') }}</div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 21,
+        "id_frs": 3,
+        "reference": "GEL-001",
+        "designation": "Gel coiffant",
+        "description": "",
+        "pv_1": 250,
+        "pv_2": 230,
+        "pv_3": 220,
+        "stock": 14,
+        "image_principale": "produits/3/gel-001.jpg",
+        "categorie": "Cosmetique",
+        "abonne_only": 0,
+        "enable_tier_pricing": false,
+        "quantity_prices": [],
+        "actif": 1,
+        "images": []
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "last_page": 1,
+      "per_page": 20,
+      "total": 1
+    }
+  },
+  "message": "Produits PME"
+}</pre>
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
