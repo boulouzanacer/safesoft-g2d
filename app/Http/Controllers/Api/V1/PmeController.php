@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\PmeClientUpsertRequest;
 use App\Http\Requests\Api\V1\PmeFournisseurInfoRequest;
+use App\Http\Requests\Api\V1\PmeStoreProduitRequest;
 use App\Http\Requests\Api\V1\PmeStoreFournisseurRequest;
 use App\Http\Requests\Api\V1\PmeSyncClientsRequest;
 use App\Http\Requests\Api\V1\PmeSyncProduitsRequest;
@@ -29,6 +30,7 @@ class PmeController extends Controller
         return [
             'id' => (int) $produit->id,
             'id_frs' => (int) $produit->id_frs,
+            'synced_pme' => (int) ($produit->synced_pme ?? 0),
             'reference' => $produit->reference,
             'designation' => $produit->designation,
             'description' => $produit->description,
@@ -56,6 +58,105 @@ class PmeController extends Controller
             'created_at' => optional($produit->created_at)?->toISOString(),
             'updated_at' => optional($produit->updated_at)?->toISOString(),
         ];
+    }
+
+    private function normalizeProductQuantityPrices(array $tiers): array
+    {
+        $normalized = [];
+
+        foreach ($tiers as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $min = (int) ($row['quantity_min'] ?? 0);
+            $maxRaw = $row['quantity_max'] ?? null;
+            $max = ($maxRaw === null || $maxRaw === '') ? null : (int) $maxRaw;
+            $price = (float) ($row['price'] ?? 0);
+
+            $normalized[] = [
+                'quantity_min' => $min,
+                'quantity_max' => $max,
+                'price' => $price,
+            ];
+        }
+
+        usort($normalized, fn ($a, $b) => $a['quantity_min'] <=> $b['quantity_min']);
+
+        return $normalized;
+    }
+
+    private function resolveProductData(array $validated, int $frsId, ?Produit $existing = null): array
+    {
+        $pv1 = array_key_exists('pv_1', $validated) ? (float) $validated['pv_1'] : (float) ($validated['prix'] ?? 0);
+
+        return [
+            'id_frs' => $frsId,
+            'synced_pme' => 1,
+            'reference' => $validated['reference'],
+            'designation' => $validated['designation'],
+            'description' => (string) ($validated['description'] ?? ($existing?->description ?? '')),
+            'pv_1' => $pv1,
+            'pv_2' => array_key_exists('pv_2', $validated) ? (float) $validated['pv_2'] : (array_key_exists('pv_1', $validated) ? $pv1 : (float) ($validated['prix'] ?? 0)),
+            'pv_3' => array_key_exists('pv_3', $validated) ? (float) $validated['pv_3'] : (array_key_exists('pv_1', $validated) ? $pv1 : (float) ($validated['prix'] ?? 0)),
+            'stock' => (int) $validated['stock'],
+            'categorie' => $validated['categorie'],
+            'abonne_only' => (int) ($validated['abonne_only'] ?? 0) === 1 ? 1 : 0,
+            'enable_tier_pricing' => (int) ($validated['enable_tier_pricing'] ?? 0) === 1 ? 1 : 0,
+            'actif' => array_key_exists('actif', $validated) ? ((int) $validated['actif'] === 1 ? 1 : 0) : 1,
+        ];
+    }
+
+    private function saveProductQuantityPrices(Produit $produit, array $validated): void
+    {
+        $produit->quantityPrices()->delete();
+
+        if ((int) ($validated['enable_tier_pricing'] ?? 0) !== 1) {
+            return;
+        }
+
+        $tiers = $this->normalizeProductQuantityPrices($validated['quantity_prices'] ?? []);
+
+        foreach ($tiers as $tier) {
+            $produit->quantityPrices()->create([
+                'quantity_min' => $tier['quantity_min'],
+                'quantity_max' => $tier['quantity_max'],
+                'price' => $tier['price'],
+            ]);
+        }
+    }
+
+    private function upsertPmeProduct(array $validated, int $frsId): array
+    {
+        $existing = Produit::query()
+            ->where('id_frs', $frsId)
+            ->where('reference', $validated['reference'])
+            ->first();
+
+        $created = false;
+
+        $produit = DB::transaction(function () use ($validated, $frsId, $existing, &$created) {
+            $payload = $this->resolveProductData($validated, $frsId, $existing);
+
+            if ($existing) {
+                $existing->update($payload);
+                $produit = $existing;
+            } else {
+                $produit = Produit::create($payload);
+                $created = true;
+            }
+
+            $this->saveProductQuantityPrices($produit, $validated);
+
+            return $produit;
+        });
+
+        $produit->load([
+            'images' => fn ($query) => $query->orderBy('ordre'),
+            'quantityPrices',
+        ]);
+
+        return [$produit, $created];
     }
 
     private function formatClient(Client $client): array
@@ -462,6 +563,7 @@ class PmeController extends Controller
         $search = trim((string) $request->query('search', ''));
         $actif = $request->query('actif');
         $abonneOnly = $request->query('abonne_only');
+        $synced = $request->query('synced');
         $perPage = min(max((int) $request->query('per_page', 50), 1), 100);
 
         $paginator = Produit::query()
@@ -471,6 +573,7 @@ class PmeController extends Controller
                 'images' => fn ($query) => $query->orderBy('ordre'),
                 'quantityPrices',
             ])
+            ->when(in_array((string) $synced, ['0', '1'], true), fn ($query) => $query->where('synced_pme', (int) $synced))
             ->when(in_array((string) $actif, ['0', '1'], true), fn ($query) => $query->where('actif', (int) $actif))
             ->when(in_array((string) $abonneOnly, ['0', '1'], true), fn ($query) => $query->where('abonne_only', (int) $abonneOnly))
             ->when($categorie !== '', fn ($query) => $query->where('categorie', $categorie))
@@ -501,6 +604,18 @@ class PmeController extends Controller
         ], 'Produits PME');
     }
 
+    public function storeProduit(PmeStoreProduitRequest $request)
+    {
+        $frs = $request->attributes->get('fournisseur');
+        [$produit, $created] = $this->upsertPmeProduct($request->validated(), (int) $frs->id);
+
+        return $this->success(
+            $this->formatPmeProduct($produit),
+            $created ? 'Produit cree' : 'Produit mis a jour',
+            $created ? 201 : 200
+        );
+    }
+
     public function syncProduits(PmeSyncProduitsRequest $request)
     {
         $frs = $request->attributes->get('fournisseur');
@@ -511,32 +626,8 @@ class PmeController extends Controller
 
         DB::transaction(function () use ($frs, $items, &$inserted, &$updated) {
             foreach ($items as $item) {
-                $existing = Produit::query()
-                    ->where('id_frs', $frs->id)
-                    ->where('reference', $item['reference'])
-                    ->first();
-
-                $data = [
-                    'id_frs' => $frs->id,
-                    'reference' => $item['reference'],
-                    'designation' => $item['designation'],
-                    'description' => $existing?->description ?? '',
-                    'pv_1' => $item['pv_1'] ?? ($item['prix'] ?? 0),
-                    'pv_2' => $item['pv_2'] ?? ($item['pv_1'] ?? ($item['prix'] ?? 0)),
-                    'pv_3' => $item['pv_3'] ?? ($item['pv_1'] ?? ($item['prix'] ?? 0)),
-                    'stock' => (int) $item['stock'],
-                    'categorie' => $item['categorie'],
-                    'abonne_only' => (int) ($item['abonne_only'] ?? 0) === 1 ? 1 : 0,
-                    'actif' => 1,
-                ];
-
-                if ($existing) {
-                    $existing->update($data);
-                    $updated++;
-                } else {
-                    Produit::create($data);
-                    $inserted++;
-                }
+                [, $created] = $this->upsertPmeProduct($item, (int) $frs->id);
+                $created ? $inserted++ : $updated++;
             }
         });
 
@@ -544,6 +635,29 @@ class PmeController extends Controller
             'nb_inseres' => $inserted,
             'nb_mis_a_jour' => $updated,
         ], 'Sync produits terminé');
+    }
+
+    public function markProduitSynced(Request $request, int $id)
+    {
+        $frs = $request->attributes->get('fournisseur');
+
+        $produit = Produit::query()
+            ->where('id_frs', $frs->id)
+            ->whereNull('deleted_at')
+            ->find($id);
+
+        if (! $produit) {
+            return $this->notFound('Produit introuvable');
+        }
+
+        $produit->update(['synced_pme' => 1]);
+        $produit->refresh();
+
+        return $this->success([
+            'id' => (int) $produit->id,
+            'reference' => $produit->reference,
+            'synced_pme' => (int) $produit->synced_pme,
+        ], 'Produit synchronise');
     }
 
     public function syncFournisseur(Request $request)

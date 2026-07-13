@@ -57,6 +57,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/clients', [PmeController::class, 'clients']);
         Route::get('/clients/{id}', [PmeController::class, 'showClient']);
         Route::get('/produits', [PmeController::class, 'produits']);
+        Route::post('/produits', [PmeController::class, 'storeProduit']);
+        Route::put('/produits/{id}/sync', [PmeController::class, 'markProduitSynced']);
         Route::post('/clients', [PmeController::class, 'storeClient']);
         Route::put('/clients/{id}', [PmeController::class, 'updateClient']);
         Route::delete('/clients/{id}', [PmeController::class, 'destroyClient']);

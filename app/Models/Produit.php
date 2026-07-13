@@ -18,6 +18,7 @@ class Produit extends Model
 
     protected $fillable = [
         'id_frs',
+        'synced_pme',
         'reference',
         'designation',
         'description',
@@ -36,6 +37,7 @@ class Produit extends Model
         'pv_1' => 'float',
         'pv_2' => 'float',
         'pv_3' => 'float',
+        'synced_pme' => 'integer',
         'abonne_only' => 'integer',
         'enable_tier_pricing' => 'boolean',
         'actif' => 'integer',

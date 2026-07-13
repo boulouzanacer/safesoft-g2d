@@ -802,7 +802,8 @@
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     La partie produits permet maintenant de lister les produits de la boutique du token PME,
-                                    puis de les creer ou mettre a jour en masse en matchant sur
+                                    d'envoyer un produit unitaire, de marquer un produit comme synchronise,
+                                    puis de creer ou mettre a jour plusieurs produits en matchant sur
                                     <span class="font-mono">reference</span>.
                                 </div>
                             </div>
@@ -812,6 +813,7 @@
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Retourne la liste paginee des produits appartenant a la boutique du token PME.
                                     Filtres supportes:
+                                    <span class="font-mono">synced=0|1</span>,
                                     <span class="font-mono">categorie</span>,
                                     <span class="font-mono">search</span>,
                                     <span class="font-mono">actif=0|1</span>,
@@ -821,6 +823,7 @@
                                 <div class="mt-2 text-xs text-white/60">
                                     Champs retournes:
                                     <span class="font-mono">id</span>,
+                                    <span class="font-mono">synced_pme</span>,
                                     <span class="font-mono">reference</span>,
                                     <span class="font-mono">designation</span>,
                                     <span class="font-mono">description</span>,
@@ -843,6 +846,7 @@
       {
         "id": 21,
         "id_frs": 3,
+        "synced_pme": 0,
         "reference": "GEL-001",
         "designation": "Gel coiffant",
         "description": "",
@@ -871,18 +875,148 @@
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">POST /produits</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Cree ou met a jour un seul produit de la boutique du token PME.
+                                    Le matching se fait par
+                                    <span class="font-mono">reference</span>
+                                    dans la boutique courante.
+                                    Si le produit existe deja, il est mis a jour, sinon il est cree.
+                                    A la reception, le serveur positionne automatiquement
+                                    <span class="font-mono">synced_pme=1</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Champs d'envoi supportes:
+                                    <span class="font-mono">reference</span>,
+                                    <span class="font-mono">designation</span>,
+                                    <span class="font-mono">description</span>,
+                                    <span class="font-mono">prix</span> ou <span class="font-mono">pv_1</span>,
+                                    <span class="font-mono">pv_2</span>,
+                                    <span class="font-mono">pv_3</span>,
+                                    <span class="font-mono">stock</span>,
+                                    <span class="font-mono">categorie</span>,
+                                    <span class="font-mono">abonne_only</span>,
+                                    <span class="font-mono">actif</span>,
+                                    <span class="font-mono">enable_tier_pricing</span>,
+                                    <span class="font-mono">quantity_prices[]</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Regles:
+                                    si <span class="font-mono">pv_2</span> et <span class="font-mono">pv_3</span> ne sont pas envoyes,
+                                    ils reprennent la valeur de <span class="font-mono">pv_1</span> ou <span class="font-mono">prix</span>.
+                                    Si <span class="font-mono">enable_tier_pricing=1</span>,
+                                    il faut envoyer au moins un palier dans <span class="font-mono">quantity_prices</span>.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/produits') }}</div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "reference": "GEL-001",
+  "designation": "Gel coiffant",
+  "description": "Fixation forte",
+  "pv_1": 250,
+  "pv_2": 230,
+  "pv_3": 220,
+  "stock": 14,
+  "categorie": "Cosmetique",
+  "abonne_only": 0,
+  "actif": 1,
+  "enable_tier_pricing": true,
+  "quantity_prices": [
+    {
+      "quantity_min": 1,
+      "quantity_max": 5,
+      "price": 250
+    },
+    {
+      "quantity_min": 6,
+      "quantity_max": null,
+      "price": 210
+    }
+  ]
+}</pre>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 21,
+    "id_frs": 3,
+    "synced_pme": 1,
+    "reference": "GEL-001",
+    "designation": "Gel coiffant",
+    "description": "Fixation forte",
+    "pv_1": 250,
+    "pv_2": 230,
+    "pv_3": 220,
+    "stock": 14,
+    "image_principale": null,
+    "categorie": "Cosmetique",
+    "abonne_only": 0,
+    "enable_tier_pricing": true,
+    "quantity_prices": [
+      {
+        "quantity_min": 1,
+        "quantity_max": 5,
+        "price": 250
+      },
+      {
+        "quantity_min": 6,
+        "quantity_max": null,
+        "price": 210
+      }
+    ],
+    "actif": 1,
+    "images": [],
+    "created_at": "2026-07-13T10:15:00.000000Z",
+    "updated_at": "2026-07-13T10:15:00.000000Z"
+  },
+  "message": "Produit cree"
+}</pre>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                <div class="font-bold">PUT /produits/{id}/sync</div>
+                                <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                    Marque un produit de la boutique du token PME comme synchronise dans le serveur.
+                                    Utilisez cet endpoint apres traitement ou import reussi du produit dans votre logiciel PME.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Aucun body n'est requis. Le serveur positionne
+                                    <span class="font-mono">synced_pme=1</span>.
+                                </div>
+                                <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/produits/21/sync') }}</div>
+                                <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 21,
+    "reference": "GEL-001",
+    "synced_pme": 1
+  },
+  "message": "Produit synchronise"
+}</pre>
+                            </div>
+
+                            <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="font-bold">POST /sync-produits</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
-                                    Cree ou met a jour une liste de produits.
-                                    Champs supportes par produit:
+                                    Cree ou met a jour une liste de produits dans la boutique du token PME.
+                                    Chaque element est traite comme l'endpoint
+                                    <span class="font-mono">POST /produits</span>,
+                                    avec matching sur
+                                    <span class="font-mono">reference</span>.
+                                    Pour chaque produit recu, le serveur positionne automatiquement
+                                    <span class="font-mono">synced_pme=1</span>.
+                                </div>
+                                <div class="mt-2 text-xs text-white/60">
+                                    Champs d'envoi supportes par produit:
                                     <span class="font-mono">reference</span>, <span class="font-mono">designation</span>,
+                                    <span class="font-mono">description</span>,
                                     <span class="font-mono">prix</span> ou <span class="font-mono">pv_1</span>,
                                     <span class="font-mono">pv_2</span>, <span class="font-mono">pv_3</span>,
                                     <span class="font-mono">stock</span>, <span class="font-mono">categorie</span>,
-                                    <span class="font-mono">abonne_only</span>.
+                                    <span class="font-mono">abonne_only</span>,
+                                    <span class="font-mono">actif</span>,
+                                    <span class="font-mono">enable_tier_pricing</span>,
+                                    <span class="font-mono">quantity_prices[]</span>.
                                     Si <span class="font-mono">pv_2</span> et <span class="font-mono">pv_3</span> ne sont pas fournis,
                                     ils reprennent la valeur de <span class="font-mono">pv_1</span> ou <span class="font-mono">prix</span>.
-                                    L'API force actuellement <span class="font-mono">actif=1</span>.
                                 </div>
                                 <div class="mt-2 text-xs text-white/60">
                                     Cas d'usage: synchronisation catalogue depuis PME. Pas encore d'endpoint dedie pour supprimer un produit.
@@ -892,19 +1026,37 @@
     {
       "reference": "R1",
       "designation": "Prod 1",
+      "description": "Description du produit 1",
       "pv_1": 100.0,
       "pv_2": 95.0,
       "pv_3": 90.0,
       "stock": 10,
       "categorie": "Cat",
-      "abonne_only": 1
+      "abonne_only": 1,
+      "actif": 1
     },
     {
       "reference": "R2",
       "designation": "Prod 2",
+      "description": "Description du produit 2",
       "prix": 250.0,
       "stock": 4,
-      "categorie": "Accessoires"
+      "categorie": "Accessoires",
+      "abonne_only": 0,
+      "actif": 1,
+      "enable_tier_pricing": true,
+      "quantity_prices": [
+        {
+          "quantity_min": 1,
+          "quantity_max": 9,
+          "price": 250
+        },
+        {
+          "quantity_min": 10,
+          "quantity_max": null,
+          "price": 225
+        }
+      ]
     }
   ]
 }</pre>

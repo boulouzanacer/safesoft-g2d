@@ -163,6 +163,7 @@ class ProduitController extends Controller
         $produit = DB::transaction(function () use ($frsId, $data, $enableTier, $tiers) {
             $produit = Produit::create([
                 'id_frs' => $frsId,
+                'synced_pme' => 0,
                 'reference' => $data['reference'],
                 'designation' => $data['designation'],
                 'description' => $data['description'],
@@ -297,6 +298,7 @@ class ProduitController extends Controller
 
         DB::transaction(function () use ($produit, $data, $enableTier, $tiers) {
             $produit->update([
+                'synced_pme' => 0,
                 'reference' => $data['reference'],
                 'designation' => $data['designation'],
                 'description' => $data['description'],
@@ -403,6 +405,7 @@ class ProduitController extends Controller
             ->findOrFail($id);
 
         $produit->actif = (int) $produit->actif === 1 ? 0 : 1;
+        $produit->synced_pme = 0;
         $produit->save();
 
         return back()->with('success', 'Statut produit mis à jour.');
