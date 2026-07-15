@@ -107,17 +107,31 @@
 @php($isStorefrontMode = (bool) ($storefront_mode ?? false))
 @php($storefrontHomeUrl = trim((string) ($storefront_home_url ?? '')))
 @php($logoHref = ($isStorefrontMode && $storefrontHomeUrl !== '') ? $storefrontHomeUrl : url('/'))
+@php($headerBrandBoutique = $header_brand_boutique ?? ($store_theme_boutique ?? ($storefront_boutique ?? null)))
+@php($headerBrandUrl = trim((string) ($header_brand_url ?? '')))
+@php($brandHref = $headerBrandUrl !== '' ? $headerBrandUrl : $logoHref)
+@php($brandLogoUrl = trim((string) ($headerBrandBoutique->logo_url ?? '')))
+@php($brandName = trim((string) ($headerBrandBoutique->nom_frs ?? '')) !== '' ? trim((string) $headerBrandBoutique->nom_frs) : 'SafeSoft G2D')
+@php($brandSubtitle = trim((string) ($headerBrandBoutique->boutiqueCategory->name ?? '')) !== '' ? trim((string) $headerBrandBoutique->boutiqueCategory->name) : ($headerBrandBoutique ? 'Boutique' : 'Store'))
+@php($brandInitial = strtoupper(mb_substr($brandName, 0, 1)))
 <div class="min-h-screen flex flex-col">
     <header class="store-topbar sticky top-0 z-40 border-b backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-            <a href="{{ $logoHref }}" class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
-                     style="background: linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));">
-                    G2D
-                </div>
+            <a href="{{ $brandHref }}" class="flex items-center gap-3">
+                @if($brandLogoUrl !== '')
+                    <img src="{{ $brandLogoUrl }}"
+                         alt="{{ $brandName }}"
+                         class="h-10 w-10 rounded-xl object-cover border bg-white"
+                         style="border-color: var(--store-border);">
+                @else
+                    <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
+                         style="background: linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));">
+                        {{ $headerBrandBoutique ? $brandInitial : 'G2D' }}
+                    </div>
+                @endif
                 <div class="leading-tight">
-                    <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
-                    <div class="store-muted text-xs">{{ $isStorefrontMode ? (($storefront_boutique->nom_frs ?? 'Boutique') ?: 'Boutique') : 'Store' }}</div>
+                    <div class="font-extrabold tracking-wide">{{ $brandName }}</div>
+                    <div class="store-muted text-xs">{{ $brandSubtitle }}</div>
                 </div>
             </a>
 
