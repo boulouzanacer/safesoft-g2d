@@ -24,32 +24,14 @@
             <button class="hidden" type="submit">Rechercher</button>
         </form>
 
-        @if(($boutique_categories ?? collect())->count() > 0)
-            <div class="mt-4 flex flex-wrap gap-3">
-                <a href="{{ url('/produits').'?'.http_build_query(array_filter(['q' => $q])) }}"
-                   class="inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold border {{ ! $selected_boutique_category ? 'border-[var(--store-primary)] bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
-                    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
-                        <i class="fa-solid fa-grid-2"></i>
-                    </span>
-                    Toutes les catégories
-                </a>
-                @foreach($boutique_categories as $category)
-                    <a href="{{ url('/produits').'?'.http_build_query(array_filter(['q' => $q, 'categorie_boutique' => $category->id])) }}"
-                       class="inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold border {{ (int) $selected_boutique_category === (int) $category->id ? 'border-[var(--store-primary)] bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
-                        <span class="h-8 w-8 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                            @if($category->image_url)
-                                <img src="{{ $category->image_url }}" alt="{{ $category->name }}" class="h-full w-full object-cover">
-                            @else
-                                <span class="flex h-full w-full items-center justify-center text-slate-400">
-                                    <i class="fa-solid fa-image"></i>
-                                </span>
-                            @endif
-                        </span>
-                        {{ $category->name }}
-                    </a>
-                @endforeach
-            </div>
-        @endif
+        @include('store.partials.boutique-category-grid', [
+            'categories' => $boutique_categories ?? collect(),
+            'selectedCategoryId' => $selected_boutique_category,
+            'currentUrl' => url('/produits'),
+            'query' => $q,
+            'title' => 'Catégories boutiques',
+            'subtitle' => 'Choisissez une catégorie de boutique pour filtrer les produits de façon plus visuelle.',
+        ])
     </div>
 
     <div class="space-y-3">
