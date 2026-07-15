@@ -7,6 +7,7 @@ use App\Http\Requests\StoreFournisseurRequest;
 use App\Http\Requests\UpdateFournisseurRequest;
 use App\Models\BoutiqueCategory;
 use App\Models\Commune;
+use App\Models\CustomDomain;
 use App\Models\Fournisseur;
 use App\Models\Wilaya;
 use Illuminate\Contracts\View\View;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class FournisseurController extends Controller
 {
@@ -37,7 +39,9 @@ class FournisseurController extends Controller
         $editCommunes = collect();
 
         if ($editId > 0) {
-            $editingFournisseur = Fournisseur::query()->findOrFail($editId);
+            $editingFournisseur = Fournisseur::query()
+                ->with(['customDomains' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('domain')])
+                ->findOrFail($editId);
             $editCommunes = Commune::query()
                 ->where('ID_WILAYA', $editingFournisseur->id_wilaya)
                 ->orderBy('COMMUNE')
@@ -82,11 +86,15 @@ class FournisseurController extends Controller
     public function store(StoreFournisseurRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $primaryCustomDomain = (string) ($data['primary_custom_domain'] ?? '');
+
+        $this->validatePrimaryCustomDomainValue($primaryCustomDomain);
 
         $token = (string) Str::uuid();
 
         $frs = Fournisseur::create([
             'nom_frs' => $data['nom_frs'],
+            'storefront_theme' => Fournisseur::normalizeStorefrontTheme($data['storefront_theme'] ?? null),
             'boutique_category_id' => (int) $data['boutique_category_id'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
@@ -114,6 +122,8 @@ class FournisseurController extends Controller
             $frs->update(['logo_path' => $path]);
         }
 
+        $this->syncPrimaryCustomDomain($frs, $primaryCustomDomain);
+
         return redirect()
             ->to("/admin/fournisseurs?edit={$frs->id}")
             ->with('created_token', $token);
@@ -130,9 +140,13 @@ class FournisseurController extends Controller
     {
         $frs = Fournisseur::query()->findOrFail($id);
         $data = $request->validated();
+        $primaryCustomDomain = (string) ($data['primary_custom_domain'] ?? '');
+
+        $this->validatePrimaryCustomDomainValue($primaryCustomDomain, $frs);
 
         $payload = [
             'nom_frs' => $data['nom_frs'],
+            'storefront_theme' => Fournisseur::normalizeStorefrontTheme($data['storefront_theme'] ?? null),
             'boutique_category_id' => (int) $data['boutique_category_id'],
             'email' => $data['email'],
             'telephone' => $data['telephone'] ?? null,
@@ -174,7 +188,86 @@ class FournisseurController extends Controller
 
         $frs->update($payload);
 
+        $this->syncPrimaryCustomDomain($frs, $primaryCustomDomain);
+
         return back()->with('success', 'Boutique mise à jour.');
+    }
+
+    public function storeCustomDomain(Request $request, int $id): RedirectResponse
+    {
+        $frs = Fournisseur::query()->findOrFail($id);
+        $normalizedDomain = $this->normalizeDomain((string) $request->input('domain', ''));
+
+        if (! $this->isValidDomain($normalizedDomain)) {
+            return back()->withErrors([
+                'domain' => 'Le domaine saisi est invalide. Exemple: www.boutika.com',
+            ])->withInput();
+        }
+
+        $exists = CustomDomain::query()
+            ->where('domain', $normalizedDomain)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors([
+                'domain' => 'Ce domaine est deja utilise par une autre boutique.',
+            ])->withInput();
+        }
+
+        $hasPrimary = $frs->customDomains()->where('is_primary', 1)->exists();
+
+        $frs->customDomains()->create([
+            'domain' => $normalizedDomain,
+            'is_primary' => ! $hasPrimary,
+            'is_active' => 1,
+        ]);
+
+        return back()->with('success', 'Domaine personnalisé ajouté à la boutique.');
+    }
+
+    public function makeCustomDomainPrimary(int $id, int $domainId): RedirectResponse
+    {
+        Fournisseur::query()->findOrFail($id);
+
+        $domain = CustomDomain::query()
+            ->where('fournisseur_id', $id)
+            ->findOrFail($domainId);
+
+        CustomDomain::query()
+            ->where('fournisseur_id', $id)
+            ->update(['is_primary' => 0]);
+
+        $domain->forceFill([
+            'is_primary' => 1,
+            'is_active' => 1,
+        ])->save();
+
+        return back()->with('success', 'Domaine principal mis à jour.');
+    }
+
+    public function destroyCustomDomain(int $id, int $domainId): RedirectResponse
+    {
+        Fournisseur::query()->findOrFail($id);
+
+        $domain = CustomDomain::query()
+            ->where('fournisseur_id', $id)
+            ->findOrFail($domainId);
+
+        $wasPrimary = (bool) $domain->is_primary;
+        $domain->delete();
+
+        if ($wasPrimary) {
+            $replacement = CustomDomain::query()
+                ->where('fournisseur_id', $id)
+                ->orderBy('domain')
+                ->first();
+
+            if ($replacement) {
+                $replacement->forceFill(['is_primary' => 1])->save();
+            }
+        }
+
+        return back()->with('success', 'Domaine personnalisé supprimé.');
     }
 
     public function destroy(int $id): RedirectResponse
@@ -230,5 +323,81 @@ class FournisseurController extends Controller
         }
 
         return $isActive;
+    }
+
+    protected function syncPrimaryCustomDomain(Fournisseur $frs, string $value): void
+    {
+        $normalizedDomain = $this->normalizeDomain($value);
+
+        if ($normalizedDomain === '') {
+            return;
+        }
+
+        CustomDomain::query()
+            ->where('fournisseur_id', $frs->id)
+            ->update(['is_primary' => 0]);
+
+        $domain = CustomDomain::query()->firstOrNew([
+            'domain' => $normalizedDomain,
+        ]);
+
+        $domain->forceFill([
+            'fournisseur_id' => $frs->id,
+            'domain' => $normalizedDomain,
+            'is_primary' => 1,
+            'is_active' => 1,
+        ])->save();
+    }
+
+    protected function validatePrimaryCustomDomainValue(string $value, ?Fournisseur $frs = null): void
+    {
+        $normalizedDomain = $this->normalizeDomain($value);
+
+        if ($normalizedDomain === '') {
+            return;
+        }
+
+        if (! $this->isValidDomain($normalizedDomain)) {
+            throw ValidationException::withMessages([
+                'primary_custom_domain' => 'Le domaine saisi est invalide. Exemple: www.boutika.com',
+            ]);
+        }
+
+        $existing = CustomDomain::query()
+            ->where('domain', $normalizedDomain)
+            ->first();
+
+        if ($existing && (int) $existing->fournisseur_id !== (int) ($frs?->id ?? 0)) {
+            throw ValidationException::withMessages([
+                'primary_custom_domain' => 'Ce domaine est deja utilise par une autre boutique.',
+            ]);
+        }
+    }
+
+    protected function normalizeDomain(string $value): string
+    {
+        $normalized = mb_strtolower(trim($value));
+
+        if ($normalized === '') {
+            return '';
+        }
+
+        if (str_starts_with($normalized, 'http://') || str_starts_with($normalized, 'https://')) {
+            $normalized = (string) parse_url($normalized, PHP_URL_HOST);
+        }
+
+        $normalized = trim($normalized, "/ \t\n\r\0\x0B.");
+        $normalized = preg_replace('/\/.*$/', '', $normalized) ?? $normalized;
+
+        return mb_strtolower(trim((string) $normalized));
+    }
+
+    protected function isValidDomain(string $domain): bool
+    {
+        if ($domain === '') {
+            return false;
+        }
+
+        return (bool) preg_match('/^(?=.{4,190}$)(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i', $domain);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Fournisseur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Commune;
-use App\Models\CustomDomain;
 use App\Models\Fournisseur;
 use App\Models\Wilaya;
 use Illuminate\Contracts\View\View;
@@ -19,9 +18,7 @@ class ProfileController extends Controller
 {
     public function edit(): View
     {
-        $frs = Fournisseur::query()
-            ->with(['customDomains' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('domain')])
-            ->findOrFail((int) session('frs_id'));
+        $frs = Fournisseur::query()->findOrFail((int) session('frs_id'));
 
         $wilayas = Wilaya::query()->orderBy('ID_WILAYA')->get();
         $communes = Commune::query()
@@ -34,6 +31,7 @@ class ProfileController extends Controller
             'frs' => $frs,
             'wilayas' => $wilayas,
             'communes' => $communes,
+            'storefront_theme_options' => Fournisseur::storefrontThemeOptions(),
         ]);
     }
 
@@ -52,6 +50,7 @@ class ProfileController extends Controller
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'is_visible' => ['nullable', 'boolean'],
+            'storefront_theme' => ['nullable', 'string', 'in:'.implode(',', array_keys(Fournisseur::storefrontThemeOptions()))],
         ]);
 
         $payload = [
@@ -63,6 +62,7 @@ class ProfileController extends Controller
             'latitude' => array_key_exists('latitude', $data) ? (float) $data['latitude'] : null,
             'longitude' => array_key_exists('longitude', $data) ? (float) $data['longitude'] : null,
             'is_visible' => (int) ($data['is_visible'] ?? 0) === 1 ? 1 : 0,
+            'storefront_theme' => Fournisseur::normalizeStorefrontTheme($data['storefront_theme'] ?? null),
         ];
 
         if ((int) ($data['remove_logo'] ?? 0) === 1) {

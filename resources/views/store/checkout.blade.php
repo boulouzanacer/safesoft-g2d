@@ -5,28 +5,28 @@
     <div class="flex items-center justify-between">
         <div>
             <div class="text-2xl font-extrabold tracking-wide">Finaliser la commande</div>
-            <div class="mt-1 text-sm text-slate-600">
+            <div class="store-muted mt-1 text-sm">
                 @if($boutique)
-                    Boutique: <span class="font-semibold text-slate-900">{{ $boutique->nom_frs }}</span>
+                    Boutique: <span class="font-semibold" style="color: var(--store-text);">{{ $boutique->nom_frs }}</span>
                 @endif
             </div>
         </div>
-        <a href="{{ url('/panier') }}" class="text-sm text-slate-500 hover:text-slate-900">
+        <a href="{{ url('/panier') }}" class="store-muted text-sm hover:opacity-90">
             <i class="fa-solid fa-arrow-left-long mr-2"></i>
             Retour panier
         </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6">
+        <div class="store-panel lg:col-span-2 p-6">
             <div class="text-lg font-extrabold tracking-wide">Adresse de livraison</div>
             <form method="POST" action="{{ url('/checkout') }}" class="mt-4 space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Adresse</label>
+                    <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Adresse</label>
                     <input name="adresse_livraison"
                            value="{{ old('adresse_livraison', $client->adresse ?? '') }}"
-                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           class="store-input w-full px-4 py-3"
                            required>
                     @error('adresse_livraison')
                         <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
@@ -35,10 +35,10 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Wilaya</label>
+                        <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Wilaya</label>
                         <select id="wilayaSelect"
                                 name="id_wilaya"
-                                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                                class="store-input w-full px-4 py-3"
                                 required>
                             @foreach($wilayas as $w)
                                 <option value="{{ $w->ID_WILAYA }}"
@@ -52,10 +52,10 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Commune</label>
+                        <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Commune</label>
                         <select id="communeSelect"
                                 name="id_commune"
-                                class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                                class="store-input w-full px-4 py-3"
                                 required>
                             @foreach($communes as $c)
                                 <option value="{{ $c->ID_COMMUNE }}"
@@ -71,25 +71,24 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Notes (optionnel)</label>
+                    <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Notes (optionnel)</label>
                     <textarea name="notes"
                               rows="4"
-                              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]">{{ old('notes') }}</textarea>
+                              class="store-input w-full px-4 py-3">{{ old('notes') }}</textarea>
                     @error('notes')
                         <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <button type="submit"
-                        class="w-full inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white"
-                        style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);">
+                        class="store-button-primary w-full inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold">
                     <i class="fa-solid fa-cart-shopping"></i>
                     Confirmer la commande
                 </button>
             </form>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6 h-fit">
+        <div class="store-panel p-6 h-fit">
             <div class="text-lg font-extrabold tracking-wide">Récapitulatif</div>
             <div class="mt-4 space-y-3">
                 @foreach($items as $it)
@@ -97,19 +96,19 @@
                     <div class="flex items-start justify-between gap-3 text-sm">
                         <div class="min-w-0">
                             <div class="font-bold truncate">{{ $p->designation }}</div>
-                            <div class="text-slate-500">x{{ (int)$it['qty'] }}</div>
+                            <div class="store-muted">x{{ (int)$it['qty'] }}</div>
                         </div>
                         <div class="font-extrabold">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>
                     </div>
                 @endforeach
             </div>
 
-            <div class="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between">
-                <span class="text-slate-600">Total</span>
-                <span class="font-extrabold text-slate-900">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
+            <div class="mt-4 pt-4 border-t flex items-center justify-between" style="border-color: var(--store-border);">
+                <span class="store-muted">Total</span>
+                <span class="font-extrabold" style="color: var(--store-text);">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
             </div>
 
-            <div class="mt-3 text-xs text-slate-500">
+            <div class="store-muted mt-3 text-xs">
                 Paiement à la livraison.
             </div>
         </div>

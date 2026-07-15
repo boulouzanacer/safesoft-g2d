@@ -1,3 +1,12 @@
+@php
+    $themeConfig = $storefront_theme_config ?? \App\Models\Fournisseur::storefrontThemeOptions()[\App\Models\Fournisseur::DEFAULT_STOREFRONT_THEME];
+    $themeVars = $themeConfig['vars'] ?? [];
+    $themeInlineStyle = '';
+
+    foreach ($themeVars as $varName => $varValue) {
+        $themeInlineStyle .= $varName.':'.$varValue.';';
+    }
+@endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -20,40 +29,116 @@
     <style>
         :root{
             --store-primary:#1E6FD9;
+            --store-primary-dark:#0A3D7A;
             --store-bg:#F8FAFC;
             --store-card:#FFFFFF;
+            --store-card-soft:#EFF6FF;
+            --store-text:#0F172A;
+            --store-muted:#475569;
+            --store-border:#CBD5E1;
+            --store-accent:#DBEAFE;
+            --store-accent-text:#1D4ED8;
+            --store-hero-from:#1E6FD9;
+            --store-hero-to:#0EA5E9;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 22px 45px rgba(30, 111, 217, 0.14);
+            --store-radius-xl:1rem;
+            --store-radius-2xl:1.5rem;
         }
         html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+        body{
+            background:
+                radial-gradient(circle at top left, color-mix(in srgb, var(--store-primary) 10%, transparent), transparent 32%),
+                radial-gradient(circle at top right, color-mix(in srgb, var(--store-hero-to) 14%, transparent), transparent 26%),
+                var(--store-bg);
+            color:var(--store-text);
+        }
+        .store-panel{
+            background:var(--store-card);
+            border:1px solid var(--store-border);
+            border-radius:var(--store-radius-2xl);
+            box-shadow:var(--store-shadow);
+        }
+        .store-surface{
+            background:rgba(255,255,255,.9);
+            border:1px solid var(--store-border);
+            border-radius:var(--store-radius-xl);
+        }
+        .store-soft{
+            background:var(--store-card-soft);
+            border:1px solid color-mix(in srgb, var(--store-border) 75%, white);
+            border-radius:var(--store-radius-xl);
+        }
+        .store-input{
+            background:#fff;
+            border:1px solid var(--store-border);
+            border-radius:var(--store-radius-2xl);
+            color:var(--store-text);
+        }
+        .store-input::placeholder{
+            color:color-mix(in srgb, var(--store-muted) 72%, white);
+        }
+        .store-input:focus{
+            outline:none;
+            border-color:var(--store-primary);
+            box-shadow:0 0 0 3px color-mix(in srgb, var(--store-primary) 14%, white);
+        }
+        .store-link{
+            color:var(--store-primary);
+        }
+        .store-badge{
+            background:var(--store-accent);
+            color:var(--store-accent-text);
+            border:1px solid color-mix(in srgb, var(--store-primary) 18%, white);
+        }
+        .store-muted{
+            color:var(--store-muted);
+        }
+        .store-button-primary{
+            color:var(--store-button-text);
+            background:linear-gradient(135deg, var(--store-primary), var(--store-hero-to));
+            box-shadow:0 16px 32px color-mix(in srgb, var(--store-primary) 22%, transparent);
+        }
+        .store-topbar,
+        .store-footer{
+            border-color:color-mix(in srgb, var(--store-border) 85%, white);
+            background:color-mix(in srgb, var(--store-card) 88%, white);
+        }
+        .store-chip-active{
+            border-color:var(--store-primary);
+            background:var(--store-accent);
+            color:var(--store-accent-text);
+        }
     </style>
 </head>
-<body class="min-h-screen bg-[var(--store-bg)] text-slate-900">
+<body class="min-h-screen" style="{{ $themeInlineStyle }}">
 @php($cartCount = is_array(session('cart')) ? count(session('cart')) : 0)
 @php($isStorefrontMode = (bool) ($storefront_mode ?? false))
 @php($storefrontHomeUrl = trim((string) ($storefront_home_url ?? '')))
 @php($logoHref = ($isStorefrontMode && $storefrontHomeUrl !== '') ? $storefrontHomeUrl : url('/'))
 <div class="min-h-screen flex flex-col">
-    <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
+    <header class="store-topbar sticky top-0 z-40 border-b backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
             <a href="{{ $logoHref }}" class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
-                     style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);">
+                     style="background: linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));">
                     G2D
                 </div>
                 <div class="leading-tight">
                     <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
-                    <div class="text-xs text-slate-500">{{ $isStorefrontMode ? (($storefront_boutique->nom_frs ?? 'Boutique') ?: 'Boutique') : 'Store' }}</div>
+                    <div class="store-muted text-xs">{{ $isStorefrontMode ? (($storefront_boutique->nom_frs ?? 'Boutique') ?: 'Boutique') : 'Store' }}</div>
                 </div>
             </a>
 
             @unless($isStorefrontMode)
             <nav class="hidden lg:flex items-center gap-2">
                 <a href="{{ url('/boutiques') }}"
-                   class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                   class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                     <i class="fa-solid fa-store text-[var(--store-primary)]"></i>
                     <span>Boutiques</span>
                 </a>
                 <a href="{{ url('/produits') }}"
-                   class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                   class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                     <i class="fa-solid fa-box-open text-[var(--store-primary)]"></i>
                     <span>Produits</span>
                 </a>
@@ -62,10 +147,10 @@
 
             <div class="flex items-center gap-2">
                 <a href="{{ url('/panier') }}"
-                   class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                   class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                     <i class="fa-solid fa-cart-shopping text-[var(--store-primary)]"></i>
                     <span>Panier</span>
-                    <span class="ml-1 inline-flex items-center justify-center min-w-[22px] h-5 px-1.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-700">
+                    <span class="store-soft ml-1 inline-flex items-center justify-center min-w-[22px] h-5 px-1.5 rounded-full text-xs font-extrabold">
                         {{ $cartCount }}
                     </span>
                 </a>
@@ -73,13 +158,13 @@
                 @if(($client ?? null))
                     @unless($isStorefrontMode)
                         <a href="{{ url('/profil') }}"
-                           class="inline-flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 bg-white hover:bg-slate-50"
+                           class="store-surface inline-flex items-center justify-center h-11 w-11 hover:opacity-95"
                            title="Mon profil"
                            aria-label="Mon profil">
                             <i class="fa-solid fa-user-circle text-lg text-[var(--store-primary)]"></i>
                         </a>
                         <a href="{{ url('/mes-commandes') }}"
-                           class="hidden sm:inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                           class="store-surface hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                             <i class="fa-solid fa-receipt text-[var(--store-primary)]"></i>
                             <span>Mes commandes</span>
                         </a>
@@ -87,20 +172,19 @@
                     <form method="POST" action="{{ url('/logout') }}">
                         @csrf
                         <button type="submit"
-                                class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                                class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                             <i class="fa-solid fa-right-from-bracket text-red-600"></i>
                             <span class="hidden sm:inline">Déconnexion</span>
                         </button>
                     </form>
                 @else
                     <a href="{{ url('/login') }}"
-                       class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                       class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                         <i class="fa-solid fa-user text-[var(--store-primary)]"></i>
                         <span>Connexion</span>
                     </a>
                     <a href="{{ url('/register') }}"
-                       class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold text-white"
-                       style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);">
+                       class="store-button-primary inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold">
                         <i class="fa-solid fa-user-plus"></i>
                         <span class="hidden sm:inline">Créer compte</span>
                     </a>
@@ -131,8 +215,8 @@
         </div>
     </main>
 
-    <footer class="border-t border-slate-200 bg-white">
-        <div class="max-w-7xl mx-auto px-4 py-6 text-sm text-slate-500">
+    <footer class="store-footer border-t">
+        <div class="store-muted max-w-7xl mx-auto px-4 py-6 text-sm">
             © {{ date('Y') }} {{ config('app.name') }}
         </div>
     </footer>

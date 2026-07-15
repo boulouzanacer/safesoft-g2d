@@ -10,18 +10,18 @@
     <div class="flex items-center justify-between">
         <div>
             <div class="text-2xl font-extrabold tracking-wide">Mes commandes</div>
-            <div class="mt-1 text-sm text-slate-600">Historique des commandes</div>
+            <div class="store-muted mt-1 text-sm">Historique des commandes</div>
         </div>
-        <a href="{{ $storeReturnUrl }}" class="text-sm text-slate-500 hover:text-slate-900">
+        <a href="{{ $storeReturnUrl }}" class="store-muted text-sm hover:opacity-90">
             <i class="fa-solid fa-store mr-2"></i>
             {{ (bool) ($storefront_mode ?? false) ? 'Retour boutique' : 'Retour store' }}
         </a>
     </div>
 
-    <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] overflow-hidden">
+    <div class="store-panel overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
-                <thead class="text-slate-500">
+                <thead class="store-muted">
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">#</th>
                         <th class="text-left py-3 px-4 font-semibold">Date</th>
@@ -31,7 +31,7 @@
                         <th class="text-right py-3 px-4 font-semibold">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200">
+                <tbody class="divide-y" style="border-color: var(--store-border);">
                     @forelse($commandes as $c)
                         @php
                             $statut = (string)$c->statut;
@@ -44,18 +44,17 @@
                                 default => 'bg-slate-50 text-slate-600 border border-slate-200'
                             };
                         @endphp
-                        <tr class="hover:bg-slate-50">
+                        <tr class="hover:opacity-95">
                             <td class="py-3 px-4 font-semibold">#{{ $c->id }}</td>
-                            <td class="py-3 px-4 text-slate-700">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
-                            <td class="py-3 px-4 text-slate-700">{{ $c->frs_nom ?? '—' }}</td>
+                            <td class="py-3 px-4">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="py-3 px-4">{{ $c->frs_nom ?? '—' }}</td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
                             </td>
                             <td class="py-3 px-4 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }} DA</td>
                             <td class="py-3 px-4 text-right">
                                 <a href="{{ url('/mes-commandes/'.$c->id) }}"
-                                   class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-extrabold text-white"
-                                   style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);">
+                                   class="store-button-primary inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-extrabold">
                                     Détail
                                     <i class="fa-solid fa-arrow-right-long"></i>
                                 </a>
@@ -63,7 +62,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-10 text-center text-slate-600">Aucune commande</td>
+                            <td colspan="6" class="store-muted py-10 text-center">Aucune commande</td>
                         </tr>
                     @endforelse
                 </tbody>

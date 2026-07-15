@@ -22,6 +22,7 @@ class DashboardController extends Controller
             ->findOrFail($frsId);
 
         $primaryCustomDomain = $frs->customDomains->first();
+        $storefrontTheme = $frs->storefrontThemeConfig();
 
         $cmdEnAttente = Cmd1::query()
             ->where('id_frs', $frsId)
@@ -104,6 +105,9 @@ class DashboardController extends Controller
             'title' => 'Mon Dashboard',
             'storefront_url' => $frs->storefront_url,
             'primary_custom_domain' => $primaryCustomDomain?->domain,
+            'storefront_theme_name' => $storefrontTheme['name'] ?? 'Theme',
+            'storefront_theme_tagline' => $storefrontTheme['tagline'] ?? '',
+            'storefront_theme_preview' => $storefrontTheme['preview'] ?? [],
             'cmd_en_attente' => $cmdEnAttente,
             'cmd_du_jour' => $cmdDuJour,
             'clients_abonnes' => $clientsAbonnes,

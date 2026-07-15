@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Fournisseur;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreFournisseurRequest extends FormRequest
 {
@@ -27,6 +29,8 @@ class StoreFournisseurRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'actif' => ['nullable', 'boolean'],
             'expires_at' => ['required', 'date'],
+            'primary_custom_domain' => ['nullable', 'string', 'max:190'],
+            'storefront_theme' => ['nullable', 'string', Rule::in(array_keys(Fournisseur::storefrontThemeOptions()))],
         ];
     }
 }

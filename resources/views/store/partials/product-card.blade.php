@@ -17,7 +17,7 @@
 @endphp
 
 @if($produit)
-    <div class="rounded-xl sm:rounded-2xl border border-slate-200 bg-[var(--store-card)] overflow-hidden">
+    <div class="store-panel rounded-xl sm:rounded-2xl overflow-hidden">
         <a href="{{ url('/produits/'.$produit->id) }}" class="block">
             <div class="aspect-square sm:aspect-[4/3] bg-slate-100">
                 @if($img !== '')
@@ -35,8 +35,8 @@
                     <a href="{{ url('/produits/'.$produit->id) }}" class="block font-extrabold text-[13px] sm:text-sm leading-snug hover:underline truncate">
                         {{ $produit->designation }}
                     </a>
-                    <div class="mt-1 text-xs text-slate-500">Ref: {{ $produit->reference }}</div>
-                    <div class="mt-1 text-xs text-slate-500 hidden sm:block">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
+                    <div class="store-muted mt-1 text-xs">Ref: {{ $produit->reference }}</div>
+                    <div class="store-muted mt-1 text-xs hidden sm:block">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
                 </div>
                 <div class="text-right">
                     <div class="font-extrabold text-xs sm:text-sm">{{ number_format((float) $produit->prixUnitairePourQuantite($client, 1), 2, '.', ' ') }} DA</div>
@@ -49,12 +49,12 @@
             <div class="mt-3 flex items-center justify-between gap-2">
                 <div class="hidden sm:flex flex-wrap gap-2">
                     @if(($produit->fournisseur?->boutiqueCategory?->name ?? '') !== '')
-                        <span class="text-[11px] font-bold px-2 py-1 rounded-full border border-sky-200 bg-sky-50 text-sky-700">
+                        <span class="store-badge text-[11px] font-bold px-2 py-1 rounded-full">
                             {{ $produit->fournisseur->boutiqueCategory->name }}
                         </span>
                     @endif
                     @if(($produit->categorie ?? '') !== '')
-                        <span class="text-[11px] font-bold px-2 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
+                        <span class="store-soft store-muted text-[11px] font-bold px-2 py-1 rounded-full">
                             {{ $produit->categorie }}
                         </span>
                     @endif
@@ -67,7 +67,7 @@
                     <button type="submit"
                             aria-label="Ajouter au panier"
                             class="inline-flex items-center justify-center gap-2 rounded-xl w-9 h-9 sm:w-auto sm:h-auto sm:px-2.5 sm:py-2 text-xs font-extrabold text-white disabled:opacity-40"
-                            style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);"
+                            style="background: linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));"
                             @disabled((int) $produit->stock <= 0)>
                         <i class="fa-solid fa-cart-plus"></i>
                         <span class="sr-only sm:not-sr-only">Ajouter</span>

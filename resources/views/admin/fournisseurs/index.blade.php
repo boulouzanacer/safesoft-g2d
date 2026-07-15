@@ -227,6 +227,99 @@
                         </button>
                     </div>
                 </form>
+
+                <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <div class="text-lg font-extrabold tracking-wide">Domaines personnalisés</div>
+                            <div class="mt-1 text-sm text-white/60">
+                                Gère ici les domaines publics de cette boutique, par exemple <span class="font-mono text-white/80">www.boutika.com</span>.
+                            </div>
+                        </div>
+                        <div class="text-xs text-white/50">
+                            DNS conseillé: <span class="font-mono text-white/80">CNAME</span> vers <span class="font-mono text-white/80">g2d-dz.com</span>
+                        </div>
+                    </div>
+
+                    <form method="POST"
+                          action="{{ url('/admin/fournisseurs/'.$editing_fournisseur->id.'/custom-domains') }}"
+                          class="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3">
+                        @csrf
+                        <div>
+                            <label class="block text-sm font-semibold text-white/70 mb-1">Ajouter un domaine</label>
+                            <input name="domain"
+                                   value="{{ old('domain') }}"
+                                   placeholder="www.boutika.com"
+                                   class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
+                            @error('domain')
+                                <div class="mt-1 text-xs font-semibold text-red-300">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit"
+                                    class="w-full lg:w-auto rounded-2xl px-5 py-3 font-extrabold text-white"
+                                    style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
+                                Ajouter le domaine
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-5 space-y-3">
+                        @forelse($editing_fournisseur->customDomains as $domain)
+                            <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4">
+                                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                                    <div class="min-w-0">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <div class="font-bold break-all">{{ $domain->domain }}</div>
+                                            @if($domain->is_primary)
+                                                <span class="inline-flex items-center rounded-full border border-sky-400/20 bg-sky-500/15 px-2.5 py-1 text-[11px] font-bold text-sky-200">
+                                                    Principal
+                                                </span>
+                                            @endif
+                                            @if($domain->verified_at)
+                                                <span class="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-200">
+                                                    Vérifié
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-500/15 px-2.5 py-1 text-[11px] font-bold text-amber-200">
+                                                    En attente de visite
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="mt-2 text-xs text-white/50">
+                                            Ce domaine ouvrira directement la boutique sans afficher le domaine global de la plateforme.
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        @if(! $domain->is_primary)
+                                            <form method="POST" action="{{ url('/admin/fournisseurs/'.$editing_fournisseur->id.'/custom-domains/'.$domain->id.'/primary') }}">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="rounded-2xl px-4 py-2 text-sm font-extrabold border border-white/10 hover:bg-white/10">
+                                                    Définir principal
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <form method="POST" action="{{ url('/admin/fournisseurs/'.$editing_fournisseur->id.'/custom-domains/'.$domain->id) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="rounded-2xl px-4 py-2 text-sm font-extrabold border border-red-400/20 bg-red-500/10 text-red-200 hover:bg-red-500/20">
+                                                Supprimer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 text-sm text-white/60">
+                                Aucun domaine personnalisé pour cette boutique.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
         </div>
     @endif

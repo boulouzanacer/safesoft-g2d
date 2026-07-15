@@ -106,7 +106,7 @@
                 </div>
             @else
                 <div class="mt-3 text-xs text-white/50">
-                    Tu peux aussi brancher un domaine personnalisé depuis <a href="{{ url('/fournisseur/profil') }}" class="font-bold text-[var(--frs-primary)] hover:opacity-90">Mon Profil</a>.
+                    Les domaines personnalisés se gèrent maintenant depuis l'administration, dans l'édition de la boutique.
                 </div>
             @endif
         </div>
@@ -123,6 +123,33 @@
                 <i class="fa-regular fa-copy"></i>
                 Copier le lien
             </button>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)]">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="min-w-0">
+            <div class="font-extrabold tracking-wide">Theme actuel du storefront</div>
+            <div class="mt-1 text-sm text-white/60">{{ $storefront_theme_name }}{{ $storefront_theme_tagline ? ' - '.$storefront_theme_tagline : '' }}</div>
+            <div class="mt-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs font-bold text-white/70">
+                <i class="fa-solid fa-palette"></i>
+                <span>Modifiable depuis votre profil ou depuis l administration</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 rounded-3xl border border-white/10 bg-black/20 p-3">
+                <div class="h-10 w-10 rounded-2xl"
+                     style="background: linear-gradient(135deg, {{ $storefront_theme_preview['from'] ?? 'var(--frs-primary)' }}, {{ $storefront_theme_preview['to'] ?? '#0A3D7A' }});"></div>
+                <div class="h-10 w-16 rounded-2xl"
+                     style="background: {{ $storefront_theme_preview['accent'] ?? 'rgba(255,255,255,.12)' }};"></div>
+            </div>
+            <a href="{{ url('/fournisseur/profil') }}"
+               class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white"
+               style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                <i class="fa-solid fa-palette"></i>
+                Changer le theme
+            </a>
         </div>
     </div>
 </div>

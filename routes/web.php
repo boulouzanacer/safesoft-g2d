@@ -79,6 +79,9 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
     Route::delete('/fournisseurs/{id}', [FournisseurController::class, 'destroy']);
     Route::post('/fournisseurs/{id}/toggle-actif', [FournisseurController::class, 'toggleActif']);
     Route::post('/fournisseurs/{id}/regenerer-token', [FournisseurController::class, 'regenererToken']);
+    Route::post('/fournisseurs/{id}/custom-domains', [FournisseurController::class, 'storeCustomDomain']);
+    Route::post('/fournisseurs/{id}/custom-domains/{domainId}/primary', [FournisseurController::class, 'makeCustomDomainPrimary']);
+    Route::delete('/fournisseurs/{id}/custom-domains/{domainId}', [FournisseurController::class, 'destroyCustomDomain']);
 
     Route::get('/wilayas/{idWilaya}/communes', [FournisseurController::class, 'communes']);
 
@@ -145,9 +148,6 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
     Route::get('/profil', [FrsProfileController::class, 'edit']);
     Route::put('/profil', [FrsProfileController::class, 'update']);
     Route::put('/profil/password', [FrsProfileController::class, 'updatePassword']);
-    Route::post('/profil/custom-domains', [FrsProfileController::class, 'storeCustomDomain']);
-    Route::post('/profil/custom-domains/{id}/primary', [FrsProfileController::class, 'makeCustomDomainPrimary']);
-    Route::delete('/profil/custom-domains/{id}', [FrsProfileController::class, 'destroyCustomDomain']);
 
     Route::get('/wilayas/{idWilaya}/communes', [FrsProfileController::class, 'communes']);
 });

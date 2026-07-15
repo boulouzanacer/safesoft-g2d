@@ -17,9 +17,9 @@
     <div class="flex items-center justify-between">
         <div>
             <div class="text-2xl font-extrabold tracking-wide">Panier</div>
-            <div class="mt-1 text-sm text-slate-600">
+            <div class="store-muted mt-1 text-sm">
                 @if($boutique)
-                    Boutique: <span class="font-semibold text-slate-900">{{ $boutique->nom_frs }}</span>
+                    Boutique: <span class="font-semibold" style="color: var(--store-text);">{{ $boutique->nom_frs }}</span>
                 @else
                     —
                 @endif
@@ -27,7 +27,7 @@
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ $continueUrl }}"
-               class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+               class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                 <i class="fa-solid fa-store text-[var(--store-primary)]"></i>
                 Continuer
             </a>
@@ -45,7 +45,7 @@
     </div>
 
     @if(count($items) === 0)
-        <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-10 text-center text-slate-600">
+        <div class="store-panel p-10 text-center store-muted">
             Votre panier est vide.
         </div>
     @else
@@ -53,8 +53,8 @@
             <div class="lg:col-span-2 space-y-3">
                 @foreach($items as $it)
                     @php($p = $it['produit'])
-                    <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-4 flex items-start gap-4">
-                        <a href="{{ $productBaseUrl ? str_replace('__PRODUCT__', (string) $p->id, $productBaseUrl) : url('/produits/'.$p->id) }}" class="h-20 w-28 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+                    <div class="store-panel p-4 flex items-start gap-4">
+                        <a href="{{ $productBaseUrl ? str_replace('__PRODUCT__', (string) $p->id, $productBaseUrl) : url('/produits/'.$p->id) }}" class="h-20 w-28 rounded-xl overflow-hidden border flex-shrink-0" style="border-color: var(--store-border); background: var(--store-card-soft);">
                             @if(($it['image'] ?? '') !== '')
                                 <img src="{{ $it['image'] }}" alt="" class="w-full h-full object-cover">
                             @else
@@ -69,12 +69,12 @@
                                     <a href="{{ $productBaseUrl ? str_replace('__PRODUCT__', (string) $p->id, $productBaseUrl) : url('/produits/'.$p->id) }}" class="font-extrabold hover:underline block truncate">
                                         {{ $p->designation }}
                                     </a>
-                                    <div class="mt-1 text-sm text-slate-600">Ref: {{ $p->reference }}</div>
-                                    <div class="mt-1 text-xs text-slate-500">{{ number_format((float)$it['prix_unitaire'], 2, '.', ' ') }} DA</div>
+                                    <div class="store-muted mt-1 text-sm">Ref: {{ $p->reference }}</div>
+                                    <div class="store-muted mt-1 text-xs">{{ number_format((float)$it['prix_unitaire'], 2, '.', ' ') }} DA</div>
                                 </div>
                                 <div class="text-right">
                                     <div class="font-extrabold">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>
-                                    <div class="text-xs text-slate-500">Stock: {{ (int)$p->stock }}</div>
+                                    <div class="store-muted text-xs">Stock: {{ (int)$p->stock }}</div>
                                 </div>
                             </div>
 
@@ -87,9 +87,9 @@
                                            min="1"
                                            max="{{ max(1, (int)$p->stock) }}"
                                            value="{{ (int)$it['qty'] }}"
-                                           class="w-24 rounded-xl border border-slate-200 bg-white px-3 py-2 outline-none focus:border-[var(--store-primary)]">
+                                           class="store-input w-24 px-3 py-2">
                                     <button type="submit"
-                                            class="rounded-xl px-3 py-2 text-sm font-bold border border-slate-200 bg-white hover:bg-slate-50">
+                                            class="store-surface rounded-xl px-3 py-2 text-sm font-bold hover:opacity-95">
                                         Mettre à jour
                                     </button>
                                 </form>
@@ -108,23 +108,22 @@
                 @endforeach
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6 h-fit">
+            <div class="store-panel p-6 h-fit">
                 <div class="text-lg font-extrabold tracking-wide">Récapitulatif</div>
-                <div class="mt-4 flex items-center justify-between text-slate-600">
+                <div class="store-muted mt-4 flex items-center justify-between">
                     <span>Total</span>
-                    <span class="font-extrabold text-slate-900">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
+                    <span class="font-extrabold" style="color: var(--store-text);">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
                 </div>
 
                 <div class="mt-5">
                     <a href="{{ url('/checkout') }}"
-                       class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold text-white"
-                       style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);">
+                       class="store-button-primary w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold">
                         <i class="fa-solid fa-lock"></i>
                         Commander
                     </a>
                 </div>
 
-                <div class="mt-3 text-xs text-slate-500">
+                <div class="store-muted mt-3 text-xs">
                     Les commandes sont créées pour une seule boutique à la fois.
                 </div>
             </div>

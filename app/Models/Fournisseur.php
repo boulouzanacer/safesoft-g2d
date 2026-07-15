@@ -19,11 +19,14 @@ class Fournisseur extends Authenticatable
     use SoftDeletes;
     use Notifiable;
 
+    public const DEFAULT_STOREFRONT_THEME = 'azure_modern';
+
     protected $table = 'frs';
 
     protected $fillable = [
         'nom_frs',
         'storefront_slug',
+        'storefront_theme',
         'boutique_category_id',
         'email',
         'password',
@@ -79,6 +82,203 @@ class Fournisseur extends Authenticatable
         return $slug === '' ? '' : route('storefront.boutique', ['slug' => $slug]);
     }
 
+    public static function storefrontThemeOptions(): array
+    {
+        return [
+            'azure_modern' => [
+                'name' => 'Azure Modern',
+                'tagline' => 'Clair, premium et polyvalent',
+                'description' => 'Un style lumineux bleu glacier ideal pour electronique, services et boutiques generalistes.',
+                'preview' => [
+                    'from' => '#1D4ED8',
+                    'to' => '#0EA5E9',
+                    'accent' => '#DBEAFE',
+                ],
+                'vars' => [
+                    '--store-primary' => '#1D4ED8',
+                    '--store-primary-dark' => '#1E3A8A',
+                    '--store-bg' => '#F4F8FF',
+                    '--store-card' => '#FFFFFF',
+                    '--store-card-soft' => '#EFF6FF',
+                    '--store-text' => '#0F172A',
+                    '--store-muted' => '#475569',
+                    '--store-border' => '#BFDBFE',
+                    '--store-accent' => '#DBEAFE',
+                    '--store-accent-text' => '#1D4ED8',
+                    '--store-hero-from' => '#1D4ED8',
+                    '--store-hero-to' => '#0EA5E9',
+                    '--store-button-text' => '#FFFFFF',
+                    '--store-shadow' => '0 22px 45px rgba(37, 99, 235, 0.15)',
+                    '--store-radius-xl' => '1rem',
+                    '--store-radius-2xl' => '1.5rem',
+                ],
+            ],
+            'emerald_bloom' => [
+                'name' => 'Emerald Bloom',
+                'tagline' => 'Frais, naturel et rassurant',
+                'description' => 'Un univers vert premium bien adapte aux cosmétiques, bio, sante et produits naturels.',
+                'preview' => [
+                    'from' => '#059669',
+                    'to' => '#34D399',
+                    'accent' => '#D1FAE5',
+                ],
+                'vars' => [
+                    '--store-primary' => '#059669',
+                    '--store-primary-dark' => '#065F46',
+                    '--store-bg' => '#F2FBF7',
+                    '--store-card' => '#FFFFFF',
+                    '--store-card-soft' => '#ECFDF5',
+                    '--store-text' => '#0F172A',
+                    '--store-muted' => '#4B5563',
+                    '--store-border' => '#A7F3D0',
+                    '--store-accent' => '#D1FAE5',
+                    '--store-accent-text' => '#047857',
+                    '--store-hero-from' => '#047857',
+                    '--store-hero-to' => '#34D399',
+                    '--store-button-text' => '#FFFFFF',
+                    '--store-shadow' => '0 22px 48px rgba(5, 150, 105, 0.16)',
+                    '--store-radius-xl' => '1rem',
+                    '--store-radius-2xl' => '1.5rem',
+                ],
+            ],
+            'sunset_pop' => [
+                'name' => 'Sunset Pop',
+                'tagline' => 'Chaleureux, dynamique et vendeur',
+                'description' => 'Des tons corail et ambre qui donnent beaucoup d energie aux boutiques mode et tendances.',
+                'preview' => [
+                    'from' => '#EA580C',
+                    'to' => '#FB7185',
+                    'accent' => '#FFE4E6',
+                ],
+                'vars' => [
+                    '--store-primary' => '#EA580C',
+                    '--store-primary-dark' => '#9A3412',
+                    '--store-bg' => '#FFF7ED',
+                    '--store-card' => '#FFFFFF',
+                    '--store-card-soft' => '#FFF1F2',
+                    '--store-text' => '#431407',
+                    '--store-muted' => '#7C2D12',
+                    '--store-border' => '#FDBA74',
+                    '--store-accent' => '#FFE4E6',
+                    '--store-accent-text' => '#BE123C',
+                    '--store-hero-from' => '#EA580C',
+                    '--store-hero-to' => '#FB7185',
+                    '--store-button-text' => '#FFFFFF',
+                    '--store-shadow' => '0 24px 50px rgba(234, 88, 12, 0.16)',
+                    '--store-radius-xl' => '1rem',
+                    '--store-radius-2xl' => '1.5rem',
+                ],
+            ],
+            'violet_luxe' => [
+                'name' => 'Violet Luxe',
+                'tagline' => 'Elegant, fort et distinctif',
+                'description' => 'Une identité violette haut de gamme pour boutiques premium, cadeaux et univers luxe.',
+                'preview' => [
+                    'from' => '#7C3AED',
+                    'to' => '#A855F7',
+                    'accent' => '#EDE9FE',
+                ],
+                'vars' => [
+                    '--store-primary' => '#7C3AED',
+                    '--store-primary-dark' => '#4C1D95',
+                    '--store-bg' => '#F8F5FF',
+                    '--store-card' => '#FFFFFF',
+                    '--store-card-soft' => '#F5F3FF',
+                    '--store-text' => '#1F1635',
+                    '--store-muted' => '#5B5570',
+                    '--store-border' => '#DDD6FE',
+                    '--store-accent' => '#EDE9FE',
+                    '--store-accent-text' => '#6D28D9',
+                    '--store-hero-from' => '#6D28D9',
+                    '--store-hero-to' => '#A855F7',
+                    '--store-button-text' => '#FFFFFF',
+                    '--store-shadow' => '0 24px 52px rgba(124, 58, 237, 0.18)',
+                    '--store-radius-xl' => '1.15rem',
+                    '--store-radius-2xl' => '1.75rem',
+                ],
+            ],
+            'rose_boutique' => [
+                'name' => 'Rose Boutique',
+                'tagline' => 'Doux, tendance et feminin',
+                'description' => 'Un rose poudré moderne pour beaute, accessoires, cadeaux et univers lifestyle.',
+                'preview' => [
+                    'from' => '#DB2777',
+                    'to' => '#FB7185',
+                    'accent' => '#FCE7F3',
+                ],
+                'vars' => [
+                    '--store-primary' => '#DB2777',
+                    '--store-primary-dark' => '#9D174D',
+                    '--store-bg' => '#FFF7FB',
+                    '--store-card' => '#FFFFFF',
+                    '--store-card-soft' => '#FDF2F8',
+                    '--store-text' => '#3F1732',
+                    '--store-muted' => '#6B3358',
+                    '--store-border' => '#FBCFE8',
+                    '--store-accent' => '#FCE7F3',
+                    '--store-accent-text' => '#BE185D',
+                    '--store-hero-from' => '#DB2777',
+                    '--store-hero-to' => '#FB7185',
+                    '--store-button-text' => '#FFFFFF',
+                    '--store-shadow' => '0 24px 50px rgba(219, 39, 119, 0.16)',
+                    '--store-radius-xl' => '1rem',
+                    '--store-radius-2xl' => '1.65rem',
+                ],
+            ],
+            'graphite_pro' => [
+                'name' => 'Graphite Pro',
+                'tagline' => 'Sobre, technique et premium',
+                'description' => 'Une ambiance graphite tres professionnelle pour auto, materiel, B2B et high-tech.',
+                'preview' => [
+                    'from' => '#111827',
+                    'to' => '#334155',
+                    'accent' => '#E2E8F0',
+                ],
+                'vars' => [
+                    '--store-primary' => '#111827',
+                    '--store-primary-dark' => '#020617',
+                    '--store-bg' => '#F3F4F6',
+                    '--store-card' => '#FFFFFF',
+                    '--store-card-soft' => '#E5E7EB',
+                    '--store-text' => '#0F172A',
+                    '--store-muted' => '#475569',
+                    '--store-border' => '#CBD5E1',
+                    '--store-accent' => '#E2E8F0',
+                    '--store-accent-text' => '#0F172A',
+                    '--store-hero-from' => '#111827',
+                    '--store-hero-to' => '#334155',
+                    '--store-button-text' => '#FFFFFF',
+                    '--store-shadow' => '0 22px 48px rgba(15, 23, 42, 0.18)',
+                    '--store-radius-xl' => '0.95rem',
+                    '--store-radius-2xl' => '1.35rem',
+                ],
+            ],
+        ];
+    }
+
+    public static function normalizeStorefrontTheme(?string $theme): string
+    {
+        $normalized = trim((string) $theme);
+        $options = self::storefrontThemeOptions();
+
+        return array_key_exists($normalized, $options)
+            ? $normalized
+            : self::DEFAULT_STOREFRONT_THEME;
+    }
+
+    public function storefrontThemeKey(): string
+    {
+        return self::normalizeStorefrontTheme($this->storefront_theme);
+    }
+
+    public function storefrontThemeConfig(): array
+    {
+        $key = $this->storefrontThemeKey();
+        $options = self::storefrontThemeOptions();
+
+        return $options[$key] ?? $options[self::DEFAULT_STOREFRONT_THEME];
+    }
+
     protected static function booted(): void
     {
         static::creating(function (self $model): void {
@@ -89,12 +289,16 @@ class Fournisseur extends Authenticatable
             if (empty($model->storefront_slug)) {
                 $model->storefront_slug = self::generateUniqueStorefrontSlug((string) $model->nom_frs);
             }
+
+            $model->storefront_theme = self::normalizeStorefrontTheme($model->storefront_theme);
         });
 
         static::saving(function (self $model): void {
             if (empty($model->storefront_slug)) {
                 $model->storefront_slug = self::generateUniqueStorefrontSlug((string) $model->nom_frs, $model->id ? (int) $model->id : null);
             }
+
+            $model->storefront_theme = self::normalizeStorefrontTheme($model->storefront_theme);
         });
 
         static::deleted(function (self $model): void {

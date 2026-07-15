@@ -12,20 +12,22 @@
     <div class="mt-5 space-y-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <div class="text-sm font-extrabold tracking-wide text-slate-900">{{ $title }}</div>
-                <div class="text-xs text-slate-500">{{ $subtitle }}</div>
+                <div class="text-sm font-extrabold tracking-wide" style="color: var(--store-text);">{{ $title }}</div>
+                <div class="store-muted text-xs">{{ $subtitle }}</div>
             </div>
-            <div class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                <span class="font-semibold text-slate-500">Sélection :</span>
-                <span class="font-bold text-slate-900">{{ $selectedCategory?->name ?? 'Toutes les catégories' }}</span>
+            <div class="store-soft inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs">
+                <span class="store-muted font-semibold">Sélection :</span>
+                <span class="font-bold" style="color: var(--store-text);">{{ $selectedCategory?->name ?? 'Toutes les catégories' }}</span>
             </div>
         </div>
 
         <div class="grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 2xl:grid-cols-12">
             <a href="{{ $currentUrl.'?'.http_build_query(array_filter(['q' => $query])) }}"
                class="group relative flex min-w-0 flex-col items-center text-center transition duration-200">
-                <div class="relative flex h-16 w-16 items-center justify-center rounded-full border bg-white shadow-sm transition duration-200 sm:h-[4.5rem] sm:w-[4.5rem] {{ ! $selectedCategoryId ? 'border-[var(--store-primary)] ring-2 ring-blue-100 text-[var(--store-primary)]' : 'border-slate-200 text-slate-400 group-hover:-translate-y-0.5 group-hover:border-slate-300 group-hover:shadow-md group-hover:text-slate-600' }}">
-                    <span class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 sm:h-14 sm:w-14 {{ ! $selectedCategoryId ? 'bg-blue-50' : '' }}">
+                <div class="relative flex h-16 w-16 items-center justify-center rounded-full border bg-white shadow-sm transition duration-200 sm:h-[4.5rem] sm:w-[4.5rem] {{ ! $selectedCategoryId ? 'border-[var(--store-primary)] ring-2 ring-blue-100 text-[var(--store-primary)]' : 'text-slate-400 group-hover:-translate-y-0.5 group-hover:shadow-md group-hover:text-slate-600' }}"
+                     style="{{ ! $selectedCategoryId ? '' : 'border-color: var(--store-border);' }}">
+                    <span class="flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 {{ ! $selectedCategoryId ? '' : '' }}"
+                          style="background: {{ ! $selectedCategoryId ? 'var(--store-accent)' : 'var(--store-card-soft)' }};">
                         <i class="fa-solid fa-grid-2 text-xl"></i>
                     </span>
                     @if(! $selectedCategoryId)
@@ -34,7 +36,8 @@
                         </span>
                     @endif
                 </div>
-                <div class="mt-2 h-8 overflow-hidden text-[11px] font-semibold leading-4 text-slate-700 sm:text-xs {{ ! $selectedCategoryId ? 'text-[var(--store-primary)]' : 'group-hover:text-slate-900' }}">
+                <div class="mt-2 h-8 overflow-hidden text-[11px] font-semibold leading-4 sm:text-xs {{ ! $selectedCategoryId ? 'text-[var(--store-primary)]' : 'group-hover:text-slate-900' }}"
+                     style="{{ ! $selectedCategoryId ? '' : 'color: var(--store-text);' }}">
                     Toutes les catégories
                 </div>
             </a>
@@ -42,7 +45,8 @@
             @foreach($categories as $category)
                 <a href="{{ $currentUrl.'?'.http_build_query(array_filter(['q' => $query, 'categorie_boutique' => $category->id])) }}"
                    class="group relative flex min-w-0 flex-col items-center text-center transition duration-200">
-                    <div class="relative h-16 w-16 overflow-hidden rounded-full border bg-white shadow-sm transition duration-200 sm:h-[4.5rem] sm:w-[4.5rem] {{ (int) $selectedCategoryId === (int) $category->id ? 'border-[var(--store-primary)] ring-2 ring-blue-100' : 'border-slate-200 group-hover:-translate-y-0.5 group-hover:border-slate-300 group-hover:shadow-md' }}">
+                    <div class="relative h-16 w-16 overflow-hidden rounded-full border bg-white shadow-sm transition duration-200 sm:h-[4.5rem] sm:w-[4.5rem] {{ (int) $selectedCategoryId === (int) $category->id ? 'border-[var(--store-primary)] ring-2 ring-blue-100' : 'group-hover:-translate-y-0.5 group-hover:shadow-md' }}"
+                         style="{{ (int) $selectedCategoryId === (int) $category->id ? '' : 'border-color: var(--store-border);' }}">
                         @if($category->image_url)
                             <img src="{{ $category->image_url }}"
                                  alt="{{ $category->name }}"
@@ -60,7 +64,8 @@
                         @endif
                     </div>
 
-                    <div class="mt-2 h-8 overflow-hidden text-[11px] font-semibold leading-4 text-slate-700 sm:text-xs {{ (int) $selectedCategoryId === (int) $category->id ? 'text-[var(--store-primary)]' : 'group-hover:text-slate-900' }}">
+                    <div class="mt-2 h-8 overflow-hidden text-[11px] font-semibold leading-4 sm:text-xs {{ (int) $selectedCategoryId === (int) $category->id ? 'text-[var(--store-primary)]' : 'group-hover:text-slate-900' }}"
+                         style="{{ (int) $selectedCategoryId === (int) $category->id ? '' : 'color: var(--store-text);' }}">
                         {{ $category->name }}
                     </div>
                 </a>

@@ -5,13 +5,13 @@
     <div class="flex items-center justify-between">
         <div>
             <div class="text-2xl font-extrabold tracking-wide">Commande #{{ $commande->id }}</div>
-            <div class="mt-1 text-sm text-slate-600">
-                Boutique: <span class="font-semibold text-slate-900">{{ $commande->frs_nom ?? '—' }}</span>
-                <span class="mx-2 text-slate-300">•</span>
+            <div class="store-muted mt-1 text-sm">
+                Boutique: <span class="font-semibold" style="color: var(--store-text);">{{ $commande->frs_nom ?? '—' }}</span>
+                <span class="mx-2 opacity-40">•</span>
                 {{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y H:i') }}
             </div>
         </div>
-        <a href="{{ url('/mes-commandes') }}" class="text-sm text-slate-500 hover:text-slate-900">
+        <a href="{{ url('/mes-commandes') }}" class="store-muted text-sm hover:opacity-90">
             <i class="fa-solid fa-arrow-left-long mr-2"></i>
             Retour
         </a>
@@ -30,15 +30,15 @@
     @endphp
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-[var(--store-card)] overflow-hidden">
-            <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+        <div class="store-panel lg:col-span-2 overflow-hidden">
+            <div class="p-5 border-b flex items-center justify-between" style="border-color: var(--store-border);">
                 <div class="font-extrabold tracking-wide">Produits</div>
                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
             </div>
-            <div class="divide-y divide-slate-200">
+            <div class="divide-y" style="border-color: var(--store-border);">
                 @foreach($lignes as $l)
                     <div class="p-5 flex items-start gap-4">
-                        <div class="h-16 w-16 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+                        <div class="h-16 w-16 rounded-xl overflow-hidden border flex-shrink-0" style="border-color: var(--store-border); background: var(--store-card-soft);">
                             @if(($l->produit_image_url ?? '') !== '')
                                 <img src="{{ $l->produit_image_url }}" alt="" class="w-full h-full object-cover">
                             @else
@@ -51,11 +51,11 @@
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
                                     <div class="font-extrabold truncate">{{ $l->produit_designation ?? ('Produit #'.$l->id_produit) }}</div>
-                                    <div class="mt-1 text-sm text-slate-600">Ref: {{ $l->produit_reference ?? '—' }}</div>
+                                    <div class="store-muted mt-1 text-sm">Ref: {{ $l->produit_reference ?? '—' }}</div>
                                 </div>
                                 <div class="text-right">
                                     <div class="font-extrabold">{{ number_format((float)$l->sous_total, 2, '.', ' ') }} DA</div>
-                                    <div class="text-xs text-slate-500">{{ (int)$l->quantite }} × {{ number_format((float)$l->prix_unitaire, 2, '.', ' ') }} DA</div>
+                                    <div class="store-muted text-xs">{{ (int)$l->quantite }} × {{ number_format((float)$l->prix_unitaire, 2, '.', ' ') }} DA</div>
                                 </div>
                             </div>
                         </div>
@@ -65,22 +65,22 @@
         </div>
 
         <div class="space-y-4">
-            <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6">
+            <div class="store-panel p-6">
                 <div class="text-lg font-extrabold tracking-wide">Livraison</div>
-                <div class="mt-3 text-sm text-slate-700 leading-relaxed">
+                <div class="mt-3 text-sm leading-relaxed" style="color: var(--store-text);">
                     {{ $commande->adresse_livraison ?? '—' }}
                 </div>
                 @if(trim((string)($commande->notes ?? '')) !== '')
-                    <div class="mt-4 text-xs font-bold text-slate-500">Notes</div>
-                    <div class="mt-1 text-sm text-slate-700">{{ $commande->notes }}</div>
+                    <div class="store-muted mt-4 text-xs font-bold">Notes</div>
+                    <div class="mt-1 text-sm" style="color: var(--store-text);">{{ $commande->notes }}</div>
                 @endif
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6">
+            <div class="store-panel p-6">
                 <div class="text-lg font-extrabold tracking-wide">Total</div>
-                <div class="mt-3 flex items-center justify-between text-slate-600">
+                <div class="store-muted mt-3 flex items-center justify-between">
                     <span>Montant total</span>
-                    <span class="font-extrabold text-slate-900">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }} DA</span>
+                    <span class="font-extrabold" style="color: var(--store-text);">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }} DA</span>
                 </div>
             </div>
         </div>

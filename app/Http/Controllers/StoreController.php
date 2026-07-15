@@ -428,6 +428,8 @@ class StoreController extends Controller
     {
         $client = $data['client'] ?? null;
         $client = $client instanceof Client ? $client : $this->currentClient();
+        $themeBoutique = $data['theme_boutique'] ?? null;
+        $themeBoutique = $themeBoutique instanceof Fournisseur ? $themeBoutique : null;
 
         if (! $storefrontMode) {
             $state = $this->currentStorefrontState($client, $storefrontBoutique);
@@ -440,12 +442,20 @@ class StoreController extends Controller
                 : '';
         }
 
+        $resolvedThemeBoutique = $storefrontBoutique ?? $themeBoutique;
+        $storefrontThemeKey = $resolvedThemeBoutique?->storefrontThemeKey() ?? Fournisseur::DEFAULT_STOREFRONT_THEME;
+        $storefrontThemeConfig = $resolvedThemeBoutique?->storefrontThemeConfig()
+            ?? Fournisseur::storefrontThemeOptions()[Fournisseur::DEFAULT_STOREFRONT_THEME];
+
         return view($view, $data + [
             'storefront_mode' => $storefrontBoutique !== null,
             'storefront_mode_type' => $storefrontMode,
             'custom_domain_mode' => $storefrontMode === 'domain',
             'storefront_boutique' => $storefrontBoutique,
             'storefront_home_url' => $storefrontHomeUrl,
+            'store_theme_boutique' => $resolvedThemeBoutique,
+            'storefront_theme_key' => $storefrontThemeKey,
+            'storefront_theme_config' => $storefrontThemeConfig,
         ]);
     }
 
@@ -584,6 +594,7 @@ class StoreController extends Controller
             'title' => $boutique->nom_frs,
             'client' => $client,
             'boutique' => $boutique,
+            'theme_boutique' => $boutique,
             'produits' => $produits,
             'categories' => $cats,
             'selected_categorie' => $categorie,
@@ -651,6 +662,7 @@ class StoreController extends Controller
             'title' => $p->designation,
             'client' => $client,
             'produit' => $p,
+            'theme_boutique' => $boutique,
             'images' => $images,
             'tiers' => $tiers,
             'tierEnabled' => $tierEnabled,

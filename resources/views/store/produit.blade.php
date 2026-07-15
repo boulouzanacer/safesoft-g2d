@@ -6,19 +6,19 @@
 @endphp
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <a href="{{ $backBoutiqueUrl }}" class="text-sm text-slate-500 hover:text-slate-900">
+        <a href="{{ $backBoutiqueUrl }}" class="store-muted text-sm hover:opacity-90">
             <i class="fa-solid fa-arrow-left-long mr-2"></i>
             Retour boutique
         </a>
         <a href="{{ url('/panier') }}"
-           class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+           class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
             <i class="fa-solid fa-cart-shopping text-[var(--store-primary)]"></i>
             <span>Panier</span>
         </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] overflow-hidden">
+        <div class="store-panel overflow-hidden">
             <div class="aspect-[4/3] bg-slate-100">
                 @if(count($images) > 0)
                     <img src="{{ $images[0] }}" alt="" class="w-full h-full object-cover">
@@ -29,18 +29,18 @@
                 @endif
             </div>
             @if(count($images) > 1)
-                <div class="p-4 border-t border-slate-200 grid grid-cols-5 gap-2 bg-slate-50">
+                <div class="store-soft p-4 border-t grid grid-cols-5 gap-2" style="border-color: var(--store-border); border-top-left-radius: 0; border-top-right-radius: 0;">
                     @foreach($images as $u)
-                        <img src="{{ $u }}" alt="" class="h-14 w-full object-cover rounded-lg border border-slate-200">
+                        <img src="{{ $u }}" alt="" class="h-14 w-full object-cover rounded-lg border" style="border-color: var(--store-border);">
                     @endforeach
                 </div>
             @endif
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6">
+        <div class="store-panel p-6">
             <div class="text-2xl font-extrabold tracking-wide">{{ $produit->designation }}</div>
-            <div class="mt-1 text-sm text-slate-600">Ref: {{ $produit->reference }}</div>
-            <div class="mt-1 text-sm text-slate-600">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
+            <div class="store-muted mt-1 text-sm">Ref: {{ $produit->reference }}</div>
+            <div class="store-muted mt-1 text-sm">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
 
             @php
                 $initialQty = (int) ($initialQty ?? 1);
@@ -62,29 +62,29 @@
                 <div class="text-2xl font-extrabold">
                     <span id="unitPrice">{{ number_format($initialUnit, 2, '.', ' ') }}</span> DA
                 </div>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-600">
+                <span class="store-soft store-muted text-xs font-bold px-2.5 py-1 rounded-full">
                     {{ $produit->categorie ?: '—' }}
                 </span>
             </div>
-            <div class="mt-1 text-xs text-slate-500">
-                Total: <span class="font-bold text-slate-700"><span id="totalPrice">{{ number_format($initialUnit * $initialQty, 2, '.', ' ') }}</span> DA</span>
+            <div class="store-muted mt-1 text-xs">
+                Total: <span class="font-bold" style="color: var(--store-text);"><span id="totalPrice">{{ number_format($initialUnit * $initialQty, 2, '.', ' ') }}</span> DA</span>
             </div>
 
             <div class="mt-2 text-sm {{ (int)$produit->stock > 0 ? 'text-emerald-700' : 'text-red-600' }}">
                 {{ (int)$produit->stock > 0 ? ('Stock disponible: '.(int)$produit->stock) : 'Rupture de stock' }}
             </div>
 
-            <div class="mt-5 text-sm text-slate-700 leading-relaxed">
+            <div class="mt-5 text-sm leading-relaxed" style="color: var(--store-text);">
                 {{ trim((string)$produit->description) !== '' ? $produit->description : '—' }}
             </div>
 
             @if($tierEnabled)
-                <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div class="store-soft mt-6 p-4">
                     <div class="font-extrabold tracking-wide">Tarifs par quantité</div>
                     <div class="mt-3 space-y-2 text-sm">
                         @foreach($tiers as $t)
                             <div class="flex items-center justify-between gap-3">
-                                <div class="text-slate-600">
+                                <div class="store-muted">
                                     @if($t['quantity_max'] === null)
                                         {{ (int)$t['quantity_min'] }}+ pièces
                                     @else
@@ -108,10 +108,9 @@
                            min="1"
                            max="{{ max(1, (int)$produit->stock) }}"
                            value="1"
-                           class="w-24 rounded-xl border border-slate-200 bg-white px-3 py-2 outline-none focus:border-[var(--store-primary)]">
+                           class="store-input w-24 px-3 py-2">
                     <button type="submit"
-                            class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold text-white disabled:opacity-40"
-                            style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);"
+                            class="store-button-primary flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-extrabold disabled:opacity-40"
                             @disabled((int)$produit->stock <= 0)>
                         <i class="fa-solid fa-cart-plus"></i>
                         Ajouter au panier

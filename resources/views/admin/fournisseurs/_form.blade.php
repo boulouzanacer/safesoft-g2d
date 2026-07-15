@@ -4,6 +4,9 @@
     $wilayaSelectId = $formPrefix.'_wilayaSelect';
     $communeSelectId = $formPrefix.'_communeSelect';
     $selectedCommuneId = (int) old('id_commune', $frs?->id_commune ?? 0);
+    $primaryCustomDomain = old('primary_custom_domain', $frs?->customDomains?->firstWhere('is_primary', true)?->domain ?? '');
+    $selectedTheme = old('storefront_theme', $frs?->storefrontThemeKey() ?? \App\Models\Fournisseur::DEFAULT_STOREFRONT_THEME);
+    $themeOptions = \App\Models\Fournisseur::storefrontThemeOptions();
 @endphp
 
 @csrf
@@ -55,6 +58,41 @@
                value="{{ old('email', $frs?->email ?? '') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                required>
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold text-white/70 mb-1">Domaine principal (optionnel)</label>
+        <input name="primary_custom_domain"
+               value="{{ $primaryCustomDomain }}"
+               placeholder="www.boutika.com"
+               class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
+        <div class="mt-1 text-xs text-white/50">Exemple: www.boutika.com. Tu peux le gérer aussi plus bas en édition.</div>
+        @error('primary_custom_domain')
+            <div class="mt-1 text-xs font-semibold text-red-300">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="md:col-span-2">
+        <div class="flex items-center justify-between gap-3 mb-2">
+            <div>
+                <label class="block text-sm font-semibold text-white/70">Theme storefront</label>
+                <div class="mt-1 text-xs text-white/50">Ce theme sera applique au site public de cette boutique et a son domaine personnalise.</div>
+            </div>
+        </div>
+
+        @include('partials.storefront-theme-picker', [
+            'themeOptions' => $themeOptions,
+            'selectedTheme' => $selectedTheme,
+            'inputName' => 'storefront_theme',
+            'inputIdPrefix' => $formPrefix.'-storefront-theme',
+            'surfaceClass' => 'bg-[var(--admin-card)] border-white/10',
+            'mutedClass' => 'text-white/60',
+            'titleClass' => 'text-white',
+        ])
+
+        @error('storefront_theme')
+            <div class="mt-2 text-xs font-semibold text-red-300">{{ $message }}</div>
+        @enderror
     </div>
 
     @if(!isset($isEdit) || !$isEdit)
