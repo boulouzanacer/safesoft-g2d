@@ -23,6 +23,7 @@ class Fournisseur extends Authenticatable
 
     protected $fillable = [
         'nom_frs',
+        'storefront_slug',
         'boutique_category_id',
         'email',
         'password',
@@ -41,6 +42,7 @@ class Fournisseur extends Authenticatable
 
     protected $appends = [
         'logo_url',
+        'storefront_url',
     ];
 
     protected $hidden = [
@@ -70,11 +72,28 @@ class Fournisseur extends Authenticatable
         return Storage::url($raw);
     }
 
+    public function getStorefrontUrlAttribute(): string
+    {
+        $slug = trim((string) ($this->storefront_slug ?? ''));
+
+        return $slug === '' ? '' : route('storefront.boutique', ['slug' => $slug]);
+    }
+
     protected static function booted(): void
     {
         static::creating(function (self $model): void {
             if (empty($model->token)) {
                 $model->token = (string) Str::uuid();
+            }
+
+            if (empty($model->storefront_slug)) {
+                $model->storefront_slug = self::generateUniqueStorefrontSlug((string) $model->nom_frs);
+            }
+        });
+
+        static::saving(function (self $model): void {
+            if (empty($model->storefront_slug)) {
+                $model->storefront_slug = self::generateUniqueStorefrontSlug((string) $model->nom_frs, $model->id ? (int) $model->id : null);
             }
         });
 
@@ -111,6 +130,29 @@ class Fournisseur extends Authenticatable
         }
 
         return $base.'@'.$domain;
+    }
+
+    public static function generateUniqueStorefrontSlug(string $name, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($name);
+        if ($base === '') {
+            $base = 'boutique';
+        }
+
+        $slug = $base;
+        $index = 2;
+
+        while (
+            self::query()
+                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+                ->where('storefront_slug', $slug)
+                ->exists()
+        ) {
+            $slug = $base.'-'.$index;
+            $index++;
+        }
+
+        return $slug;
     }
 
     public function isExpired(): bool

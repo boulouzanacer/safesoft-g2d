@@ -323,6 +323,37 @@ class StoreController extends Controller
             ->get(['id', 'name', 'slug', 'image_path']);
     }
 
+    private function activateStorefront(Fournisseur $boutique): void
+    {
+        session(['storefront_frs_id' => (int) $boutique->id]);
+    }
+
+    private function clearStorefront(): void
+    {
+        session()->forget('storefront_frs_id');
+    }
+
+    private function storefrontBoutiqueFromSession(?Client $client): ?Fournisseur
+    {
+        $frsId = (int) session('storefront_frs_id', 0);
+        if ($frsId <= 0) {
+            return null;
+        }
+
+        return $this->publicBoutiquesQuery($client)
+            ->where('id', $frsId)
+            ->first(['id', 'nom_frs', 'storefront_slug', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
+    }
+
+    private function storeView(string $view, array $data = [], ?Fournisseur $storefrontBoutique = null): View
+    {
+        return view($view, $data + [
+            'storefront_mode' => $storefrontBoutique !== null,
+            'storefront_boutique' => $storefrontBoutique,
+            'storefront_home_url' => $storefrontBoutique?->storefront_url ?? '',
+        ]);
+    }
+
     private function selectedBoutiqueCategoryId(Request $request): ?int
     {
         $value = (int) $request->query('categorie_boutique', 0);
@@ -392,6 +423,7 @@ class StoreController extends Controller
 
     public function index(Request $request): View
     {
+        $this->clearStorefront();
         $client = $this->currentClient();
         $q = trim((string) $request->query('q', ''));
         $boutiqueCategoryId = $this->selectedBoutiqueCategoryId($request);
@@ -407,7 +439,7 @@ class StoreController extends Controller
             })
             ->orderBy('nom_frs')
             ->limit(8)
-            ->get(['id', 'nom_frs', 'boutique_category_id', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
+            ->get(['id', 'nom_frs', 'storefront_slug', 'boutique_category_id', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
 
         $produits = $this->publicProductsQuery($client)
             ->when($boutiqueCategoryId, function ($query) use ($boutiqueCategoryId) {
@@ -426,7 +458,7 @@ class StoreController extends Controller
 
         $cartSummary = $this->cartSummary();
 
-        return view('store.index', [
+        return $this->storeView('store.index', [
             'title' => 'Boutiques & Produits',
             'client' => $client,
             'boutiques_preview' => $boutiques,
@@ -441,6 +473,7 @@ class StoreController extends Controller
 
     public function boutiques(Request $request): View
     {
+        $this->clearStorefront();
         $client = $this->currentClient();
         $q = trim((string) $request->query('q', ''));
         $boutiqueCategoryId = $this->selectedBoutiqueCategoryId($request);
@@ -460,7 +493,7 @@ class StoreController extends Controller
 
         $cartSummary = $this->cartSummary();
 
-        return view('store.boutiques', [
+        return $this->storeView('store.boutiques', [
             'title' => 'Toutes les boutiques',
             'client' => $client,
             'boutiques' => $boutiques,
@@ -474,6 +507,7 @@ class StoreController extends Controller
 
     public function produits(Request $request): View
     {
+        $this->clearStorefront();
         $client = $this->currentClient();
         $q = trim((string) $request->query('q', ''));
         $boutiqueCategoryId = $this->selectedBoutiqueCategoryId($request);
@@ -495,7 +529,7 @@ class StoreController extends Controller
 
         $cartSummary = $this->cartSummary();
 
-        return view('store.produits', [
+        return $this->storeView('store.produits', [
             'title' => 'Tous les produits',
             'client' => $client,
             'produits' => $produits,
@@ -509,6 +543,7 @@ class StoreController extends Controller
 
     public function boutique(int $id, Request $request): View
     {
+        $this->clearStorefront();
         $client = $this->currentClient();
         $abonneFournisseurIds = $this->abonneFournisseurIds($client);
         if ($client && $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== $id) {
@@ -557,17 +592,77 @@ class StoreController extends Controller
 
         $cartSummary = $this->cartSummary();
 
-        return view('store.boutique', [
+        return $this->storeView('store.boutique', [
             'title' => $boutique->nom_frs,
             'client' => $client,
             'boutique' => $boutique,
             'produits' => $produits,
             'categories' => $cats,
             'selected_categorie' => $categorie,
+            'boutique_page_url' => url('/boutiques/'.$boutique->id),
             'q' => $q,
             'cart_total' => $cartSummary['total'],
             'cart_count' => count($cartSummary['items']),
         ]);
+    }
+
+    public function storefrontBoutique(string $slug, Request $request): View
+    {
+        $client = $this->currentClient();
+
+        $boutique = $this->publicBoutiquesQuery($client)
+            ->where('storefront_slug', $slug)
+            ->firstOrFail(['id', 'nom_frs', 'storefront_slug', 'boutique_category_id', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
+
+        $this->activateStorefront($boutique);
+
+        $abonneFournisseurIds = $this->abonneFournisseurIds($client);
+        $q = trim((string) $request->query('q', ''));
+        $categorie = trim((string) $request->query('categorie', ''));
+
+        $cats = Produit::query()
+            ->whereNull('deleted_at')
+            ->where('actif', 1)
+            ->where('id_frs', $boutique->id)
+            ->when(! in_array((int) $boutique->id, $abonneFournisseurIds, true), fn ($query) => $query->where('abonne_only', 0))
+            ->distinct()
+            ->orderBy('categorie')
+            ->pluck('categorie')
+            ->filter()
+            ->values();
+
+        $produits = Produit::query()
+            ->whereNull('deleted_at')
+            ->where('actif', 1)
+            ->where('id_frs', $boutique->id)
+            ->when(! in_array((int) $boutique->id, $abonneFournisseurIds, true), fn ($query) => $query->where('abonne_only', 0))
+            ->with('quantityPrices')
+            ->when($categorie !== '', fn ($query) => $query->where('categorie', $categorie))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('designation', 'like', "%{$q}%")
+                        ->orWhere('reference', 'like', "%{$q}%")
+                        ->orWhere('categorie', 'like', "%{$q}%");
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(18)
+            ->withQueryString();
+
+        $cartSummary = $this->cartSummary();
+
+        return $this->storeView('store.boutique', [
+            'title' => $boutique->nom_frs,
+            'client' => $client,
+            'boutique' => $boutique,
+            'produits' => $produits,
+            'categories' => $cats,
+            'selected_categorie' => $categorie,
+            'boutique_page_url' => $boutique->storefront_url,
+            'q' => $q,
+            'cart_total' => $cartSummary['total'],
+            'cart_count' => count($cartSummary['items']),
+        ], $boutique);
     }
 
     public function produit(int $id): View
@@ -631,32 +726,112 @@ class StoreController extends Controller
         $initialQty = 1;
         $initialUnit = (float) $p->prixUnitairePourQuantite($this->fournisseurClientFor($client, (int) $p->id_frs), $initialQty);
 
-        return view('store.produit', [
+        $storefrontBoutique = null;
+        $sessionStorefront = $this->storefrontBoutiqueFromSession($client);
+        if ($sessionStorefront && (int) $sessionStorefront->id === (int) $p->id_frs) {
+            $storefrontBoutique = $sessionStorefront;
+        }
+
+        return $this->storeView('store.produit', [
             'title' => $p->designation,
             'client' => $client,
             'produit' => $p,
             'images' => $images,
             'tiers' => $tiers,
             'tierEnabled' => $tierEnabled,
+            'back_boutique_url' => $storefrontBoutique
+                ? route('storefront.boutique', ['slug' => $storefrontBoutique->storefront_slug])
+                : url('/boutiques/'.$p->id_frs),
             'initialQty' => $initialQty,
             'initialUnit' => $initialUnit,
             'cart_total' => $cartSummary['total'],
             'cart_count' => count($cartSummary['items']),
-        ]);
+        ], $storefrontBoutique);
+    }
+
+    public function storefrontProduit(string $slug, int $id): View
+    {
+        $client = $this->currentClient();
+
+        $boutique = $this->publicBoutiquesQuery($client)
+            ->where('storefront_slug', $slug)
+            ->firstOrFail(['id', 'nom_frs', 'storefront_slug', 'logo_path', 'telephone', 'adresse', 'id_wilaya', 'id_commune', 'latitude', 'longitude']);
+
+        $this->activateStorefront($boutique);
+
+        $p = Produit::query()
+            ->whereNull('deleted_at')
+            ->where('actif', 1)
+            ->where('id_frs', $boutique->id)
+            ->with(['images' => fn ($query) => $query->orderBy('ordre'), 'fournisseur:id,nom_frs,storefront_slug,actif,is_visible,deleted_at', 'quantityPrices'])
+            ->findOrFail($id);
+
+        $abonneForProduct = $this->isAbonneFor($client, (int) $p->id_frs);
+
+        if (! $abonneForProduct && (int) ($p->abonne_only ?? 0) === 1) {
+            abort(404);
+        }
+
+        $images = [];
+        $main = $this->resolveUrl($p->image_principale);
+        if ($main !== '') {
+            $images[] = $main;
+        }
+        foreach ($p->images as $img) {
+            $u = $this->resolveUrl($img->url_principale);
+            if ($u !== '') {
+                $images[] = $u;
+            }
+        }
+        $images = array_values(array_unique($images));
+
+        $cartSummary = $this->cartSummary();
+
+        $tierModels = $p->relationLoaded('quantityPrices')
+            ? $p->quantityPrices
+            : $p->quantityPrices()->get(['quantity_min', 'quantity_max', 'price']);
+
+        $tiers = $tierModels
+            ->map(fn ($t) => [
+                'quantity_min' => (int) $t->quantity_min,
+                'quantity_max' => $t->quantity_max === null ? null : (int) $t->quantity_max,
+                'price' => (float) $t->price,
+            ])
+            ->values()
+            ->all();
+
+        $tierEnabled = $p->isTierPricingEnabled() && count($tiers) > 0;
+        $initialQty = 1;
+        $initialUnit = (float) $p->prixUnitairePourQuantite($this->fournisseurClientFor($client, (int) $p->id_frs), $initialQty);
+
+        return $this->storeView('store.produit', [
+            'title' => $p->designation,
+            'client' => $client,
+            'produit' => $p,
+            'images' => $images,
+            'tiers' => $tiers,
+            'tierEnabled' => $tierEnabled,
+            'back_boutique_url' => $boutique->storefront_url,
+            'initialQty' => $initialQty,
+            'initialUnit' => $initialUnit,
+            'cart_total' => $cartSummary['total'],
+            'cart_count' => count($cartSummary['items']),
+        ], $boutique);
     }
 
     public function panier(): View
     {
         $client = $this->currentClient();
         $summary = $this->cartSummary();
+        $storefrontBoutique = $this->storefrontBoutiqueFromSession($client);
 
-        return view('store.panier', [
+        return $this->storeView('store.panier', [
             'title' => 'Panier',
             'client' => $client,
             'items' => $summary['items'],
             'total' => $summary['total'],
             'boutique' => $summary['frs'],
-        ]);
+        ], $storefrontBoutique);
     }
 
     public function panierAdd(Request $request): RedirectResponse
@@ -802,7 +977,7 @@ class StoreController extends Controller
             ->orderBy('COMMUNE')
             ->get(['ID_COMMUNE', 'COMMUNE', 'ID_WILAYA']);
 
-        return view('store.checkout', [
+        return $this->storeView('store.checkout', [
             'title' => 'Finaliser la commande',
             'client' => $client,
             'items' => $summary['items'],
@@ -811,7 +986,7 @@ class StoreController extends Controller
             'wilayas' => $wilayas,
             'communes' => $communes,
             'selected_wilaya' => $selectedWilaya,
-        ]);
+        ], $this->storefrontBoutiqueFromSession($client));
     }
 
     public function checkoutStore(Request $request): RedirectResponse
@@ -1011,11 +1186,11 @@ class StoreController extends Controller
             ]]);
         }
 
-        return view('store.profil', [
+        return $this->storeView('store.profil', [
             'title' => 'Mon profil',
             'client' => $client,
             'profile_tabs' => $profileTabs,
-        ]);
+        ], $this->storefrontBoutiqueFromSession($client));
     }
 
     public function mesCommandes(): RedirectResponse|View
@@ -1035,11 +1210,11 @@ class StoreController extends Controller
             ->orderByDesc('cmd1.date_cmd')
             ->paginate(15);
 
-        return view('store.commandes.index', [
+        return $this->storeView('store.commandes.index', [
             'title' => 'Mes commandes',
             'client' => $client,
             'commandes' => $commandes,
-        ]);
+        ], $this->storefrontBoutiqueFromSession($client));
     }
 
     public function commandeShow(int $id): RedirectResponse|View
@@ -1075,11 +1250,11 @@ class StoreController extends Controller
                 return $l;
             });
 
-        return view('store.commandes.show', [
+        return $this->storeView('store.commandes.show', [
             'title' => 'Commande #'.$commande->id,
             'client' => $client,
             'commande' => $commande,
             'lignes' => $lignes,
-        ]);
+        ], $this->storefrontBoutiqueFromSession($client));
     }
 }

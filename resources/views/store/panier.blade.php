@@ -1,6 +1,14 @@
 @extends('store.layout')
 
 @section('content')
+@php
+    $continueUrl = (bool) ($storefront_mode ?? false)
+        ? ($storefront_home_url ?: url('/'))
+        : url('/');
+    $productBaseUrl = ((bool) ($storefront_mode ?? false) && ($storefront_boutique?->storefront_slug ?? '') !== '')
+        ? route('storefront.produit', ['slug' => $storefront_boutique->storefront_slug, 'id' => '__PRODUCT__'])
+        : null;
+@endphp
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
@@ -14,7 +22,7 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ url('/') }}"
+            <a href="{{ $continueUrl }}"
                class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
                 <i class="fa-solid fa-store text-[var(--store-primary)]"></i>
                 Continuer
@@ -42,7 +50,7 @@
                 @foreach($items as $it)
                     @php($p = $it['produit'])
                     <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-4 flex items-start gap-4">
-                        <a href="{{ url('/produits/'.$p->id) }}" class="h-20 w-28 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+                        <a href="{{ $productBaseUrl ? str_replace('__PRODUCT__', (string) $p->id, $productBaseUrl) : url('/produits/'.$p->id) }}" class="h-20 w-28 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
                             @if(($it['image'] ?? '') !== '')
                                 <img src="{{ $it['image'] }}" alt="" class="w-full h-full object-cover">
                             @else
@@ -54,7 +62,7 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0">
-                                    <a href="{{ url('/produits/'.$p->id) }}" class="font-extrabold hover:underline block truncate">
+                                    <a href="{{ $productBaseUrl ? str_replace('__PRODUCT__', (string) $p->id, $productBaseUrl) : url('/produits/'.$p->id) }}" class="font-extrabold hover:underline block truncate">
                                         {{ $p->designation }}
                                     </a>
                                     <div class="mt-1 text-sm text-slate-600">Ref: {{ $p->reference }}</div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Fournisseur;
 use App\Http\Controllers\Controller;
 use App\Models\Cmd1;
 use App\Models\Client;
+use App\Models\Fournisseur;
 use App\Models\Produit;
 use App\Models\VisitDaily;
 use App\Models\VisitPlan;
@@ -16,6 +17,7 @@ class DashboardController extends Controller
     public function index(): View
     {
         $frsId = (int) session('frs_id');
+        $frs = Fournisseur::query()->findOrFail($frsId);
 
         $cmdEnAttente = Cmd1::query()
             ->where('id_frs', $frsId)
@@ -96,6 +98,7 @@ class DashboardController extends Controller
 
         return view('fournisseur.dashboard', [
             'title' => 'Mon Dashboard',
+            'storefront_url' => $frs->storefront_url,
             'cmd_en_attente' => $cmdEnAttente,
             'cmd_du_jour' => $cmdDuJour,
             'clients_abonnes' => $clientsAbonnes,

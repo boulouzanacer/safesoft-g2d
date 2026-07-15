@@ -1,14 +1,20 @@
 @extends('store.layout')
 
 @section('content')
+@php
+    $isStorefrontMode = (bool) ($storefront_mode ?? false);
+    $boutiquePageUrl = $boutique_page_url ?? ($isStorefrontMode ? ($boutique->storefront_url ?? url('/boutiques/'.$boutique->id)) : url('/boutiques/'.$boutique->id));
+@endphp
 <div class="space-y-6">
     <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-4 sm:p-6">
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
-                <a href="{{ url('/') }}" class="text-sm text-slate-500 hover:text-slate-900">
-                    <i class="fa-solid fa-arrow-left-long mr-2"></i>
-                    Retour au store
-                </a>
+                @unless($isStorefrontMode)
+                    <a href="{{ url('/') }}" class="text-sm text-slate-500 hover:text-slate-900">
+                        <i class="fa-solid fa-arrow-left-long mr-2"></i>
+                        Retour au store
+                    </a>
+                @endunless
                 <div class="mt-3 flex items-start gap-4">
                     @if(($boutique->logo_url ?? '') !== '')
                         <img src="{{ $boutique->logo_url }}"
@@ -51,7 +57,7 @@
             </div>
         </div>
 
-        <form method="GET" action="{{ url('/boutiques/'.$boutique->id) }}" class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <form method="GET" action="{{ $boutiquePageUrl }}" class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-3">
             <div class="lg:col-span-2">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -74,12 +80,12 @@
 
         @if(($categories ?? collect())->count() > 0)
             <div class="mt-4 flex flex-wrap gap-2">
-                <a href="{{ url('/boutiques/'.$boutique->id).'?'.http_build_query(array_filter(['q' => $q])) }}"
+                <a href="{{ $boutiquePageUrl.'?'.http_build_query(array_filter(['q' => $q])) }}"
                    class="rounded-full px-3 py-1 text-xs font-bold border {{ $selected_categorie === '' ? 'border-[var(--store-primary)] bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     Toutes catégories
                 </a>
                 @foreach($categories as $category)
-                    <a href="{{ url('/boutiques/'.$boutique->id).'?'.http_build_query(array_filter(['q' => $q, 'categorie' => $category])) }}"
+                    <a href="{{ $boutiquePageUrl.'?'.http_build_query(array_filter(['q' => $q, 'categorie' => $category])) }}"
                        class="rounded-full px-3 py-1 text-xs font-bold border {{ (string) $selected_categorie === (string) $category ? 'border-[var(--store-primary)] bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                         {{ $category }}
                     </a>
@@ -107,7 +113,7 @@
                     }
                 @endphp
                 <div class="rounded-xl sm:rounded-2xl border border-slate-200 bg-[var(--store-card)] overflow-hidden">
-                    <a href="{{ url('/produits/'.$p->id) }}" class="block">
+                    <a href="{{ $isStorefrontMode ? route('storefront.produit', ['slug' => $boutique->storefront_slug, 'id' => $p->id]) : url('/produits/'.$p->id) }}" class="block">
                         <div class="aspect-square sm:aspect-[4/3] bg-slate-100">
                             @if($img !== '')
                                 <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
@@ -121,7 +127,7 @@
                     <div class="p-2 sm:p-3">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <a href="{{ url('/produits/'.$p->id) }}" class="block font-extrabold text-[13px] sm:text-sm leading-snug hover:underline truncate">
+                                <a href="{{ $isStorefrontMode ? route('storefront.produit', ['slug' => $boutique->storefront_slug, 'id' => $p->id]) : url('/produits/'.$p->id) }}" class="block font-extrabold text-[13px] sm:text-sm leading-snug hover:underline truncate">
                                     {{ $p->designation }}
                                 </a>
                                 <div class="mt-1 text-xs text-slate-500">Ref: {{ $p->reference }}</div>

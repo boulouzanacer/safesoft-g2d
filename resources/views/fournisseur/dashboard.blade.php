@@ -94,6 +94,29 @@
     </div>
 </div>
 
+<div class="mt-4 rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)]">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <div class="font-extrabold tracking-wide">Lien spécial de ma boutique</div>
+            <div class="mt-1 text-sm text-white/60">Ce lien affiche uniquement les produits de votre boutique, sans renvoyer le visiteur vers la plateforme globale.</div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+            <input type="text"
+                   id="storefrontLinkInput"
+                   value="{{ $storefront_url }}"
+                   readonly
+                   class="min-w-0 w-full lg:w-[420px] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none">
+            <button type="button"
+                    id="copyStorefrontLinkButton"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white"
+                    style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                <i class="fa-regular fa-copy"></i>
+                Copier le lien
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
     <div class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)] xl:col-span-2">
         <div class="flex items-center justify-between gap-3 mb-4">
@@ -213,4 +236,31 @@
         </div>
     </div>
 </div>
+
+<script>
+    (() => {
+        const button = document.getElementById('copyStorefrontLinkButton');
+        const input = document.getElementById('storefrontLinkInput');
+        if (!button || !input) return;
+
+        button.addEventListener('click', async () => {
+            const value = input.value || '';
+            if (value === '') return;
+
+            try {
+                await navigator.clipboard.writeText(value);
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Lien copié';
+            } catch (_) {
+                input.focus();
+                input.select();
+                document.execCommand('copy');
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Lien copié';
+            }
+
+            window.setTimeout(() => {
+                button.innerHTML = '<i class="fa-regular fa-copy"></i> Copier le lien';
+            }, 1800);
+        });
+    })();
+</script>
 @endsection

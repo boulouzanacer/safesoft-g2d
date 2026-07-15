@@ -26,6 +26,8 @@ Route::get('/boutiques', [StoreController::class, 'boutiques']);
 Route::get('/boutiques/{id}', [StoreController::class, 'boutique']);
 Route::get('/produits', [StoreController::class, 'produits']);
 Route::get('/produits/{id}', [StoreController::class, 'produit']);
+Route::get('/s/{slug}', [StoreController::class, 'storefrontBoutique'])->name('storefront.boutique');
+Route::get('/s/{slug}/produits/{id}', [StoreController::class, 'storefrontProduit'])->name('storefront.produit');
 
 Route::get('/login', [ClientAuthController::class, 'showLogin']);
 Route::post('/login', [ClientAuthController::class, 'login']);

@@ -28,20 +28,24 @@
 </head>
 <body class="min-h-screen bg-[var(--store-bg)] text-slate-900">
 @php($cartCount = is_array(session('cart')) ? count(session('cart')) : 0)
+@php($isStorefrontMode = (bool) ($storefront_mode ?? false))
+@php($storefrontHomeUrl = trim((string) ($storefront_home_url ?? '')))
+@php($logoHref = ($isStorefrontMode && $storefrontHomeUrl !== '') ? $storefrontHomeUrl : url('/'))
 <div class="min-h-screen flex flex-col">
     <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-            <a href="{{ url('/') }}" class="flex items-center gap-3">
+            <a href="{{ $logoHref }}" class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
                      style="background: linear-gradient(135deg, var(--store-primary), #0A3D7A);">
                     G2D
                 </div>
                 <div class="leading-tight">
                     <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
-                    <div class="text-xs text-slate-500">Store</div>
+                    <div class="text-xs text-slate-500">{{ $isStorefrontMode ? (($storefront_boutique->nom_frs ?? 'Boutique') ?: 'Boutique') : 'Store' }}</div>
                 </div>
             </a>
 
+            @unless($isStorefrontMode)
             <nav class="hidden lg:flex items-center gap-2">
                 <a href="{{ url('/boutiques') }}"
                    class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
@@ -54,6 +58,7 @@
                     <span>Produits</span>
                 </a>
             </nav>
+            @endunless
 
             <div class="flex items-center gap-2">
                 <a href="{{ url('/panier') }}"
@@ -66,17 +71,19 @@
                 </a>
 
                 @if(($client ?? null))
-                    <a href="{{ url('/profil') }}"
-                       class="inline-flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 bg-white hover:bg-slate-50"
-                       title="Mon profil"
-                       aria-label="Mon profil">
-                        <i class="fa-solid fa-user-circle text-lg text-[var(--store-primary)]"></i>
-                    </a>
-                    <a href="{{ url('/mes-commandes') }}"
-                       class="hidden sm:inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
-                        <i class="fa-solid fa-receipt text-[var(--store-primary)]"></i>
-                        <span>Mes commandes</span>
-                    </a>
+                    @unless($isStorefrontMode)
+                        <a href="{{ url('/profil') }}"
+                           class="inline-flex items-center justify-center h-11 w-11 rounded-xl border border-slate-200 bg-white hover:bg-slate-50"
+                           title="Mon profil"
+                           aria-label="Mon profil">
+                            <i class="fa-solid fa-user-circle text-lg text-[var(--store-primary)]"></i>
+                        </a>
+                        <a href="{{ url('/mes-commandes') }}"
+                           class="hidden sm:inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50">
+                            <i class="fa-solid fa-receipt text-[var(--store-primary)]"></i>
+                            <span>Mes commandes</span>
+                        </a>
+                    @endunless
                     <form method="POST" action="{{ url('/logout') }}">
                         @csrf
                         <button type="submit"

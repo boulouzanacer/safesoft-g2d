@@ -1,15 +1,20 @@
 @extends('store.layout')
 
 @section('content')
+@php
+    $storeReturnUrl = (bool) ($storefront_mode ?? false)
+        ? ($storefront_home_url ?: url('/'))
+        : url('/');
+@endphp
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
             <div class="text-2xl font-extrabold tracking-wide">Mes commandes</div>
             <div class="mt-1 text-sm text-slate-600">Historique des commandes</div>
         </div>
-        <a href="{{ url('/') }}" class="text-sm text-slate-500 hover:text-slate-900">
+        <a href="{{ $storeReturnUrl }}" class="text-sm text-slate-500 hover:text-slate-900">
             <i class="fa-solid fa-store mr-2"></i>
-            Retour store
+            {{ (bool) ($storefront_mode ?? false) ? 'Retour boutique' : 'Retour store' }}
         </a>
     </div>
 

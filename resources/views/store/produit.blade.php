@@ -1,9 +1,12 @@
 @extends('store.layout')
 
 @section('content')
+@php
+    $backBoutiqueUrl = $back_boutique_url ?? url('/boutiques/'.$produit->id_frs);
+@endphp
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <a href="{{ url('/boutiques/'.$produit->id_frs) }}" class="text-sm text-slate-500 hover:text-slate-900">
+        <a href="{{ $backBoutiqueUrl }}" class="text-sm text-slate-500 hover:text-slate-900">
             <i class="fa-solid fa-arrow-left-long mr-2"></i>
             Retour boutique
         </a>
@@ -119,17 +122,23 @@
     </div>
 </div>
 
+<div class="hidden js-store-produit-config"
+     data-tier-enabled="{{ $tierEnabled ? '1' : '0' }}"
+     data-tiers="{{ e(json_encode($tiers)) }}"
+     data-initial-unit="{{ $initialUnit }}"></div>
+
 <script>
     (function () {
         const qtyInput = document.getElementById('qtyInput');
         const unitEl = document.getElementById('unitPrice');
         const totalEl = document.getElementById('totalPrice');
+        const configElement = document.querySelector('.js-store-produit-config');
 
-        if (!qtyInput || !unitEl || !totalEl) return;
+        if (!qtyInput || !unitEl || !totalEl || !configElement) return;
 
-        const enableTier = @json($tierEnabled);
-        const tiers = @json($tiers);
-        const baseUnit = Number(@json($initialUnit));
+        const enableTier = configElement.dataset.tierEnabled === '1';
+        const tiers = JSON.parse(configElement.dataset.tiers || '[]');
+        const baseUnit = Number(configElement.dataset.initialUnit || 0);
 
         function matchTier(qty) {
             if (!enableTier) return null;

@@ -1,9 +1,12 @@
 @php
     $boutique = $boutique ?? null;
+    $boutiqueUrl = ($boutique && ($boutique->storefront_url ?? '') !== '')
+        ? $boutique->storefront_url
+        : ($boutique ? url('/boutiques/'.$boutique->id) : '#');
 @endphp
 
 @if($boutique)
-    <a href="{{ url('/boutiques/'.$boutique->id) }}"
+    <a href="{{ $boutiqueUrl }}"
        class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-5 hover:bg-slate-50 transition">
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
