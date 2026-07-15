@@ -79,7 +79,7 @@
                     @forelse($api_keys as $apiKey)
                         <tr class="hover:bg-white/5">
                             <td class="py-3 px-4">
-                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold border {{ $apiKey->type === \App\Models\ApiKey::TYPE_CREATE_FOURNISSEUR ? 'bg-sky-500/15 text-sky-200 border-sky-400/20' : 'bg-violet-500/15 text-violet-200 border-violet-400/20' }}">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold border {{ $apiKey->type === $create_fournisseur_type ? 'bg-sky-500/15 text-sky-200 border-sky-400/20' : 'bg-violet-500/15 text-violet-200 border-violet-400/20' }}">
                                     {{ $apiKey->type_label }}
                                 </span>
                             </td>

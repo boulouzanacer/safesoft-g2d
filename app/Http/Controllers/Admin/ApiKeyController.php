@@ -35,6 +35,7 @@ class ApiKeyController extends Controller
             'create_open' => $createOpen,
             'api_keys' => $apiKeys,
             'type_options' => ApiKey::typeOptions(),
+            'create_fournisseur_type' => ApiKey::TYPE_CREATE_FOURNISSEUR,
         ]);
     }
 

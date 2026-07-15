@@ -71,7 +71,7 @@
 </head>
 <body class="min-h-screen text-slate-100"
       :class="dark ? 'bg-[var(--frs-bg)]' : 'bg-slate-100 text-slate-900'">
-@php($frs = \App\Models\Fournisseur::find(session('frs_id')))
+@php($frs = $current_fournisseur ?? null)
 <div class="flex min-h-screen">
     <aside class="fixed inset-y-0 left-0 w-[240px] border-r bg-[var(--frs-bg)]"
            :class="dark ? 'border-white/10' : 'border-slate-200'">

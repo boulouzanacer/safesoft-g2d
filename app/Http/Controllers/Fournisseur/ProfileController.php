@@ -32,6 +32,7 @@ class ProfileController extends Controller
             'wilayas' => $wilayas,
             'communes' => $communes,
             'storefront_theme_options' => Fournisseur::storefrontThemeOptions(),
+            'default_storefront_theme' => Fournisseur::DEFAULT_STOREFRONT_THEME,
         ]);
     }
 
@@ -146,7 +147,7 @@ class ProfileController extends Controller
     public function makeCustomDomainPrimary(int $id): RedirectResponse
     {
         $frsId = (int) session('frs_id');
-        $domain = CustomDomain::query()
+        $domain = \App\Models\CustomDomain::query()
             ->where('fournisseur_id', $frsId)
             ->findOrFail($id);
 

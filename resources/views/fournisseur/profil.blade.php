@@ -3,7 +3,7 @@
 @section('content')
 @php
     $selectedTheme = old('storefront_theme', $frs->storefrontThemeKey());
-    $themeOptions = $storefront_theme_options ?? \App\Models\Fournisseur::storefrontThemeOptions();
+    $themeOptions = $storefront_theme_options ?? [];
 @endphp
 <div class="max-w-4xl space-y-4">
     @if(session('success'))

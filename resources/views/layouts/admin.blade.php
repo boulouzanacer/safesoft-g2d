@@ -71,7 +71,7 @@
 </head>
 <body class="min-h-screen text-slate-100"
       :class="dark ? 'bg-[var(--admin-bg)]' : 'bg-slate-100 text-slate-900'">
-@php($admin = \App\Models\Admin::find(session('admin_id')))
+@php($admin = $current_admin ?? null)
 <div class="flex min-h-screen">
     <aside class="fixed inset-y-0 left-0 w-[260px] border-r bg-[var(--admin-bg)]"
            :class="dark ? 'border-white/10' : 'border-slate-200'">

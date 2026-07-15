@@ -1,12 +1,3 @@
-@php
-    $themeConfig = $storefront_theme_config ?? \App\Models\Fournisseur::storefrontThemeOptions()[\App\Models\Fournisseur::DEFAULT_STOREFRONT_THEME];
-    $themeVars = $themeConfig['vars'] ?? [];
-    $themeInlineStyle = '';
-
-    foreach ($themeVars as $varName => $varValue) {
-        $themeInlineStyle .= $varName.':'.$varValue.';';
-    }
-@endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -28,28 +19,28 @@
 
     <style>
         :root{
-            --store-primary:#1E6FD9;
-            --store-primary-dark:#0A3D7A;
-            --store-bg:#F8FAFC;
-            --store-card:#FFFFFF;
-            --store-card-soft:#EFF6FF;
-            --store-text:#0F172A;
-            --store-muted:#475569;
-            --store-border:#CBD5E1;
-            --store-accent:#DBEAFE;
-            --store-accent-text:#1D4ED8;
-            --store-hero-from:#1E6FD9;
-            --store-hero-to:#0EA5E9;
-            --store-button-text:#FFFFFF;
-            --store-shadow:0 22px 45px rgba(30, 111, 217, 0.14);
-            --store-radius-xl:1rem;
-            --store-radius-2xl:1.5rem;
+            --store-primary:{{ data_get($storefront_theme_config, 'vars.--store-primary', '#1D4ED8') }};
+            --store-primary-dark:{{ data_get($storefront_theme_config, 'vars.--store-primary-dark', '#1E3A8A') }};
+            --store-bg:{{ data_get($storefront_theme_config, 'vars.--store-bg', '#F4F8FF') }};
+            --store-card:{{ data_get($storefront_theme_config, 'vars.--store-card', '#FFFFFF') }};
+            --store-card-soft:{{ data_get($storefront_theme_config, 'vars.--store-card-soft', '#EFF6FF') }};
+            --store-text:{{ data_get($storefront_theme_config, 'vars.--store-text', '#0F172A') }};
+            --store-muted:{{ data_get($storefront_theme_config, 'vars.--store-muted', '#475569') }};
+            --store-border:{{ data_get($storefront_theme_config, 'vars.--store-border', '#CBD5E1') }};
+            --store-accent:{{ data_get($storefront_theme_config, 'vars.--store-accent', '#DBEAFE') }};
+            --store-accent-text:{{ data_get($storefront_theme_config, 'vars.--store-accent-text', '#1D4ED8') }};
+            --store-hero-from:{{ data_get($storefront_theme_config, 'vars.--store-hero-from', '#1D4ED8') }};
+            --store-hero-to:{{ data_get($storefront_theme_config, 'vars.--store-hero-to', '#0EA5E9') }};
+            --store-button-text:{{ data_get($storefront_theme_config, 'vars.--store-button-text', '#FFFFFF') }};
+            --store-shadow:{{ data_get($storefront_theme_config, 'vars.--store-shadow', '0 22px 45px rgba(37, 99, 235, 0.15)') }};
+            --store-radius-xl:{{ data_get($storefront_theme_config, 'vars.--store-radius-xl', '1rem') }};
+            --store-radius-2xl:{{ data_get($storefront_theme_config, 'vars.--store-radius-2xl', '1.5rem') }};
         }
         html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
         body{
             background:
-                radial-gradient(circle at top left, color-mix(in srgb, var(--store-primary) 10%, transparent), transparent 32%),
-                radial-gradient(circle at top right, color-mix(in srgb, var(--store-hero-to) 14%, transparent), transparent 26%),
+                radial-gradient(circle at top left, rgba(255,255,255,.55), transparent 32%),
+                radial-gradient(circle at top right, rgba(255,255,255,.35), transparent 26%),
                 var(--store-bg);
             color:var(--store-text);
         }
@@ -66,7 +57,7 @@
         }
         .store-soft{
             background:var(--store-card-soft);
-            border:1px solid color-mix(in srgb, var(--store-border) 75%, white);
+            border:1px solid var(--store-border);
             border-radius:var(--store-radius-xl);
         }
         .store-input{
@@ -81,7 +72,7 @@
         .store-input:focus{
             outline:none;
             border-color:var(--store-primary);
-            box-shadow:0 0 0 3px color-mix(in srgb, var(--store-primary) 14%, white);
+            box-shadow:0 0 0 3px rgba(37, 99, 235, 0.14);
         }
         .store-link{
             color:var(--store-primary);
@@ -89,7 +80,7 @@
         .store-badge{
             background:var(--store-accent);
             color:var(--store-accent-text);
-            border:1px solid color-mix(in srgb, var(--store-primary) 18%, white);
+            border:1px solid var(--store-border);
         }
         .store-muted{
             color:var(--store-muted);
@@ -97,12 +88,12 @@
         .store-button-primary{
             color:var(--store-button-text);
             background:linear-gradient(135deg, var(--store-primary), var(--store-hero-to));
-            box-shadow:0 16px 32px color-mix(in srgb, var(--store-primary) 22%, transparent);
+            box-shadow:0 16px 32px rgba(37, 99, 235, 0.18);
         }
         .store-topbar,
         .store-footer{
-            border-color:color-mix(in srgb, var(--store-border) 85%, white);
-            background:color-mix(in srgb, var(--store-card) 88%, white);
+            border-color:var(--store-border);
+            background:rgba(255,255,255,.88);
         }
         .store-chip-active{
             border-color:var(--store-primary);
@@ -111,7 +102,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen" style="{{ $themeInlineStyle }}">
+<body class="min-h-screen">
 @php($cartCount = is_array(session('cart')) ? count(session('cart')) : 0)
 @php($isStorefrontMode = (bool) ($storefront_mode ?? false))
 @php($storefrontHomeUrl = trim((string) ($storefront_home_url ?? '')))

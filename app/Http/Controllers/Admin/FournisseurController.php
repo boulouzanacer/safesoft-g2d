@@ -72,6 +72,8 @@ class FournisseurController extends Controller
             'fournisseurs' => $fournisseurs,
             'boutique_categories' => BoutiqueCategory::query()->orderBy('name')->get(),
             'wilayas' => Wilaya::query()->orderBy('ID_WILAYA')->get(),
+            'storefront_theme_options' => Fournisseur::storefrontThemeOptions(),
+            'default_storefront_theme' => Fournisseur::DEFAULT_STOREFRONT_THEME,
             'create_open' => $createOpen,
             'editing_fournisseur' => $editingFournisseur,
             'edit_communes' => $editCommunes,

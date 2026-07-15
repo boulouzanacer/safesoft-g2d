@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-@php($admin = \App\Models\Admin::find(session('admin_id')))
+@php($admin = $current_admin ?? null)
 <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
     <div class="text-2xl font-extrabold tracking-wide">Profil</div>
 
@@ -21,4 +21,3 @@
     </div>
 </div>
 @endsection
-

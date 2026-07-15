@@ -1,6 +1,6 @@
 @php
     $themeOptions = $themeOptions ?? [];
-    $selectedTheme = $selectedTheme ?? \App\Models\Fournisseur::DEFAULT_STOREFRONT_THEME;
+    $selectedTheme = $selectedTheme ?? 'azure_modern';
     $inputName = $inputName ?? 'storefront_theme';
     $inputIdPrefix = $inputIdPrefix ?? 'storefront-theme';
     $surfaceClass = $surfaceClass ?? 'bg-black/20 border-white/10';

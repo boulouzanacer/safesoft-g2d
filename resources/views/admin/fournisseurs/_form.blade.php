@@ -5,8 +5,9 @@
     $communeSelectId = $formPrefix.'_communeSelect';
     $selectedCommuneId = (int) old('id_commune', $frs?->id_commune ?? 0);
     $primaryCustomDomain = old('primary_custom_domain', $frs?->customDomains?->firstWhere('is_primary', true)?->domain ?? '');
-    $selectedTheme = old('storefront_theme', $frs?->storefrontThemeKey() ?? \App\Models\Fournisseur::DEFAULT_STOREFRONT_THEME);
-    $themeOptions = \App\Models\Fournisseur::storefrontThemeOptions();
+    $defaultStorefrontTheme = $default_storefront_theme ?? 'azure_modern';
+    $selectedTheme = old('storefront_theme', $frs?->storefrontThemeKey() ?? $defaultStorefrontTheme);
+    $themeOptions = $storefront_theme_options ?? [];
 @endphp
 
 @csrf
