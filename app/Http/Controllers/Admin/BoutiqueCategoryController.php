@@ -16,18 +16,8 @@ class BoutiqueCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150', Rule::unique('boutique_categories', 'name')],
-            'image' => ['bail', 'required', 'file', 'image', 'max:4096'],
-        ], [
-            'image.required' => 'L\'image est obligatoire pour créer une catégorie boutique.',
-            'image.file' => 'Le fichier image est invalide.',
-            'image.image' => 'Le fichier sélectionné doit être une image valide.',
+            'image' => ['nullable', 'image', 'max:4096'],
         ]);
-
-        if (! $request->hasFile('image')) {
-            return back()
-                ->withErrors(['image' => 'L\'image est obligatoire pour créer une catégorie boutique.'])
-                ->withInput();
-        }
 
         $category = BoutiqueCategory::query()->create([
             'name' => trim($validated['name']),
