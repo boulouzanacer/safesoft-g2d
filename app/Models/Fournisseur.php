@@ -185,6 +185,11 @@ class Fournisseur extends Authenticatable
         return $this->belongsTo(BoutiqueCategory::class, 'boutique_category_id', 'id');
     }
 
+    public function customDomains(): HasMany
+    {
+        return $this->hasMany(CustomDomain::class, 'fournisseur_id', 'id');
+    }
+
     public function prevendeurs(): HasMany
     {
         return $this->hasMany(Prevendeur::class, 'id_frs', 'id');

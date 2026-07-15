@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Fournisseur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Commune;
+use App\Models\CustomDomain;
 use App\Models\Fournisseur;
 use App\Models\Wilaya;
 use Illuminate\Contracts\View\View;
@@ -18,7 +19,9 @@ class ProfileController extends Controller
 {
     public function edit(): View
     {
-        $frs = Fournisseur::query()->findOrFail((int) session('frs_id'));
+        $frs = Fournisseur::query()
+            ->with(['customDomains' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('domain')])
+            ->findOrFail((int) session('frs_id'));
 
         $wilayas = Wilaya::query()->orderBy('ID_WILAYA')->get();
         $communes = Commune::query()
@@ -108,6 +111,81 @@ class ProfileController extends Controller
         return back()->with('success', 'Mot de passe mis à jour.');
     }
 
+    public function storeCustomDomain(Request $request): RedirectResponse
+    {
+        $frs = Fournisseur::query()->findOrFail((int) session('frs_id'));
+        $normalizedDomain = $this->normalizeDomain((string) $request->input('domain', ''));
+
+        if (! $this->isValidDomain($normalizedDomain)) {
+            return back()->withErrors([
+                'domain' => 'Le domaine saisi est invalide. Exemple: www.boutika.com',
+            ])->withInput();
+        }
+
+        $exists = CustomDomain::query()
+            ->where('domain', $normalizedDomain)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors([
+                'domain' => 'Ce domaine est deja utilise par une autre boutique.',
+            ])->withInput();
+        }
+
+        $hasPrimary = $frs->customDomains()->where('is_primary', 1)->exists();
+
+        $frs->customDomains()->create([
+            'domain' => $normalizedDomain,
+            'is_primary' => ! $hasPrimary,
+            'is_active' => 1,
+        ]);
+
+        return back()->with('success', 'Domaine personnalisé ajouté.');
+    }
+
+    public function makeCustomDomainPrimary(int $id): RedirectResponse
+    {
+        $frsId = (int) session('frs_id');
+        $domain = CustomDomain::query()
+            ->where('fournisseur_id', $frsId)
+            ->findOrFail($id);
+
+        CustomDomain::query()
+            ->where('fournisseur_id', $frsId)
+            ->update(['is_primary' => 0]);
+
+        $domain->forceFill([
+            'is_primary' => 1,
+            'is_active' => 1,
+        ])->save();
+
+        return back()->with('success', 'Domaine principal mis à jour.');
+    }
+
+    public function destroyCustomDomain(int $id): RedirectResponse
+    {
+        $frsId = (int) session('frs_id');
+        $domain = CustomDomain::query()
+            ->where('fournisseur_id', $frsId)
+            ->findOrFail($id);
+
+        $wasPrimary = (bool) $domain->is_primary;
+        $domain->delete();
+
+        if ($wasPrimary) {
+            $replacement = CustomDomain::query()
+                ->where('fournisseur_id', $frsId)
+                ->orderBy('domain')
+                ->first();
+
+            if ($replacement) {
+                $replacement->forceFill(['is_primary' => 1])->save();
+            }
+        }
+
+        return back()->with('success', 'Domaine personnalisé supprimé.');
+    }
+
     public function communes(int $idWilaya): JsonResponse
     {
         $rows = DB::table('commune')
@@ -116,5 +194,32 @@ class ProfileController extends Controller
             ->get(['ID_COMMUNE', 'COMMUNE']);
 
         return response()->json($rows);
+    }
+
+    private function normalizeDomain(string $value): string
+    {
+        $normalized = mb_strtolower(trim($value));
+
+        if ($normalized === '') {
+            return '';
+        }
+
+        if (str_starts_with($normalized, 'http://') || str_starts_with($normalized, 'https://')) {
+            $normalized = (string) parse_url($normalized, PHP_URL_HOST);
+        }
+
+        $normalized = trim($normalized, "/ \t\n\r\0\x0B.");
+        $normalized = preg_replace('/\/.*$/', '', $normalized) ?? $normalized;
+
+        return mb_strtolower(trim((string) $normalized));
+    }
+
+    private function isValidDomain(string $domain): bool
+    {
+        if ($domain === '') {
+            return false;
+        }
+
+        return (bool) preg_match('/^(?=.{4,190}$)(?!-)(?:[a-z0-9-]{1,63}\.)+[a-z]{2,63}$/i', $domain);
     }
 }

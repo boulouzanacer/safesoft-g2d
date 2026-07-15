@@ -5,9 +5,13 @@
     $continueUrl = (bool) ($storefront_mode ?? false)
         ? ($storefront_home_url ?: url('/'))
         : url('/');
-    $productBaseUrl = ((bool) ($storefront_mode ?? false) && ($storefront_boutique?->storefront_slug ?? '') !== '')
-        ? route('storefront.produit', ['slug' => $storefront_boutique->storefront_slug, 'id' => '__PRODUCT__'])
-        : null;
+    $productBaseUrl = null;
+
+    if ((bool) ($storefront_mode ?? false) && (bool) ($custom_domain_mode ?? false)) {
+        $productBaseUrl = url('/produits/__PRODUCT__');
+    } elseif ((bool) ($storefront_mode ?? false) && ($storefront_boutique?->storefront_slug ?? '') !== '') {
+        $productBaseUrl = route('storefront.produit', ['slug' => $storefront_boutique->storefront_slug, 'id' => '__PRODUCT__']);
+    }
 @endphp
 <div class="space-y-6">
     <div class="flex items-center justify-between">

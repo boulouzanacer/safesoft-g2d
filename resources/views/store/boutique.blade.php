@@ -3,6 +3,7 @@
 @section('content')
 @php
     $isStorefrontMode = (bool) ($storefront_mode ?? false);
+    $isCustomDomainMode = (bool) ($custom_domain_mode ?? false);
     $boutiquePageUrl = $boutique_page_url ?? ($isStorefrontMode ? ($boutique->storefront_url ?? url('/boutiques/'.$boutique->id)) : url('/boutiques/'.$boutique->id));
 @endphp
 <div class="space-y-6">
@@ -113,7 +114,7 @@
                     }
                 @endphp
                 <div class="rounded-xl sm:rounded-2xl border border-slate-200 bg-[var(--store-card)] overflow-hidden">
-                    <a href="{{ $isStorefrontMode ? route('storefront.produit', ['slug' => $boutique->storefront_slug, 'id' => $p->id]) : url('/produits/'.$p->id) }}" class="block">
+                    <a href="{{ $isStorefrontMode ? ($isCustomDomainMode ? url('/produits/'.$p->id) : route('storefront.produit', ['slug' => $boutique->storefront_slug, 'id' => $p->id])) : url('/produits/'.$p->id) }}" class="block">
                         <div class="aspect-square sm:aspect-[4/3] bg-slate-100">
                             @if($img !== '')
                                 <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
@@ -127,7 +128,7 @@
                     <div class="p-2 sm:p-3">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <a href="{{ $isStorefrontMode ? route('storefront.produit', ['slug' => $boutique->storefront_slug, 'id' => $p->id]) : url('/produits/'.$p->id) }}" class="block font-extrabold text-[13px] sm:text-sm leading-snug hover:underline truncate">
+                                <a href="{{ $isStorefrontMode ? ($isCustomDomainMode ? url('/produits/'.$p->id) : route('storefront.produit', ['slug' => $boutique->storefront_slug, 'id' => $p->id])) : url('/produits/'.$p->id) }}" class="block font-extrabold text-[13px] sm:text-sm leading-snug hover:underline truncate">
                                     {{ $p->designation }}
                                 </a>
                                 <div class="mt-1 text-xs text-slate-500">Ref: {{ $p->reference }}</div>

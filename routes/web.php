@@ -145,6 +145,9 @@ Route::prefix('fournisseur')->middleware('auth.fournisseur')->group(function () 
     Route::get('/profil', [FrsProfileController::class, 'edit']);
     Route::put('/profil', [FrsProfileController::class, 'update']);
     Route::put('/profil/password', [FrsProfileController::class, 'updatePassword']);
+    Route::post('/profil/custom-domains', [FrsProfileController::class, 'storeCustomDomain']);
+    Route::post('/profil/custom-domains/{id}/primary', [FrsProfileController::class, 'makeCustomDomainPrimary']);
+    Route::delete('/profil/custom-domains/{id}', [FrsProfileController::class, 'destroyCustomDomain']);
 
     Route::get('/wilayas/{idWilaya}/communes', [FrsProfileController::class, 'communes']);
 });

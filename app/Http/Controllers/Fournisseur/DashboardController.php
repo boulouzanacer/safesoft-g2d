@@ -17,7 +17,11 @@ class DashboardController extends Controller
     public function index(): View
     {
         $frsId = (int) session('frs_id');
-        $frs = Fournisseur::query()->findOrFail($frsId);
+        $frs = Fournisseur::query()
+            ->with(['customDomains' => fn ($query) => $query->where('is_primary', 1)->orderByDesc('is_primary')])
+            ->findOrFail($frsId);
+
+        $primaryCustomDomain = $frs->customDomains->first();
 
         $cmdEnAttente = Cmd1::query()
             ->where('id_frs', $frsId)
@@ -99,6 +103,7 @@ class DashboardController extends Controller
         return view('fournisseur.dashboard', [
             'title' => 'Mon Dashboard',
             'storefront_url' => $frs->storefront_url,
+            'primary_custom_domain' => $primaryCustomDomain?->domain,
             'cmd_en_attente' => $cmdEnAttente,
             'cmd_du_jour' => $cmdDuJour,
             'clients_abonnes' => $clientsAbonnes,

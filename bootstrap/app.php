@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\ResolveStorefrontDomain::class,
+        ]);
+
         $middleware->appendToGroup('api', [
             \Illuminate\Http\Middleware\HandleCors::class,
             \App\Http\Middleware\SanitizeInput::class,

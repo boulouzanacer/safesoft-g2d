@@ -99,6 +99,16 @@
         <div>
             <div class="font-extrabold tracking-wide">Lien spécial de ma boutique</div>
             <div class="mt-1 text-sm text-white/60">Ce lien affiche uniquement les produits de votre boutique, sans renvoyer le visiteur vers la plateforme globale.</div>
+            @if(! empty($primary_custom_domain))
+                <div class="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-200">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>Domaine principal : {{ $primary_custom_domain }}</span>
+                </div>
+            @else
+                <div class="mt-3 text-xs text-white/50">
+                    Tu peux aussi brancher un domaine personnalisé depuis <a href="{{ url('/fournisseur/profil') }}" class="font-bold text-[var(--frs-primary)] hover:opacity-90">Mon Profil</a>.
+                </div>
+            @endif
         </div>
         <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             <input type="text"
