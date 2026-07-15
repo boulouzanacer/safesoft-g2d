@@ -364,7 +364,7 @@
                                    accept="image/*"
                                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none file:mr-4 file:rounded-xl file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-white hover:file:bg-white/20"
                                    @change="previewCategoryImage($event, 'edit')">
-                            <div class="mt-1 text-xs text-white/50">Image obligatoire si la catégorie n'en a pas encore. Sinon tu peux la remplacer ici.</div>
+                            <div class="mt-1 text-xs text-white/50">Optionnel en modification. Tu peux changer uniquement le nom ou remplacer l'image ici.</div>
                         </div>
                     </div>
                 </div>

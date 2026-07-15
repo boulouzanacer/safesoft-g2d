@@ -39,7 +39,7 @@ class BoutiqueCategoryController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150', Rule::unique('boutique_categories', 'name')->ignore($category->id)],
-            'image' => [empty($category->image_path) ? 'required' : 'nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'image', 'max:4096'],
         ]);
 
         $name = trim($validated['name']);
