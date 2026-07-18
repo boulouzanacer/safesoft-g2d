@@ -1,10 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
+@php($platformBranding = $platform_branding ?? [])
+@php($platformLogoUrl = trim((string) ($platformBranding['logo_url'] ?? '')))
 <div class="min-h-screen flex items-center justify-center px-4"
      style="background: linear-gradient(135deg, #1A1A2E 0%, #0A3D7A 100%);">
     <div class="w-full max-w-md">
         <div class="text-center mb-6 text-white">
+            @if($platformLogoUrl !== '')
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-2xl">
+                    <img src="{{ $platformLogoUrl }}"
+                         alt="{{ config('branding.platform_name') }}"
+                         class="max-h-full max-w-full object-contain">
+                </div>
+            @endif
             <div class="text-3xl font-extrabold tracking-wide">{{ config('branding.platform_name') }}</div>
             <div class="text-sm opacity-90 mt-1">Espace Boutique</div>
         </div>

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ApiKeyController;
 use App\Http\Controllers\Admin\BoutiqueCategoryController;
+use App\Http\Controllers\Admin\PlatformSettingsController;
 use App\Http\Controllers\Auth\ClientAuthController;
 use App\Http\Controllers\Auth\FrsAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -100,9 +101,8 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
         return view('admin.api-docs', ['title' => 'API Doc']);
     });
 
-    Route::get('/parametres', function () {
-        return view('admin.parametres', ['title' => 'Paramètres']);
-    });
+    Route::get('/parametres', [PlatformSettingsController::class, 'edit']);
+    Route::post('/parametres/logo', [PlatformSettingsController::class, 'update']);
 
     Route::get('/profil', function () {
         return view('admin.profil', ['title' => 'Profil']);

@@ -72,15 +72,25 @@
 <body class="min-h-screen text-slate-100"
       :class="dark ? 'bg-[var(--frs-bg)]' : 'bg-slate-100 text-slate-900'">
 @php($frs = $current_fournisseur ?? null)
+@php($platformBranding = $platform_branding ?? [])
+@php($platformLogoUrl = trim((string) ($platformBranding['logo_url'] ?? '')))
 <div class="flex min-h-screen">
     <aside class="fixed inset-y-0 left-0 w-[240px] border-r bg-[var(--frs-bg)]"
            :class="dark ? 'border-white/10' : 'border-slate-200'">
         <div class="h-16 px-5 flex items-center gap-3 border-b"
              :class="dark ? 'border-white/10' : 'border-slate-200'">
-            <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
-                 style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
-                {{ config('branding.platform_initials') }}
-            </div>
+            @if($platformLogoUrl !== '')
+                <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white p-1">
+                    <img src="{{ $platformLogoUrl }}"
+                         alt="{{ config('branding.platform_name') }}"
+                         class="max-h-full max-w-full object-contain">
+                </div>
+            @else
+                <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
+                     style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
+                    {{ config('branding.platform_initials') }}
+                </div>
+            @endif
             <div class="leading-tight">
                 <div class="font-extrabold tracking-wide">{{ config('branding.platform_name') }}</div>
                 <div class="text-xs" :class="dark ? 'text-white/60' : 'text-slate-500'">Espace Boutique</div>

@@ -4,11 +4,12 @@ namespace App\Providers;
 
 use App\Models\Admin;
 use App\Models\Fournisseur;
+use App\Services\PlatformBranding;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
             static $shared = null;
 
             if ($shared === null) {
+                $platformBranding = app(PlatformBranding::class);
+
                 $shared = [
                     'current_admin' => session()->has('admin_id')
                         ? Admin::query()->find((int) session('admin_id'))
@@ -45,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
                     'current_fournisseur' => session()->has('frs_id')
                         ? Fournisseur::query()->find((int) session('frs_id'))
                         : null,
+                    'platform_branding' => $platformBranding->viewData(),
                 ];
             }
 
