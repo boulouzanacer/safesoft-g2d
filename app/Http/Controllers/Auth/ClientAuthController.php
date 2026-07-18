@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Commune;
 use App\Models\Wilaya;
+use App\Services\ClientBoutiqueManager;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Mail;
 
 class ClientAuthController extends Controller
 {
+    public function __construct(private readonly ClientBoutiqueManager $clientBoutiqueManager)
+    {
+    }
+
     public function showLogin(): View
     {
         return view('auth.client-login', ['title' => 'Connexion']);
@@ -35,6 +40,8 @@ class ClientAuthController extends Controller
             ->orderByDesc('id')
             ->get()
             ->first(fn (Client $candidate) => Hash::check($credentials['password'], $candidate->password));
+
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($client);
 
         if (! $client) {
             return back()

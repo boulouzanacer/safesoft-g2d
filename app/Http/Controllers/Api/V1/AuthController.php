@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\AuthRegisterRequest;
 use App\Http\Requests\Api\V1\AuthUpdateProfileRequest;
 use App\Models\Client;
 use App\Models\Fournisseur;
+use App\Services\ClientBoutiqueManager;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -20,6 +21,10 @@ use Illuminate\Support\Facades\Mail;
 class AuthController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(private readonly ClientBoutiqueManager $clientBoutiqueManager)
+    {
+    }
 
     public function register(AuthRegisterRequest $request)
     {
@@ -78,6 +83,8 @@ class AuthController extends Controller
             ->orderByDesc('id')
             ->get()
             ->first(fn (Client $candidate) => Hash::check($data['password'], $candidate->password));
+
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($client);
 
         if (! $client) {
             return $this->error('Identifiants invalides', null, 401);
@@ -284,7 +291,11 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         /** @var Client $client */
-        $client = $request->user();
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($request->user());
+
+        if (! $client) {
+            return $this->notFound();
+        }
 
         $fournisseur = null;
         if ($client->id_frs) {
@@ -317,10 +328,14 @@ class AuthController extends Controller
     public function updateProfil(AuthUpdateProfileRequest $request)
     {
         /** @var Client $client */
-        $client = $request->user();
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($request->user());
+        if (! $client) {
+            return $this->notFound();
+        }
         $validated = $request->validated();
         $validated['nom'] = Client::normalizeFullName($validated['nom']);
         $client->update($validated);
+        $this->clientBoutiqueManager->syncLinkedClientsFromGlobal($client);
 
         return $this->success([
             'id' => $client->id,
@@ -335,7 +350,10 @@ class AuthController extends Controller
     public function changePassword(AuthChangePasswordRequest $request)
     {
         /** @var Client $client */
-        $client = $request->user();
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($request->user());
+        if (! $client) {
+            return $this->notFound();
+        }
         $data = $request->validated();
 
         if (! Hash::check($data['current_password'], $client->password)) {
@@ -345,6 +363,7 @@ class AuthController extends Controller
         $client->update([
             'password' => Hash::make($data['password']),
         ]);
+        $this->clientBoutiqueManager->syncLinkedClientsFromGlobal($client, true);
 
         return $this->success(null, 'Mot de passe mis à jour');
     }

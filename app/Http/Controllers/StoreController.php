@@ -10,6 +10,7 @@ use App\Models\Commune;
 use App\Models\Fournisseur;
 use App\Models\Produit;
 use App\Models\Wilaya;
+use App\Services\ClientBoutiqueManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -19,13 +20,24 @@ use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
+    public function __construct(private readonly ClientBoutiqueManager $clientBoutiqueManager)
+    {
+    }
+
     private function currentClient(): ?Client
     {
         if (session('role') !== 'client' || ! session()->has('client_id')) {
             return null;
         }
 
-        return Client::query()->find((int) session('client_id'));
+        $client = Client::query()->find((int) session('client_id'));
+        $globalClient = $this->clientBoutiqueManager->resolveAuthenticatedClient($client);
+
+        if ($globalClient && $client && (int) $globalClient->id !== (int) $client->id) {
+            session(['client_id' => (int) $globalClient->id]);
+        }
+
+        return $globalClient;
     }
 
     private function tarifForClient(?Client $client): int
@@ -73,37 +85,7 @@ class StoreController extends Controller
 
     private function fournisseurClientMap(?Client $client): array
     {
-        static $cache = [];
-
-        if (! $client) {
-            return [];
-        }
-
-        $key = (string) $client->id;
-        if (array_key_exists($key, $cache)) {
-            return $cache[$key];
-        }
-
-        $map = [];
-
-        if ((string) $client->type_client === 'abonne' && $client->id_frs) {
-            $map[(int) $client->id_frs] = $client;
-        }
-
-        if ((string) $client->type_client === 'simple') {
-            $supplierClients = Client::query()
-                ->where('email', $client->email)
-                ->where('type_client', 'abonne')
-                ->whereNotNull('id_frs')
-                ->where('actif', 1)
-                ->get();
-
-            foreach ($supplierClients as $supplierClient) {
-                $map[(int) $supplierClient->id_frs] = $supplierClient;
-            }
-        }
-
-        return $cache[$key] = $map;
+        return $this->clientBoutiqueManager->fournisseurClientMap($client);
     }
 
     private function fournisseurClientFor(?Client $client, int $frsId): ?Client
@@ -119,32 +101,17 @@ class StoreController extends Controller
 
     private function abonneFournisseurIds(?Client $client): array
     {
-        return array_map('intval', array_keys($this->fournisseurClientMap($client)));
+        return $this->clientBoutiqueManager->abonneFournisseurIds($client);
     }
 
     private function isAbonneFor(?Client $client, int $frsId): bool
     {
-        return $this->fournisseurClientFor($client, $frsId) !== null;
+        return (string) ($this->fournisseurClientFor($client, $frsId)?->type_client ?? '') === 'abonne';
     }
 
     private function relatedClientIds(?Client $client): array
     {
-        if (! $client) {
-            return [];
-        }
-
-        $email = trim((string) $client->email);
-        if ($email === '') {
-            return [(int) $client->id];
-        }
-
-        return Client::query()
-            ->where('email', $email)
-            ->pluck('id')
-            ->map(fn ($id) => (int) $id)
-            ->unique()
-            ->values()
-            ->all();
+        return $this->clientBoutiqueManager->relatedClientIds($client);
     }
 
     private function cartFournisseurId(): ?int
@@ -168,60 +135,8 @@ class StoreController extends Controller
 
     private function resolveOrderClient(Client $client, int $frsId): array
     {
-        if ((string) $client->type_client === 'abonne' && (int) ($client->id_frs ?? 0) === $frsId) {
-            return [
-                'client' => $client,
-                'session_client_id' => (int) $client->id,
-            ];
-        }
-
-        $supplierClient = Client::findForFournisseurByEmail($frsId, (string) $client->email);
-
-        $payload = [
-            'nom' => $client->display_name,
-            'email' => $client->email,
-            'password' => $client->password,
-            'telephone' => $client->telephone,
-            'adresse' => $client->adresse,
-            'id_wilaya' => (int) $client->id_wilaya,
-            'id_commune' => (int) $client->id_commune,
-            'id_frs' => $frsId,
-            'actif' => 1,
-        ];
-
-        $isSimpleRoot = (string) $client->type_client === 'simple' && (int) ($client->id_frs ?? 0) === 0;
-
-        if ($supplierClient) {
-            $supplierClient->update($payload);
-
-            if ($isSimpleRoot && (int) $supplierClient->id !== (int) $client->id) {
-                $client->delete();
-            }
-
-            return [
-                'client' => $supplierClient->fresh(),
-                'session_client_id' => (int) $supplierClient->id,
-            ];
-        }
-
-        if ($isSimpleRoot) {
-            $client->update($payload);
-
-            return [
-                'client' => $client->fresh(),
-                'session_client_id' => (int) $client->id,
-            ];
-        }
-
-        $created = Client::create($payload + [
-            'type_client' => 'simple',
-            'tarif' => 1,
-            'synced_pme' => 0,
-            'email_verified_at' => $client->email_verified_at ?? now(),
-        ]);
-
         return [
-            'client' => $created,
+            'client' => $this->clientBoutiqueManager->resolveOrderClient($client, $frsId),
             'session_client_id' => (int) $client->id,
         ];
     }
@@ -340,7 +255,6 @@ class StoreController extends Controller
         }
 
         return Fournisseur::query()
-            ->when($client && $client->type_client === 'abonne' && $client->id_frs, fn ($query) => $query->where('id', (int) $client->id_frs))
             ->where('id', $frsId)
             ->where('actif', 1)
             ->whereNull('deleted_at')
@@ -468,32 +382,24 @@ class StoreController extends Controller
     private function publicBoutiquesQuery(?Client $client): Builder
     {
         $abonneFournisseurIds = $this->abonneFournisseurIds($client);
-        $forcedFournisseurId = ($client && $client->type_client === 'abonne' && $client->id_frs)
-            ? (int) $client->id_frs
-            : null;
 
         return Fournisseur::query()
             ->with('boutiqueCategory:id,name')
             ->where('actif', 1)
             ->whereNull('deleted_at')
-            ->when(! $forcedFournisseurId, function ($query) use ($abonneFournisseurIds) {
-                $query->where(function ($sub) use ($abonneFournisseurIds) {
-                    $sub->where('is_visible', 1);
+            ->where(function ($sub) use ($abonneFournisseurIds) {
+                $sub->where('is_visible', 1);
 
-                    if (count($abonneFournisseurIds) > 0) {
-                        $sub->orWhereIn('id', $abonneFournisseurIds);
-                    }
-                });
+                if (count($abonneFournisseurIds) > 0) {
+                    $sub->orWhereIn('id', $abonneFournisseurIds);
+                }
             })
-            ->when($forcedFournisseurId, fn ($query) => $query->where('id', $forcedFournisseurId));
+            ;
     }
 
     private function publicProductsQuery(?Client $client): Builder
     {
         $abonneFournisseurIds = $this->abonneFournisseurIds($client);
-        $forcedFournisseurId = ($client && $client->type_client === 'abonne' && $client->id_frs)
-            ? (int) $client->id_frs
-            : null;
 
         return Produit::query()
             ->whereNull('deleted_at')
@@ -510,15 +416,13 @@ class StoreController extends Controller
                 'fournisseur.boutiqueCategory:id,name',
                 'quantityPrices',
             ])
-            ->whereHas('fournisseur', function ($query) use ($forcedFournisseurId, $abonneFournisseurIds) {
+            ->whereHas('fournisseur', function ($query) use ($abonneFournisseurIds) {
                 $query->where('actif', 1)
                     ->whereNull('deleted_at')
-                    ->where(function ($sub) use ($forcedFournisseurId, $abonneFournisseurIds) {
+                    ->where(function ($sub) use ($abonneFournisseurIds) {
                         $sub->where('is_visible', 1);
 
-                        if ($forcedFournisseurId) {
-                            $sub->orWhere('id', $forcedFournisseurId);
-                        } elseif (count($abonneFournisseurIds) > 0) {
+                        if (count($abonneFournisseurIds) > 0) {
                             $sub->orWhereIn('id', $abonneFournisseurIds);
                         }
                     });
@@ -527,16 +431,6 @@ class StoreController extends Controller
 
     private function storefrontBoutiqueOrFail(?Client $client, string $slug): Fournisseur
     {
-        if ($client && $client->type_client === 'abonne' && $client->id_frs) {
-            return Fournisseur::query()
-                ->with('boutiqueCategory:id,name')
-                ->where('id', (int) $client->id_frs)
-                ->where('storefront_slug', $slug)
-                ->where('actif', 1)
-                ->whereNull('deleted_at')
-                ->firstOrFail();
-        }
-
         return Fournisseur::query()
             ->with('boutiqueCategory:id,name')
             ->where('storefront_slug', $slug)
@@ -818,9 +712,6 @@ class StoreController extends Controller
         }
 
         $abonneFournisseurIds = $this->abonneFournisseurIds($client);
-        if ($client && $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== $id) {
-            abort(403);
-        }
 
         $boutique = Fournisseur::query()
             ->with('boutiqueCategory:id,name')
@@ -862,10 +753,6 @@ class StoreController extends Controller
             if (! $allowed) {
                 abort(404);
             }
-        }
-
-        if ($client && $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== (int) $p->id_frs) {
-            abort(403);
         }
 
         if (! $abonneForProduct) {
@@ -1084,10 +971,6 @@ class StoreController extends Controller
         }
 
         $frsId = $this->cartFournisseurId();
-        if (! $frsId && $client->type_client === 'abonne' && $client->id_frs) {
-            $frsId = (int) $client->id_frs;
-        }
-
         if (! $frsId) {
             $first = $summary['items'][0]['produit'] ?? null;
             $frsId = $first ? (int) $first->id_frs : null;
@@ -1095,10 +978,6 @@ class StoreController extends Controller
 
         if (! $frsId) {
             return redirect()->to('/panier')->with('error', 'Impossible de déterminer la boutique.');
-        }
-
-        if ($client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== $frsId) {
-            return redirect()->to('/panier')->with('error', 'Commande non autorisée.');
         }
 
         $result = DB::transaction(function () use ($client, $summary, $frsId, $data) {
@@ -1210,16 +1089,18 @@ class StoreController extends Controller
         ]);
 
         $profileTabs = collect();
-        $email = trim((string) ($client->email ?? ''));
-        if ($email !== '') {
+        $relatedClientIds = collect($this->fournisseurClientMap($client))
+            ->map(fn (Client $item) => (int) $item->id)
+            ->filter(fn (int $id) => $id > 0)
+            ->values();
+
+        if ($relatedClientIds->isNotEmpty()) {
             $relatedClients = Client::query()
                 ->with('fournisseur:id,nom_frs,logo_path')
-                ->where('email', $email)
-                ->where('actif', 1)
+                ->whereIn('id', $relatedClientIds->all())
                 ->get();
 
             $profileTabs = $relatedClients
-                ->whereNotNull('id_frs')
                 ->groupBy(fn (Client $item) => (int) $item->id_frs)
                 ->map(function ($group, $frsId) {
                     /** @var \Illuminate\Support\Collection<int, Client> $group */

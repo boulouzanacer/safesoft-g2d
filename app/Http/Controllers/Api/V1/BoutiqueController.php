@@ -6,12 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\BoutiqueCategory;
 use App\Models\Client;
 use App\Models\Fournisseur;
+use App\Services\ClientBoutiqueManager;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
 
 class BoutiqueController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(private readonly ClientBoutiqueManager $clientBoutiqueManager)
+    {
+    }
 
     public function categories()
     {
@@ -30,22 +35,32 @@ class BoutiqueController extends Controller
 
     public function index()
     {
-        $client = request()->user();
-        $isAbonne = $client instanceof Client && (string) $client->type_client === 'abonne';
-        $forcedFrsId = $isAbonne && $client->id_frs ? (int) $client->id_frs : null;
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient(request()->user());
+        $abonneFournisseurIds = $this->clientBoutiqueManager->abonneFournisseurIds($client);
 
         $nbProduits = DB::table('produit')
             ->selectRaw('id_frs, COUNT(*) as nb')
             ->whereNull('deleted_at')
             ->where('actif', 1)
-            ->when(! $isAbonne, fn ($q) => $q->where('abonne_only', 0))
+            ->where(function ($q) use ($abonneFournisseurIds) {
+                $q->where('abonne_only', 0);
+
+                if (count($abonneFournisseurIds) > 0) {
+                    $q->orWhereIn('id_frs', $abonneFournisseurIds);
+                }
+            })
             ->groupBy('id_frs');
 
         $rows = Fournisseur::query()
             ->where('actif', 1)
-            ->when(! $forcedFrsId, fn ($q) => $q->where('is_visible', 1))
             ->whereNull('deleted_at')
-            ->when($forcedFrsId, fn ($q) => $q->where('frs.id', $forcedFrsId))
+            ->where(function ($q) use ($abonneFournisseurIds) {
+                $q->where('is_visible', 1);
+
+                if (count($abonneFournisseurIds) > 0) {
+                    $q->orWhereIn('frs.id', $abonneFournisseurIds);
+                }
+            })
             ->leftJoin('wilaya', 'wilaya.ID_WILAYA', '=', 'frs.id_wilaya')
             ->leftJoin('commune', 'commune.ID_COMMUNE', '=', 'frs.id_commune')
             ->leftJoinSub($nbProduits, 'p', fn ($join) => $join->on('p.id_frs', '=', 'frs.id'))
@@ -71,16 +86,20 @@ class BoutiqueController extends Controller
 
     public function show(int $id)
     {
-        $client = request()->user();
-        if ($client instanceof Client && (string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== $id) {
-            return $this->error('Non autorisé', null, 403);
-        }
-        $forcedFrsId = ($client instanceof Client && (string) $client->type_client === 'abonne' && $client->id_frs) ? (int) $client->id_frs : null;
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient(request()->user());
+        $abonneFournisseurIds = $this->clientBoutiqueManager->abonneFournisseurIds($client);
+        $isAbonneForBoutique = in_array($id, $abonneFournisseurIds, true);
 
         $frs = Fournisseur::query()
             ->where('actif', 1)
-            ->when(! $forcedFrsId, fn ($q) => $q->where('is_visible', 1))
             ->whereNull('deleted_at')
+            ->where(function ($q) use ($id, $isAbonneForBoutique) {
+                $q->where('is_visible', 1);
+
+                if ($isAbonneForBoutique) {
+                    $q->orWhere('frs.id', $id);
+                }
+            })
             ->leftJoin('wilaya', 'wilaya.ID_WILAYA', '=', 'frs.id_wilaya')
             ->leftJoin('commune', 'commune.ID_COMMUNE', '=', 'frs.id_commune')
             ->select([
@@ -107,7 +126,7 @@ class BoutiqueController extends Controller
         $stats = DB::table('produit')
             ->where('id_frs', $id)
             ->whereNull('deleted_at')
-            ->when(! ($client instanceof Client && (string) $client->type_client === 'abonne'), fn ($q) => $q->where('abonne_only', 0))
+            ->when(! $isAbonneForBoutique, fn ($q) => $q->where('abonne_only', 0))
             ->selectRaw('COUNT(*) as total, SUM(CASE WHEN actif=1 THEN 1 ELSE 0 END) as actifs, SUM(CASE WHEN stock<5 THEN 1 ELSE 0 END) as stock_faible')
             ->first();
 

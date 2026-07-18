@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -63,6 +64,11 @@ class Client extends Authenticatable
         return explode(' ', $displayName)[0] ?? '';
     }
 
+    public function isGlobalAccount(): bool
+    {
+        return (string) $this->type_client === 'simple' && (int) ($this->id_frs ?? 0) === 0;
+    }
+
     protected $hidden = [
         'password',
     ];
@@ -106,6 +112,17 @@ class Client extends Authenticatable
     public function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class, 'id_frs', 'id');
+    }
+
+    public function boutiqueRelations(): HasMany
+    {
+        return $this->hasMany(ClientBoutique::class, 'global_client_id', 'id');
+    }
+
+    public function boutiqueRelationForFournisseur(int $fournisseurId): HasOne
+    {
+        return $this->hasOne(ClientBoutique::class, 'global_client_id', 'id')
+            ->where('fournisseur_id', $fournisseurId);
     }
 
     public function prevendeur(): BelongsTo

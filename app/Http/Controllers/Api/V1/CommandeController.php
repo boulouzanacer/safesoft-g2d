@@ -8,6 +8,7 @@ use App\Models\Cmd1;
 use App\Models\Cmd2;
 use App\Models\Fournisseur;
 use App\Models\Produit;
+use App\Services\ClientBoutiqueManager;
 use App\Notifications\NouvelleCommande;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
@@ -17,17 +18,20 @@ class CommandeController extends Controller
 {
     use ApiResponseTrait;
 
+    public function __construct(private readonly ClientBoutiqueManager $clientBoutiqueManager)
+    {
+    }
+
     public function store(CommandeStoreRequest $request)
     {
         $data = $request->validated();
-        $client = $request->user();
-        $frsId = (int) $data['id_frs'];
-
-        if ((string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs !== $frsId) {
-            return $this->error('Non autorisé', null, 403);
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($request->user());
+        if (! $client) {
+            return $this->notFound();
         }
-
-        $allowInvisible = (string) $client->type_client === 'abonne' && $client->id_frs && (int) $client->id_frs === $frsId;
+        $frsId = (int) $data['id_frs'];
+        $supplierClient = $this->clientBoutiqueManager->fournisseurClientFor($client, $frsId);
+        $allowInvisible = (string) ($supplierClient?->type_client ?? '') === 'abonne';
 
         $frs = Fournisseur::query()
             ->where('id', $frsId)
@@ -42,7 +46,7 @@ class CommandeController extends Controller
         $panier = $data['panier'];
 
         try {
-            $result = DB::transaction(function () use ($client, $frs, $data, $panier) {
+            $result = DB::transaction(function () use ($client, $frs, $data, $panier, $supplierClient) {
                 $montantTotal = 0.0;
                 $lines = [];
 
@@ -61,7 +65,7 @@ class CommandeController extends Controller
                         throw new \RuntimeException("Produit {$idProduit} introuvable");
                     }
 
-                    if ((string) $client->type_client !== 'abonne' && (int) ($produit->abonne_only ?? 0) === 1) {
+                    if ((string) ($supplierClient?->type_client ?? '') !== 'abonne' && (int) ($produit->abonne_only ?? 0) === 1) {
                         throw new \RuntimeException("Produit {$idProduit} réservé aux abonnés");
                     }
 
@@ -70,7 +74,7 @@ class CommandeController extends Controller
                         throw new \RuntimeException("Stock insuffisant pour le produit {$produit->id}");
                     }
 
-                    $prix = (float) $produit->prixUnitairePourQuantite($client, $qte);
+                    $prix = (float) $produit->prixUnitairePourQuantite($supplierClient, $qte);
                     $sousTotal = $prix * $qte;
                     $montantTotal += $sousTotal;
 
@@ -85,8 +89,10 @@ class CommandeController extends Controller
                     $produitsById[$produit->id] = $produit;
                 }
 
+                $orderClient = $this->clientBoutiqueManager->resolveOrderClient($client, (int) $frs->id);
+
                 $cmd1 = Cmd1::create([
-                    'id_client' => $client->id,
+                    'id_client' => $orderClient->id,
                     'id_frs' => $frs->id,
                     'date_cmd' => now(),
                     'statut' => 'en_attente',
@@ -163,7 +169,11 @@ class CommandeController extends Controller
 
     public function index(Request $request)
     {
-        $client = $request->user();
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($request->user());
+        if (! $client) {
+            return $this->notFound();
+        }
+        $clientIds = $this->clientBoutiqueManager->relatedClientIds($client);
 
         $paginator = Cmd1::query()
             ->leftJoin('frs', 'frs.id', '=', 'cmd1.id_frs')
@@ -172,7 +182,7 @@ class CommandeController extends Controller
                 'frs.nom_frs as nom_frs',
             ])
             ->with(['wilaya', 'commune'])
-            ->where('cmd1.id_client', $client->id)
+            ->whereIn('cmd1.id_client', $clientIds)
             ->orderByDesc('cmd1.date_cmd')
             ->paginate(20);
 
@@ -207,12 +217,16 @@ class CommandeController extends Controller
 
     public function show(Request $request, int $id)
     {
-        $client = $request->user();
+        $client = $this->clientBoutiqueManager->resolveAuthenticatedClient($request->user());
+        if (! $client) {
+            return $this->notFound();
+        }
+        $clientIds = $this->clientBoutiqueManager->relatedClientIds($client);
 
         $cmd = Cmd1::query()
             ->with(['wilaya', 'commune'])
             ->where('id', $id)
-            ->where('id_client', $client->id)
+            ->whereIn('id_client', $clientIds)
             ->first();
 
         if (! $cmd) {
