@@ -15,7 +15,6 @@ class AuthRegisterRequest extends FormRequest
     {
         return [
             'nom' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8'],
             'telephone' => ['required', 'string', 'max:255'],

@@ -3,7 +3,6 @@ import 'fournisseur_model.dart';
 class ClientModel {
   final int id;
   final String nom;
-  final String prenom;
   final String email;
   final String? telephone;
   final String? adresse;
@@ -16,7 +15,6 @@ class ClientModel {
   ClientModel({
     required this.id,
     required this.nom,
-    required this.prenom,
     required this.email,
     required this.typeClient,
     this.telephone,
@@ -28,10 +26,13 @@ class ClientModel {
   });
 
   factory ClientModel.fromJson(Map<String, dynamic> json) {
+    final nom = (json['nom'] ?? '').toString().trim();
+    final prenom = (json['prenom'] ?? '').toString().trim();
+    final fullName = [prenom, nom].where((value) => value.isNotEmpty).join(' ');
+
     return ClientModel(
       id: (json['id'] ?? 0) as int,
-      nom: (json['nom'] ?? '').toString(),
-      prenom: (json['prenom'] ?? '').toString(),
+      nom: fullName.isEmpty ? nom : fullName,
       email: (json['email'] ?? '').toString(),
       telephone: json['telephone']?.toString(),
       adresse: json['adresse']?.toString(),
@@ -56,7 +57,6 @@ class ClientModel {
     return {
       'id': id,
       'nom': nom,
-      'prenom': prenom,
       'email': email,
       'telephone': telephone,
       'adresse': adresse,
@@ -66,5 +66,11 @@ class ClientModel {
       'id_frs': idFrs,
       'fournisseur': fournisseur?.toJson(),
     };
+  }
+
+  String get firstName {
+    final value = nom.trim();
+    if (value.isEmpty) return '';
+    return value.split(RegExp(r'\s+')).first;
   }
 }

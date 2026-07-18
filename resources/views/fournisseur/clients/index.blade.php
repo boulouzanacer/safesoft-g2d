@@ -41,7 +41,7 @@
                         <tr class="hover:bg-white/5 cursor-pointer"
                             onclick="window.location='{{ url('/fournisseur/clients/'.$c->id) }}'">
                             <td class="py-3 px-4 font-semibold">{{ $c->code_client ?? '-' }}</td>
-                            <td class="py-3 px-4 text-white/80">{{ $c->prenom }} {{ $c->nom }}</td>
+                            <td class="py-3 px-4 text-white/80">{{ $c->display_name ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->prevendeur_nom ?? '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->email }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->telephone }}</td>

@@ -18,7 +18,6 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _prenomCtrl = TextEditingController();
   final _nomCtrl = TextEditingController();
   final _telCtrl = TextEditingController();
   final _adresseCtrl = TextEditingController();
@@ -37,7 +36,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final client = ref.read(authProvider).client;
       if (client != null) {
-        _prenomCtrl.text = client.prenom;
         _nomCtrl.text = client.nom;
         _telCtrl.text = client.telephone ?? '';
         _adresseCtrl.text = client.adresse ?? '';
@@ -65,7 +63,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   void dispose() {
-    _prenomCtrl.dispose();
     _nomCtrl.dispose();
     _telCtrl.dispose();
     _adresseCtrl.dispose();
@@ -115,7 +112,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     try {
       final dio = ref.read(dioProvider);
       await dio.put('/auth/profil', data: {
-        'prenom': _prenomCtrl.text.trim(),
         'nom': _nomCtrl.text.trim(),
         'telephone': _telCtrl.text.trim().isEmpty ? null : _telCtrl.text.trim(),
         'adresse': _adresseCtrl.text.trim(),
@@ -172,15 +168,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     const SizedBox(height: 12),
                   ],
                   TextFormField(
-                    controller: _prenomCtrl,
-                    decoration: const InputDecoration(labelText: 'Prénom'),
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
                     controller: _nomCtrl,
-                    decoration: const InputDecoration(labelText: 'Nom'),
+                    decoration: const InputDecoration(labelText: 'Nom client'),
                     validator: (v) =>
                         (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
                   ),

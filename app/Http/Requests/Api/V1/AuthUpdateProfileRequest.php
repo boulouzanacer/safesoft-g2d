@@ -15,7 +15,6 @@ class AuthUpdateProfileRequest extends FormRequest
     {
         return [
             'nom' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
             'telephone' => ['nullable', 'string', 'max:255'],
             'adresse' => ['required', 'string'],
             'id_wilaya' => ['required', 'integer', 'exists:wilaya,ID_WILAYA'],
@@ -23,4 +22,3 @@ class AuthUpdateProfileRequest extends FormRequest
         ];
     }
 }
-

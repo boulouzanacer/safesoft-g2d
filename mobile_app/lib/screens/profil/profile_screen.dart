@@ -9,12 +9,11 @@ import '../../providers/theme_provider.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  String _initials(String prenom, String nom) {
-    final p = prenom.trim();
-    final n = nom.trim();
-    final a = p.isEmpty ? '' : p.characters.first.toUpperCase();
-    final b = n.isEmpty ? '' : n.characters.first.toUpperCase();
-    return (a + b).isEmpty ? '?' : (a + b);
+  String _initials(String fullName) {
+    final parts =
+        fullName.trim().split(RegExp(r'\s+')).where((part) => part.isNotEmpty);
+    final letters = parts.take(2).map((part) => part.characters.first.toUpperCase()).join();
+    return letters.isEmpty ? '?' : letters;
   }
 
   Widget _row({
@@ -81,7 +80,7 @@ class ProfileScreen extends ConsumerWidget {
                     backgroundColor:
                         Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                     child: Text(
-                      _initials(client.prenom, client.nom),
+                      _initials(client.nom),
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         color: Theme.of(context).colorScheme.primary,
@@ -94,7 +93,7 @@ class ProfileScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${client.prenom} ${client.nom}',
+                          client.nom,
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w900),
                         ),

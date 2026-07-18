@@ -200,7 +200,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             @forelse($clients_a_visiter as $visite)
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div class="font-bold">{{ trim(($visite->prenom ?? '').' '.($visite->nom ?? '')) }}</div>
+                    <div class="font-bold">{{ $visite->nom ?: '-' }}</div>
                     <div class="text-xs text-white/60 mt-1">Code: {{ $visite->code_client ?: '-' }}</div>
                 </div>
             @empty
@@ -261,7 +261,7 @@
                         <tr class="hover:bg-white/5">
                             <td class="py-3 pr-4 font-semibold">#{{ $c->id }}</td>
                             <td class="py-3 pr-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
-                            <td class="py-3 pr-4 text-white/80">{{ trim(($c->client_prenom ?? '').' '.($c->client_nom ?? '')) }}</td>
+                            <td class="py-3 pr-4 text-white/80">{{ $c->client_nom ?: '-' }}</td>
                             <td class="py-3 pr-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
                             </td>

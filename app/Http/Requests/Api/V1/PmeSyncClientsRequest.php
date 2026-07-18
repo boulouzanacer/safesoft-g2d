@@ -18,7 +18,6 @@ class PmeSyncClientsRequest extends FormRequest
             'clients' => ['required', 'array', 'min:1'],
             'clients.*.code_client' => ['required', 'string', 'max:50'],
             'clients.*.nom' => ['required', 'string', 'max:255'],
-            'clients.*.prenom' => ['required', 'string', 'max:255'],
             'clients.*.email' => ['required', 'email', 'max:255'],
             'clients.*.password' => ['required', 'string'],
             'clients.*.telephone' => ['nullable', 'string', 'max:255'],

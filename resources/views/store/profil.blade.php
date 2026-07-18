@@ -169,12 +169,8 @@
                 <h2 class="text-lg font-extrabold text-slate-900">Informations personnelles</h2>
                 <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Prenom</div>
-                        <div class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">{{ $client->prenom ?: '-' }}</div>
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Nom</div>
-                        <div class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">{{ $client->nom ?: '-' }}</div>
+                        <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Nom client</div>
+                        <div class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">{{ $client->display_name ?: '-' }}</div>
                     </div>
                     <div class="sm:col-span-2">
                         <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Email</div>

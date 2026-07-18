@@ -56,7 +56,6 @@ class AdminDashboardController extends Controller
                 'cmd1.statut',
                 'cmd1.montant_total',
                 'client.nom as client_nom',
-                'client.prenom as client_prenom',
                 'frs.nom_frs as frs_nom',
             ])
             ->orderByDesc('cmd1.date_cmd')

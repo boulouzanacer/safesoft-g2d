@@ -58,7 +58,7 @@
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-2xl font-extrabold tracking-wide break-words">{{ $client->prenom }} {{ $client->nom }}</div>
+                    <div class="text-2xl font-extrabold tracking-wide break-words">{{ $client->display_name ?: '-' }}</div>
                     <div class="mt-1 text-sm text-white/60 break-all">{{ $client->email ?: '-' }}</div>
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold {{ $typeBadge }}">

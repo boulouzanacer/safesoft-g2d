@@ -25,7 +25,6 @@ class CommandeController extends Controller
                 'cmd1.*',
                 'client.id as client_id',
                 'client.nom as client_nom',
-                'client.prenom as client_prenom',
                 'frs.nom_frs as frs_nom',
             ]);
 

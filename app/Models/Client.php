@@ -23,7 +23,6 @@ class Client extends Authenticatable
     protected $fillable = [
         'code_client',
         'nom',
-        'prenom',
         'email',
         'email_verified_at',
         'email_verification_code_hash',
@@ -43,6 +42,47 @@ class Client extends Authenticatable
         'synced_pme',
         'actif',
     ];
+
+    public static function normalizeFullName(?string $name): string
+    {
+        return trim((string) preg_replace('/\s+/', ' ', trim((string) $name)));
+    }
+
+    public static function fullNameFromParts(?string $nom, ?string $prenom = null): string
+    {
+        $parts = [];
+
+        $prenom = static::normalizeFullName($prenom);
+        $nom = static::normalizeFullName($nom);
+
+        if ($prenom !== '') {
+            $parts[] = $prenom;
+        }
+
+        if ($nom !== '') {
+            $parts[] = $nom;
+        }
+
+        return trim(preg_replace('/\s+/', ' ', implode(' ', $parts)) ?? '');
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return static::fullNameFromParts(
+            (string) ($this->attributes['nom'] ?? ''),
+            (string) ($this->attributes['prenom'] ?? '')
+        );
+    }
+
+    public function getFirstNameAttribute(): string
+    {
+        $displayName = $this->display_name;
+        if ($displayName === '') {
+            return '';
+        }
+
+        return explode(' ', $displayName)[0] ?? '';
+    }
 
     protected $hidden = [
         'password',

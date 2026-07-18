@@ -52,7 +52,6 @@ class DashboardController extends Controller
                 'cmd1.statut',
                 'cmd1.montant_total',
                 'client.nom as client_nom',
-                'client.prenom as client_prenom',
             ])
             ->where('cmd1.id_frs', $frsId)
             ->orderByDesc('cmd1.date_cmd')
@@ -86,7 +85,7 @@ class DashboardController extends Controller
 
         $clientsAVisiter = VisitDaily::query()
             ->leftJoin('client', 'client.id', '=', 'visit_daily.client_id')
-            ->select(['visit_daily.visit_date', 'client.id', 'client.nom', 'client.prenom', 'client.code_client'])
+            ->select(['visit_daily.visit_date', 'client.id', 'client.nom', 'client.code_client'])
             ->where('visit_daily.id_frs', $frsId)
             ->whereDate('visit_daily.visit_date', Carbon::today())
             ->orderBy('client.nom')

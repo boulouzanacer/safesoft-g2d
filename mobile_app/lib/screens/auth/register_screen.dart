@@ -22,7 +22,6 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nomCtrl = TextEditingController();
-  final _prenomCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
@@ -43,7 +42,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   void dispose() {
     _nomCtrl.dispose();
-    _prenomCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _confirmCtrl.dispose();
@@ -105,7 +103,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final ok = await ref.read(authProvider.notifier).register(
           nom: _nomCtrl.text.trim(),
-          prenom: _prenomCtrl.text.trim(),
           email: _emailCtrl.text.trim(),
           password: _passCtrl.text,
           telephone: _telCtrl.text.trim().isEmpty ? null : _telCtrl.text.trim(),
@@ -151,14 +148,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: 12),
                 ],
                 TextFormField(
-                  controller: _prenomCtrl,
-                  decoration: const InputDecoration(labelText: 'Prénom'),
-                  validator: Validators.requiredField,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
                   controller: _nomCtrl,
-                  decoration: const InputDecoration(labelText: 'Nom'),
+                  decoration: const InputDecoration(labelText: 'Nom client'),
                   validator: Validators.requiredField,
                 ),
                 const SizedBox(height: 12),

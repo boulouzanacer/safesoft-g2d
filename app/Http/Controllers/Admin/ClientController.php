@@ -29,7 +29,6 @@ class ClientController extends Controller
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('client.nom', 'like', "%{$q}%")
-                        ->orWhere('client.prenom', 'like', "%{$q}%")
                         ->orWhere('client.email', 'like', "%{$q}%");
                 });
             })

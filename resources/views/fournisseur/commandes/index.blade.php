@@ -18,7 +18,7 @@
                     class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]">
                 <option value="">Tous clients</option>
                 @foreach($clients as $c)
-                    <option value="{{ $c->id }}" @selected((string)$selected_client === (string)$c->id)>{{ $c->prenom }} {{ $c->nom }}</option>
+                    <option value="{{ $c->id }}" @selected((string)$selected_client === (string)$c->id)>{{ $c->display_name ?: '-' }}</option>
                 @endforeach
             </select>
         </div>
@@ -77,7 +77,7 @@
                         @endphp
                         <tr class="hover:bg-white/5 cursor-pointer" onclick="window.location='{{ url('/fournisseur/commandes/'.$c->id) }}'">
                             <td class="py-3 px-4 font-semibold">#{{ $c->id }}</td>
-                            <td class="py-3 px-4 text-white/80">{{ trim(($c->client_prenom ?? '').' '.($c->client_nom ?? '')) }}</td>
+                            <td class="py-3 px-4 text-white/80">{{ $c->client_nom ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
                             <td class="py-3 px-4 text-right font-extrabold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
                             <td class="py-3 px-4">
@@ -104,4 +104,3 @@
     </div>
 </div>
 @endsection
-

@@ -205,7 +205,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             final children = <Widget>[
               if (isAbonne) ...[
                 Text(
-                  'Bienvenue, ${client?.prenom ?? ''}',
+                  'Bienvenue, ${client?.firstName ?? ''}',
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.w900),
                 ),

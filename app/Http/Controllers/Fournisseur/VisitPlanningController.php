@@ -70,7 +70,7 @@ class VisitPlanningController extends Controller
             ->findOrFail($id);
 
         $visits = VisitDaily::query()
-            ->with('client:id,code_client,nom,prenom,telephone,adresse')
+            ->with('client:id,code_client,nom,telephone,adresse')
             ->where('id_frs', $frsId)
             ->whereDate('visit_date', $tour->tour_date)
             ->where('prevendeur_id', $tour->prevendeur_id)

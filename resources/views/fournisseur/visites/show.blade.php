@@ -85,7 +85,7 @@
                 <tbody class="divide-y divide-white/10">
                     @forelse($visits as $visit)
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 px-4 font-bold">{{ trim(($visit->client->prenom ?? '').' '.($visit->client->nom ?? '')) }}</td>
+                            <td class="py-3 px-4 font-bold">{{ $visit->client->display_name ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $visit->client->code_client ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $visit->client->telephone ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $visit->client->adresse ?: '-' }}</td>

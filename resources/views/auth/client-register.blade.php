@@ -52,27 +52,15 @@
         @else
             <form method="POST" action="{{ url('/register') }}" class="mt-6 space-y-4">
                 @csrf
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nom</label>
-                        <input name="nom"
-                               value="{{ old('nom') }}"
-                               class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
-                               required>
-                        @error('nom')
-                            <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Prénom</label>
-                        <input name="prenom"
-                               value="{{ old('prenom') }}"
-                               class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
-                               required>
-                        @error('prenom')
-                            <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
-                        @enderror
-                    </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nom client</label>
+                    <input name="nom"
+                           value="{{ old('nom') }}"
+                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[var(--store-primary)]"
+                           required>
+                    @error('nom')
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

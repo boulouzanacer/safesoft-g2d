@@ -79,7 +79,7 @@
                                         <span class="text-xs text-white/60">Public</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
-                                        { "nom": "...", "prenom": "...", "email": "...", "password": "...", "telephone": "..." }<br>
+                                        { "nom": "...", "email": "...", "password": "...", "telephone": "..." }<br>
                                         Optional: adresse, id_wilaya, id_commune
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">Inscription client <span class="font-mono">type_client=simple</span> avec vérification email par code (6 chiffres).</div>
@@ -145,7 +145,7 @@
                                         <span class="text-xs text-white/60">Bearer required</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
-                                        { "nom": "...", "prenom": "...", "adresse": "...", "id_wilaya": 1, "id_commune": 1 }<br>
+                                        { "nom": "...", "adresse": "...", "id_wilaya": 1, "id_commune": 1 }<br>
                                         Optional: telephone
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">Note: <span class="font-mono">tarif</span> is managed by PME sync/admin, not by this endpoint.</div>
@@ -511,8 +511,10 @@
                                 <div class="font-bold">Objectif</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Cette rubrique permet a votre logiciel PME de lister, creer, modifier, supprimer et synchroniser en masse les clients de la boutique authentifiee.
-                                    Tous les enregistrements sont automatiquement limites a la boutique du token PME. Les champs retournes par l'API sont:
-                                    <span class="font-mono">id</span>, <span class="font-mono">code_client</span>, <span class="font-mono">nom</span>, <span class="font-mono">prenom</span>,
+                                    Tous les enregistrements sont automatiquement limites a la boutique du token PME. Le champ
+                                    <span class="font-mono">nom</span>
+                                    contient maintenant directement le nom client complet. Les champs retournes par l'API sont:
+                                    <span class="font-mono">id</span>, <span class="font-mono">code_client</span>, <span class="font-mono">nom</span>,
                                     <span class="font-mono">email</span>, <span class="font-mono">telephone</span>, <span class="font-mono">adresse</span>,
                                     <span class="font-mono">id_wilaya</span>, <span class="font-mono">id_commune</span>, <span class="font-mono">type_client</span>,
                                     <span class="font-mono">tarif</span>, <span class="font-mono">actif</span>, <span class="font-mono">synced_pme</span>,
@@ -540,8 +542,7 @@
     {
       "id": 15,
       "code_client": "C12536",
-      "nom": "client1",
-      "prenom": "client1",
+      "nom": "Client 1",
       "email": "client1@example.com",
       "telephone": "0656232454",
       "adresse": "",
@@ -578,8 +579,7 @@
   "data": {
     "id": 6,
     "code_client": "C10006",
-    "nom": "client6",
-    "prenom": "client6",
+    "nom": "Client 6",
     "email": "client6@example.com",
     "telephone": "0550000006",
     "adresse": "Alger",
@@ -615,8 +615,7 @@
                                     </div>
                                     <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
   "code_client": "C12536",
-  "nom": "client1",
-  "prenom": "client1",
+  "nom": "Client 1",
   "email": "client1@example.com",
   "password": "12345678",
   "telephone": "0656232454",
@@ -682,8 +681,7 @@
   "clients": [
     {
       "code_client": "C12536",
-      "nom": "client1",
-      "prenom": "client1",
+      "nom": "Client 1",
       "email": "client1@example.com",
       "password": "12345678",
       "telephone": "0656232454",

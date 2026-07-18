@@ -63,7 +63,7 @@
         </div>
         <div class="rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-5">
             <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200/80">Client</div>
-            <div class="mt-2 text-xl font-extrabold text-emerald-100 break-words">{{ $client?->prenom }} {{ $client?->nom }}</div>
+            <div class="mt-2 text-xl font-extrabold text-emerald-100 break-words">{{ $client?->display_name ?: '-' }}</div>
             <div class="mt-3 text-xs text-emerald-100/70">Acheteur lié à cette commande.</div>
         </div>
         <div class="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-amber-500/20 to-amber-500/5 p-5">
@@ -92,11 +92,11 @@
                         @if((int)($client?->id ?? 0) > 0)
                             <a href="{{ url('/fournisseur/clients/'.$client->id) }}"
                                class="inline-flex items-center gap-2 text-[var(--frs-primary)] hover:opacity-90">
-                                <span>{{ $client?->prenom }} {{ $client?->nom }}</span>
+                                <span>{{ $client?->display_name ?: '-' }}</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                             </a>
                         @else
-                            {{ $client?->prenom }} {{ $client?->nom }}
+                            {{ $client?->display_name ?: '-' }}
                         @endif
                     </div>
                 </div>

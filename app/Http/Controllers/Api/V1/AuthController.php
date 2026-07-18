@@ -40,8 +40,7 @@ class AuthController extends Controller
         }
 
         $payload = [
-            'nom' => $data['nom'],
-            'prenom' => $data['prenom'],
+            'nom' => Client::normalizeFullName($data['nom']),
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'telephone' => $data['telephone'],
@@ -110,7 +109,6 @@ class AuthController extends Controller
             'client' => [
                 'id' => $client->id,
                 'nom' => $client->nom,
-                'prenom' => $client->prenom,
                 'email' => $client->email,
                 'telephone' => $client->telephone,
                 'adresse' => $client->adresse,
@@ -143,7 +141,6 @@ class AuthController extends Controller
                 'client' => [
                     'id' => $client->id,
                     'nom' => $client->nom,
-                    'prenom' => $client->prenom,
                     'email' => $client->email,
                     'telephone' => $client->telephone,
                     'type_client' => $client->type_client,
@@ -179,7 +176,6 @@ class AuthController extends Controller
             'client' => [
                 'id' => $client->id,
                 'nom' => $client->nom,
-                'prenom' => $client->prenom,
                 'email' => $client->email,
                 'telephone' => $client->telephone,
                 'type_client' => $client->type_client,
@@ -306,7 +302,6 @@ class AuthController extends Controller
         return $this->success([
             'id' => $client->id,
             'nom' => $client->nom,
-            'prenom' => $client->prenom,
             'email' => $client->email,
             'telephone' => $client->telephone,
             'adresse' => $client->adresse,
@@ -323,12 +318,13 @@ class AuthController extends Controller
     {
         /** @var Client $client */
         $client = $request->user();
-        $client->update($request->validated());
+        $validated = $request->validated();
+        $validated['nom'] = Client::normalizeFullName($validated['nom']);
+        $client->update($validated);
 
         return $this->success([
             'id' => $client->id,
             'nom' => $client->nom,
-            'prenom' => $client->prenom,
             'telephone' => $client->telephone,
             'adresse' => $client->adresse,
             'id_wilaya' => $client->id_wilaya,

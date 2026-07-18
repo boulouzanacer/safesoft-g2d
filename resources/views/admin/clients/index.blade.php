@@ -21,7 +21,7 @@
                 <input id="clientsSearchInput"
                        name="q"
                        value="{{ $q }}"
-                       placeholder="Rechercher nom/prénom/email..."
+                       placeholder="Rechercher nom/email..."
                        class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--admin-primary)]">
             </div>
         </div>
@@ -68,7 +68,7 @@
                 <tbody class="divide-y divide-white/10">
                     @forelse($clients as $c)
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 px-4 font-semibold">{{ $c->prenom }} {{ $c->nom }}</td>
+                            <td class="py-3 px-4 font-semibold">{{ $c->display_name ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->email }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->type_client }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->frs_nom ?? '-' }}</td>

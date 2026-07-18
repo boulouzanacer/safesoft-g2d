@@ -166,8 +166,7 @@ class PmeController extends Controller
         return [
             'id' => (int) $client->id,
             'code_client' => $client->code_client,
-            'nom' => $client->nom,
-            'prenom' => $client->prenom,
+            'nom' => $client->display_name,
             'email' => $client->email,
             'telephone' => $client->telephone,
             'adresse' => $client->adresse,
@@ -193,7 +192,6 @@ class PmeController extends Controller
         foreach ([
             'code_client',
             'nom',
-            'prenom',
             'email',
             'telephone',
             'adresse',
@@ -205,7 +203,9 @@ class PmeController extends Controller
             'actif',
         ] as $field) {
             if (array_key_exists($field, $validated)) {
-                $payload[$field] = $validated[$field];
+                $payload[$field] = $field === 'nom'
+                    ? Client::normalizeFullName((string) $validated[$field])
+                    : $validated[$field];
             }
         }
 
@@ -500,8 +500,7 @@ class PmeController extends Controller
 
                 $data = [
                     'code_client' => $item['code_client'],
-                    'nom' => $item['nom'],
-                    'prenom' => $item['prenom'],
+                    'nom' => Client::normalizeFullName((string) $item['nom']),
                     'email' => $item['email'],
                     'password' => $hashed,
                     'telephone' => $item['telephone'] ?? null,

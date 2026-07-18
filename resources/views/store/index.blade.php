@@ -8,7 +8,7 @@
                 <div class="text-2xl font-extrabold tracking-wide">Boutiques & Produits</div>
                 <div class="store-muted mt-1 text-sm">
                     @if(($client ?? null))
-                        {{ $client->prenom }} {{ $client->nom }}
+                        {{ $client->display_name }}
                         <span class="mx-2 opacity-40">•</span>
                         <span class="font-semibold">{{ $client->type_client }}</span>
                     @else

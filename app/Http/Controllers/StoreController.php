@@ -178,8 +178,7 @@ class StoreController extends Controller
         $supplierClient = Client::findForFournisseurByEmail($frsId, (string) $client->email);
 
         $payload = [
-            'nom' => $client->nom,
-            'prenom' => $client->prenom,
+            'nom' => $client->display_name,
             'email' => $client->email,
             'password' => $client->password,
             'telephone' => $client->telephone,

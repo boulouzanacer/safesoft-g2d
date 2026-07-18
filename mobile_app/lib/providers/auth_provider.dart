@@ -148,7 +148,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<bool> register({
     required String nom,
-    required String prenom,
     required String email,
     required String password,
     String? telephone,
@@ -160,7 +159,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final res = await _dio.post(ApiConstants.authRegister, data: {
         'nom': nom,
-        'prenom': prenom,
         'email': email,
         'password': password,
         'telephone': telephone,

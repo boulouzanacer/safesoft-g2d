@@ -27,7 +27,6 @@ class CommandeController extends Controller
             ->select([
                 'cmd1.*',
                 'client.nom as client_nom',
-                'client.prenom as client_prenom',
             ])
             ->where('cmd1.id_frs', $frsId);
 
@@ -54,8 +53,8 @@ class CommandeController extends Controller
 
         $clients = Client::query()
             ->where('id_frs', $frsId)
-            ->orderBy('prenom')
-            ->get(['id', 'nom', 'prenom']);
+            ->orderBy('nom')
+            ->get(['id', 'nom']);
 
         return view('fournisseur.commandes.index', [
             'title' => 'Mes Commandes',
@@ -129,4 +128,3 @@ class CommandeController extends Controller
         return back()->with('success', 'Aucun changement.');
     }
 }
-

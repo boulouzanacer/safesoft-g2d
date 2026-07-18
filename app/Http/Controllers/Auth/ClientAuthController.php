@@ -84,7 +84,6 @@ class ClientAuthController extends Controller
     {
         $data = $request->validate([
             'nom' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'telephone' => ['required', 'string', 'max:255'],
@@ -105,13 +104,12 @@ class ClientAuthController extends Controller
 
         if ($existing && ! empty($existing->email_verified_at)) {
             return back()
-                ->withInput($request->only('nom', 'prenom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
+                ->withInput($request->only('nom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
                 ->withErrors(['email' => 'Email déjà utilisé.']);
         }
 
         $payload = [
-            'nom' => $data['nom'],
-            'prenom' => $data['prenom'],
+            'nom' => Client::normalizeFullName($data['nom']),
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'telephone' => $data['telephone'],
@@ -130,7 +128,7 @@ class ClientAuthController extends Controller
 
         if (! $this->sendEmailVerificationCode($client)) {
             return back()
-                ->withInput($request->only('nom', 'prenom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
+                ->withInput($request->only('nom', 'email', 'telephone', 'adresse', 'id_wilaya', 'id_commune'))
                 ->withErrors(['email' => 'Impossible d’envoyer le code. Vérifiez la configuration Resend/Mail.']);
         }
 
@@ -236,7 +234,6 @@ class ClientAuthController extends Controller
             if ($client && $client->type_client === 'simple' && empty($client->email_verified_at)) {
                 $input = [
                     'nom' => $client->nom,
-                    'prenom' => $client->prenom,
                     'email' => $client->email,
                     'telephone' => $client->telephone,
                     'adresse' => $client->adresse,
