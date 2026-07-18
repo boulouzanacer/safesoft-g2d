@@ -68,6 +68,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/commandes', [PmeController::class, 'commandes']);
         Route::get('/commandes/export-csv', [PmeController::class, 'exportCommandesCsv']);
         Route::put('/commandes/{id}/sync', [PmeController::class, 'markSynced']);
+        Route::put('/commandes/{id}/statut', [PmeController::class, 'updateCommandeStatut']);
     });
 
 });

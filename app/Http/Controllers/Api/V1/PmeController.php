@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\PmeStoreProduitRequest;
 use App\Http\Requests\Api\V1\PmeStoreFournisseurRequest;
 use App\Http\Requests\Api\V1\PmeSyncClientsRequest;
 use App\Http\Requests\Api\V1\PmeSyncProduitsRequest;
+use App\Http\Requests\Api\V1\PmeUpdateCommandeStatutRequest;
 use App\Models\Client;
 use App\Models\Cmd1;
 use App\Models\Cmd2;
@@ -830,5 +831,42 @@ class PmeController extends Controller
             'id' => $cmd->id,
             'synced_pme' => 1,
         ], 'Commande marquée synchronisée');
+    }
+
+    public function updateCommandeStatut(PmeUpdateCommandeStatutRequest $request, int $id)
+    {
+        $frs = $request->attributes->get('fournisseur');
+
+        $cmd = Cmd1::query()
+            ->with(['client', 'wilaya', 'commune'])
+            ->where('id', $id)
+            ->where('id_frs', $frs->id)
+            ->first();
+
+        if (! $cmd) {
+            return $this->notFound('Commande introuvable');
+        }
+
+        $cmd->update([
+            'statut' => (string) $request->validated('statut'),
+        ]);
+        $cmd->refresh();
+
+        return $this->success([
+            'id' => (int) $cmd->id,
+            'id_client' => (int) $cmd->id_client,
+            'nom_client' => $cmd->client?->nom,
+            'date_cmd' => (string) $cmd->date_cmd,
+            'statut' => (string) $cmd->statut,
+            'montant_total' => (float) $cmd->montant_total,
+            'adresse_livraison' => $cmd->adresse_livraison,
+            'tele_livraison' => $cmd->tele_livraison,
+            'id_wilaya' => (int) $cmd->id_wilaya,
+            'nom_wilaya' => $cmd->wilaya?->WILAYA,
+            'id_commune' => (int) $cmd->id_commune,
+            'nom_commune' => $cmd->commune?->COMMUNE,
+            'notes' => $cmd->notes,
+            'synced_pme' => (int) $cmd->synced_pme,
+        ], 'Statut commande mis a jour');
     }
 }

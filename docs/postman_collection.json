@@ -222,6 +222,21 @@
             "header": [{ "key": "Authorization", "value": "Bearer {{pmeToken}}" }],
             "url": { "raw": "{{baseUrl}}/api/v1/pme/commandes?synced=0", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pme", "commandes"], "query": [{ "key": "synced", "value": "0" }] }
           }
+        },
+        {
+          "name": "Changer statut commande",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{pmeToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/v1/pme/commandes/101/statut", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pme", "commandes", "101", "statut"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"expediee\"\n}"
+            }
+          }
         }
       ]
     }

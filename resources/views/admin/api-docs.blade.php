@@ -780,6 +780,44 @@
   "message": "Commande synchronisee"
 }</pre>
                                 </div>
+                                <div class="rounded-xl border border-white/10 bg-black/30 p-4">
+                                    <div class="font-bold">PUT /commandes/{id}/statut</div>
+                                    <div class="mt-2 text-xs text-white/70 leading-relaxed">
+                                        Met a jour le statut d une commande de la boutique.
+                                        Valeurs autorisees:
+                                        <span class="font-mono">en_attente</span>,
+                                        <span class="font-mono">expediee</span>,
+                                        <span class="font-mono">livree</span>,
+                                        <span class="font-mono">annulee</span>.
+                                    </div>
+                                    <div class="mt-2 text-xs text-white/60">
+                                        Cas d'usage: le logiciel PME pousse l'etat logistique final de la commande vers la plateforme.
+                                    </div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/commandes/101/statut') }}</div>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "statut": "expediee"
+}</pre>
+                                    <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
+  "success": true,
+  "data": {
+    "id": 101,
+    "id_client": 15,
+    "nom_client": "client1",
+    "date_cmd": "2026-05-12 14:05:22",
+    "statut": "expediee",
+    "montant_total": 2800,
+    "adresse_livraison": "Alger centre",
+    "tele_livraison": "0550123456",
+    "id_wilaya": 16,
+    "nom_wilaya": "Alger",
+    "id_commune": 1601,
+    "nom_commune": "Sidi M'Hamed",
+    "notes": "",
+    "synced_pme": 0
+  },
+  "message": "Statut commande mis a jour"
+}</pre>
+                                </div>
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
