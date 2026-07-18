@@ -43,11 +43,11 @@ Future<void> main() async {
   if (firebaseReady) {
     await NotificationService.instance.init();
   }
-  runApp(const ProviderScope(child: SafeSoftApp()));
+  runApp(const ProviderScope(child: GrosLinkApp()));
 }
 
-class SafeSoftApp extends ConsumerWidget {
-  const SafeSoftApp({super.key});
+class GrosLinkApp extends ConsumerWidget {
+  const GrosLinkApp({super.key});
 
   Page<dynamic> _fadePage(GoRouterState state, Widget child) {
     return CustomTransitionPage(
@@ -175,7 +175,7 @@ class SafeSoftApp extends ConsumerWidget {
     final router = _router();
 
     return MaterialApp.router(
-      title: 'SafeSoft G2D',
+      title: 'GrosLink',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,

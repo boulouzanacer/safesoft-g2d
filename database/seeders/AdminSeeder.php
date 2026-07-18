@@ -11,7 +11,7 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         $admin = Admin::firstOrNew(['email' => 'admin@safesoft.dz']);
-        $admin->nom = 'SafeSoft';
+        $admin->nom = 'GrosLink';
         $admin->prenom = 'Admin';
         $admin->password = Hash::make('Admin@123');
         $admin->save();

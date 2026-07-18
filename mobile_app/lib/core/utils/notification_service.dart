@@ -19,7 +19,7 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       'safesoft_g2d_channel',
-      'SafeSoft G2D',
+      'GrosLink',
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -32,4 +32,3 @@ class NotificationService {
     );
   }
 }
-

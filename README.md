@@ -1,4 +1,4 @@
-# SafeSoft G2D
+# GrosLink
 
 Monorepo:
 - Backend Laravel: `safesoft-g2d`

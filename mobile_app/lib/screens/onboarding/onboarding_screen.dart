@@ -141,7 +141,7 @@ class _Page1 extends StatelessWidget {
       children: [
         Icon(Icons.storefront, size: 86, color: Colors.white),
         SizedBox(height: 16),
-        Text('Bienvenue sur SafeSoft G2D',
+        Text('Bienvenue sur GrosLink',
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.white,

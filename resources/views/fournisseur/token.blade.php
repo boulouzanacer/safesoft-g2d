@@ -10,7 +10,7 @@
             </div>
             <div>
                 <div class="text-2xl font-extrabold tracking-wide">Votre Token PME Pro</div>
-                <div class="text-sm text-white/60">Ce token permet à votre logiciel PME Pro de se connecter à SafeSoft G2D.</div>
+                <div class="text-sm text-white/60">Ce token permet à votre logiciel PME Pro de se connecter à {{ config('branding.platform_name') }}.</div>
             </div>
         </div>
 
@@ -39,4 +39,3 @@
     </div>
 </div>
 @endsection
-

@@ -232,7 +232,7 @@ class AuthController extends Controller
         ])->save();
 
         $subject = 'Code de vérification email';
-        $body = "Votre code de vérification est : {$code}\n\nCe code expire dans 10 minutes.\n\n" . config('app.name');
+        $body = "Votre code de vérification est : {$code}\n\nCe code expire dans 10 minutes.\n\n" . config('branding.platform_name');
 
         try {
             $resendKey = (string) (config('services.resend.key') ?? '');

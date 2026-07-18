@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Boutique' }} - {{ config('app.name') }}</title>
+    <title>{{ $title ?? 'Boutique' }} - {{ config('branding.platform_name') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,7 +227,7 @@
 @php($headerBrandUrl = trim((string) ($header_brand_url ?? '')))
 @php($brandHref = $headerBrandUrl !== '' ? $headerBrandUrl : $logoHref)
 @php($brandLogoUrl = trim((string) ($headerBrandBoutique->logo_url ?? '')))
-@php($brandName = trim((string) ($headerBrandBoutique->nom_frs ?? '')) !== '' ? trim((string) $headerBrandBoutique->nom_frs) : 'SafeSoft G2D')
+@php($brandName = trim((string) ($headerBrandBoutique->nom_frs ?? '')) !== '' ? trim((string) $headerBrandBoutique->nom_frs) : config('branding.platform_name'))
 @php($brandSubtitle = trim((string) ($headerBrandBoutique->boutiqueCategory->name ?? '')) !== '' ? trim((string) $headerBrandBoutique->boutiqueCategory->name) : ($headerBrandBoutique ? 'Boutique' : 'Store'))
 @php($brandInitial = strtoupper(mb_substr($brandName, 0, 1)))
 <div class="min-h-screen flex flex-col">
@@ -240,7 +240,7 @@
                          class="store-logo-image h-10 w-10 rounded-xl object-cover border bg-white">
                 @else
                     <div class="store-logo-fallback h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white">
-                        {{ $headerBrandBoutique ? $brandInitial : 'G2D' }}
+                        {{ $headerBrandBoutique ? $brandInitial : config('branding.platform_initials') }}
                     </div>
                 @endif
                 <div class="leading-tight">
@@ -336,7 +336,7 @@
 
     <footer class="store-footer border-t">
         <div class="store-muted max-w-7xl mx-auto px-4 py-6 text-sm">
-            © {{ date('Y') }} {{ config('app.name') }}
+            © {{ date('Y') }} {{ config('branding.platform_name') }}
         </div>
     </footer>
 </div>

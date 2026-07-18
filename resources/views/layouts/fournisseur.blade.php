@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Espace Boutique' }} - {{ config('app.name') }}</title>
+    <title>{{ $title ?? 'Espace Boutique' }} - {{ config('branding.platform_name') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,10 +79,10 @@
              :class="dark ? 'border-white/10' : 'border-slate-200'">
             <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
                  style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
-                G2D
+                {{ config('branding.platform_initials') }}
             </div>
             <div class="leading-tight">
-                <div class="font-extrabold tracking-wide">SafeSoft G2D</div>
+                <div class="font-extrabold tracking-wide">{{ config('branding.platform_name') }}</div>
                 <div class="text-xs" :class="dark ? 'text-white/60' : 'text-slate-500'">Espace Boutique</div>
             </div>
         </div>

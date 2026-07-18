@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name') }}</title>
+    <title>{{ config('branding.platform_name') }}</title>
     <script>
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {

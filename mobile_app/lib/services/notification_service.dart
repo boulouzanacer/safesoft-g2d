@@ -99,7 +99,7 @@ class NotificationService {
   ) async {
     const androidDetails = AndroidNotificationDetails(
       _channelId,
-      'SafeSoft G2D',
+      'GrosLink',
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
@@ -121,8 +121,8 @@ class NotificationService {
 
     const channel = AndroidNotificationChannel(
       _channelId,
-      'SafeSoft G2D',
-      description: 'Notifications SafeSoft G2D',
+      'GrosLink',
+      description: 'Notifications GrosLink',
       importance: Importance.high,
       playSound: true,
     );
