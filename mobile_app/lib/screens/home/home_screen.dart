@@ -9,6 +9,7 @@ import '../../models/boutique_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/produit_provider.dart';
 import '../../widgets/common/error_state.dart';
+import '../../widgets/common/horizontal_category_selector.dart';
 import '../../widgets/product/product_card.dart';
 import '../../widgets/skeletons/product_card_skeleton.dart';
 
@@ -277,47 +278,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onPressed: () => ref.invalidate(categoriesProvider(frsId)),
                     child: const Text('Réessayer'),
                   ),
-                  data: (cats) => SizedBox(
-                    height: 40,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: cats.length + 1,
-                      itemBuilder: (_, i) {
-                        if (i == 0) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ChoiceChip(
-                              label: const Text('Tous'),
-                              selected: _selectedCategorie == null,
-                              onSelected: (_) async {
-                                setState(() => _selectedCategorie = null);
-                                await ref
-                                    .read(produitProvider(
-                                            ProduitListQuery(frsId: frsId))
-                                        .notifier)
-                                    .refresh(clearCategorie: true);
-                              },
-                            ),
-                          );
-                        }
-                        final c = cats[i - 1];
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text(c),
-                            selected: _selectedCategorie == c,
-                            onSelected: (_) async {
-                              setState(() => _selectedCategorie = c);
-                              await ref
-                                  .read(produitProvider(
-                                          ProduitListQuery(frsId: frsId))
-                                      .notifier)
-                                  .refresh(categorie: c);
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                  data: (cats) => HorizontalCategorySelector(
+                    categories: cats,
+                    selectedValue: _selectedCategorie,
+                    onChanged: (value) async {
+                      setState(() => _selectedCategorie = value);
+                      final notifier = ref
+                          .read(produitProvider(ProduitListQuery(frsId: frsId)).notifier);
+
+                      if (value == null) {
+                        await notifier.refresh(clearCategorie: true);
+                        return;
+                      }
+
+                      await notifier.refresh(categorie: value);
+                    },
                   ),
                 ),
                 const SizedBox(height: 18),
