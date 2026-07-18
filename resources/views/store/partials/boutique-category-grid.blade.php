@@ -24,9 +24,18 @@
                 scroll-snap-type:x proximity;
                 -webkit-overflow-scrolling:touch;
                 scrollbar-width:none;
+                cursor:grab;
+                touch-action:pan-x;
             }
             .store-category-track::-webkit-scrollbar{
                 display:none;
+            }
+            .store-category-track.is-dragging{
+                cursor:grabbing;
+                scroll-behavior:auto;
+            }
+            .store-category-track.is-dragging a{
+                pointer-events:none;
             }
             .store-category-item{
                 flex:0 0 auto;
@@ -140,6 +149,22 @@
                         return Math.max(Math.round(track.clientWidth * 0.78), 220);
                     };
 
+                    var pointerId = null;
+                    var startX = 0;
+                    var startScrollLeft = 0;
+                    var isDragging = false;
+                    var hasDragged = false;
+
+                    var stopDragging = function () {
+                        if (!isDragging) {
+                            return;
+                        }
+
+                        isDragging = false;
+                        pointerId = null;
+                        track.classList.remove('is-dragging');
+                    };
+
                     prev.addEventListener('click', function () {
                         track.scrollBy({ left: -getStep(), behavior: 'smooth' });
                     });
@@ -147,6 +172,54 @@
                     next.addEventListener('click', function () {
                         track.scrollBy({ left: getStep(), behavior: 'smooth' });
                     });
+
+                    track.addEventListener('pointerdown', function (event) {
+                        if (event.pointerType === 'mouse' && event.button !== 0) {
+                            return;
+                        }
+
+                        pointerId = event.pointerId;
+                        startX = event.clientX;
+                        startScrollLeft = track.scrollLeft;
+                        isDragging = true;
+                        hasDragged = false;
+                        track.classList.add('is-dragging');
+                        track.setPointerCapture(event.pointerId);
+                    });
+
+                    track.addEventListener('pointermove', function (event) {
+                        if (!isDragging || pointerId !== event.pointerId) {
+                            return;
+                        }
+
+                        var deltaX = event.clientX - startX;
+                        if (Math.abs(deltaX) > 6) {
+                            hasDragged = true;
+                        }
+
+                        if (hasDragged) {
+                            track.scrollLeft = startScrollLeft - deltaX;
+                        }
+                    });
+
+                    track.addEventListener('pointerup', function (event) {
+                        if (pointerId === event.pointerId) {
+                            stopDragging();
+                        }
+                    });
+
+                    track.addEventListener('pointercancel', stopDragging);
+                    track.addEventListener('lostpointercapture', stopDragging);
+
+                    track.addEventListener('click', function (event) {
+                        if (!hasDragged) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        event.stopPropagation();
+                        hasDragged = false;
+                    }, true);
 
                     track.addEventListener('scroll', updateState, { passive: true });
                     window.addEventListener('resize', updateState);
