@@ -16,25 +16,26 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    @php($storefrontThemeVars = data_get($storefront_theme_config ?? [], 'vars', []))
 
     <style>
         :root{
-            --store-primary:{{ data_get($storefront_theme_config, 'vars.--store-primary', '#1D4ED8') }};
-            --store-primary-dark:{{ data_get($storefront_theme_config, 'vars.--store-primary-dark', '#1E3A8A') }};
-            --store-bg:{{ data_get($storefront_theme_config, 'vars.--store-bg', '#F4F8FF') }};
-            --store-card:{{ data_get($storefront_theme_config, 'vars.--store-card', '#FFFFFF') }};
-            --store-card-soft:{{ data_get($storefront_theme_config, 'vars.--store-card-soft', '#EFF6FF') }};
-            --store-text:{{ data_get($storefront_theme_config, 'vars.--store-text', '#0F172A') }};
-            --store-muted:{{ data_get($storefront_theme_config, 'vars.--store-muted', '#475569') }};
-            --store-border:{{ data_get($storefront_theme_config, 'vars.--store-border', '#CBD5E1') }};
-            --store-accent:{{ data_get($storefront_theme_config, 'vars.--store-accent', '#DBEAFE') }};
-            --store-accent-text:{{ data_get($storefront_theme_config, 'vars.--store-accent-text', '#1D4ED8') }};
-            --store-hero-from:{{ data_get($storefront_theme_config, 'vars.--store-hero-from', '#1D4ED8') }};
-            --store-hero-to:{{ data_get($storefront_theme_config, 'vars.--store-hero-to', '#0EA5E9') }};
-            --store-button-text:{{ data_get($storefront_theme_config, 'vars.--store-button-text', '#FFFFFF') }};
-            --store-shadow:{{ data_get($storefront_theme_config, 'vars.--store-shadow', '0 22px 45px rgba(37, 99, 235, 0.15)') }};
-            --store-radius-xl:{{ data_get($storefront_theme_config, 'vars.--store-radius-xl', '1rem') }};
-            --store-radius-2xl:{{ data_get($storefront_theme_config, 'vars.--store-radius-2xl', '1.5rem') }};
+            --store-primary:{{ data_get($storefrontThemeVars, '--store-primary', '#1D4ED8') }};
+            --store-primary-dark:{{ data_get($storefrontThemeVars, '--store-primary-dark', '#1E3A8A') }};
+            --store-bg:{{ data_get($storefrontThemeVars, '--store-bg', '#F4F8FF') }};
+            --store-card:{{ data_get($storefrontThemeVars, '--store-card', '#FFFFFF') }};
+            --store-card-soft:{{ data_get($storefrontThemeVars, '--store-card-soft', '#EFF6FF') }};
+            --store-text:{{ data_get($storefrontThemeVars, '--store-text', '#0F172A') }};
+            --store-muted:{{ data_get($storefrontThemeVars, '--store-muted', '#475569') }};
+            --store-border:{{ data_get($storefrontThemeVars, '--store-border', '#CBD5E1') }};
+            --store-accent:{{ data_get($storefrontThemeVars, '--store-accent', '#DBEAFE') }};
+            --store-accent-text:{{ data_get($storefrontThemeVars, '--store-accent-text', '#1D4ED8') }};
+            --store-hero-from:{{ data_get($storefrontThemeVars, '--store-hero-from', '#1D4ED8') }};
+            --store-hero-to:{{ data_get($storefrontThemeVars, '--store-hero-to', '#0EA5E9') }};
+            --store-button-text:{{ data_get($storefrontThemeVars, '--store-button-text', '#FFFFFF') }};
+            --store-shadow:{{ data_get($storefrontThemeVars, '--store-shadow', '0 22px 45px rgba(37, 99, 235, 0.15)') }};
+            --store-radius-xl:{{ data_get($storefrontThemeVars, '--store-radius-xl', '1rem') }};
+            --store-radius-2xl:{{ data_get($storefrontThemeVars, '--store-radius-2xl', '1.5rem') }};
         }
         html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
         body{
