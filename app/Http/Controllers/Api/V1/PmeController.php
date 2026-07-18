@@ -161,6 +161,8 @@ class PmeController extends Controller
 
     private function formatClient(Client $client): array
     {
+        $client->loadMissing(['wilaya', 'commune']);
+
         return [
             'id' => (int) $client->id,
             'code_client' => $client->code_client,
@@ -170,7 +172,9 @@ class PmeController extends Controller
             'telephone' => $client->telephone,
             'adresse' => $client->adresse,
             'id_wilaya' => (int) $client->id_wilaya,
+            'nom_wilaya' => $client->wilaya?->WILAYA,
             'id_commune' => (int) $client->id_commune,
+            'nom_commune' => $client->commune?->COMMUNE,
             'type_client' => (string) $client->type_client,
             'tarif' => (int) ($client->tarif ?? 1),
             'actif' => (int) $client->actif,
@@ -544,6 +548,7 @@ class PmeController extends Controller
 
         $items = Client::query()
             ->where('id_frs', $frs->id)
+            ->with(['wilaya', 'commune'])
             ->when(in_array((string) $synced, ['0', '1'], true), fn ($q) => $q->where('synced_pme', (int) $synced))
             ->when(in_array($typeClient, ['simple', 'abonne'], true), fn ($q) => $q->where('type_client', $typeClient))
             ->orderByDesc('updated_at')
