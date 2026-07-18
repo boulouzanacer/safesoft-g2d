@@ -1,6 +1,42 @@
 @extends('layouts.fournisseur')
 
 @section('content')
+@php
+    $dashboardThemePreviewClasses = [
+        'azure_modern' => 'frs-theme-preview--azure',
+        'emerald_bloom' => 'frs-theme-preview--emerald',
+        'sunset_pop' => 'frs-theme-preview--sunset',
+        'violet_luxe' => 'frs-theme-preview--violet',
+        'rose_boutique' => 'frs-theme-preview--rose',
+        'graphite_pro' => 'frs-theme-preview--graphite',
+    ];
+    $dashboardThemePreviewClass = $dashboardThemePreviewClasses[$storefront_theme_key ?? 'azure_modern'] ?? 'frs-theme-preview--azure';
+@endphp
+
+<style>
+    .frs-theme-preview-primary,
+    .frs-theme-preview-accent {
+        transition: background-color 150ms ease;
+    }
+    .frs-theme-preview--azure .frs-theme-preview-primary { background: linear-gradient(135deg, #1D4ED8, #0EA5E9); }
+    .frs-theme-preview--azure .frs-theme-preview-accent { background: #DBEAFE; }
+
+    .frs-theme-preview--emerald .frs-theme-preview-primary { background: linear-gradient(135deg, #059669, #34D399); }
+    .frs-theme-preview--emerald .frs-theme-preview-accent { background: #D1FAE5; }
+
+    .frs-theme-preview--sunset .frs-theme-preview-primary { background: linear-gradient(135deg, #EA580C, #FB7185); }
+    .frs-theme-preview--sunset .frs-theme-preview-accent { background: #FFE4E6; }
+
+    .frs-theme-preview--violet .frs-theme-preview-primary { background: linear-gradient(135deg, #7C3AED, #A855F7); }
+    .frs-theme-preview--violet .frs-theme-preview-accent { background: #EDE9FE; }
+
+    .frs-theme-preview--rose .frs-theme-preview-primary { background: linear-gradient(135deg, #DB2777, #FB7185); }
+    .frs-theme-preview--rose .frs-theme-preview-accent { background: #FCE7F3; }
+
+    .frs-theme-preview--graphite .frs-theme-preview-primary { background: linear-gradient(135deg, #111827, #334155); }
+    .frs-theme-preview--graphite .frs-theme-preview-accent { background: #E2E8F0; }
+</style>
+
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
     <a href="{{ url('/fournisseur/commandes?statut=en_attente') }}"
        class="rounded-2xl p-5 border border-white/10 bg-[var(--frs-card)] hover:bg-white/5 transition">
@@ -138,11 +174,9 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 rounded-3xl border border-white/10 bg-black/20 p-3">
-                <div class="h-10 w-10 rounded-2xl"
-                     style="background: linear-gradient(135deg, {{ $storefront_theme_preview['from'] ?? 'var(--frs-primary)' }}, {{ $storefront_theme_preview['to'] ?? '#0A3D7A' }});"></div>
-                <div class="h-10 w-16 rounded-2xl"
-                     style="background: {{ $storefront_theme_preview['accent'] ?? 'rgba(255,255,255,.12)' }};"></div>
+            <div class="{{ $dashboardThemePreviewClass }} flex items-center gap-2 rounded-3xl border border-white/10 bg-black/20 p-3">
+                <div class="frs-theme-preview-primary h-10 w-10 rounded-2xl"></div>
+                <div class="frs-theme-preview-accent h-10 w-16 rounded-2xl"></div>
             </div>
             <a href="{{ url('/fournisseur/profil') }}"
                class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white"

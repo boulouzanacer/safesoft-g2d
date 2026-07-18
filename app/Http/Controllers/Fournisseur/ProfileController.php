@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Fournisseur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Commune;
+use App\Models\CustomDomain;
 use App\Models\Fournisseur;
 use App\Models\Wilaya;
 use Illuminate\Contracts\View\View;
@@ -147,7 +148,7 @@ class ProfileController extends Controller
     public function makeCustomDomainPrimary(int $id): RedirectResponse
     {
         $frsId = (int) session('frs_id');
-        $domain = \App\Models\CustomDomain::query()
+        $domain = CustomDomain::query()
             ->where('fournisseur_id', $frsId)
             ->findOrFail($id);
 

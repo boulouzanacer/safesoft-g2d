@@ -748,7 +748,7 @@ class PmeController extends Controller
         $commandes = Cmd1::query()
             ->where('id_frs', $frs->id)
             ->where('synced_pme', $syncedValue)
-            ->with(['wilaya', 'commune'])
+            ->with(['client', 'wilaya', 'commune'])
             ->orderByDesc('date_cmd')
             ->limit(200)
             ->get();
@@ -790,6 +790,7 @@ class PmeController extends Controller
             return [
                 'id' => $c->id,
                 'id_client' => (int) $c->id_client,
+                'nom_client' => $c->client?->nom,
                 'date_cmd' => (string) $c->date_cmd,
                 'statut' => (string) $c->statut,
                 'montant_total' => (float) $c->montant_total,

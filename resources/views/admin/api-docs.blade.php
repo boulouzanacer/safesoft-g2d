@@ -734,6 +734,7 @@
     {
       "id": 101,
       "id_client": 15,
+      "nom_client": "client1",
       "date_cmd": "2026-05-12 14:05:22",
       "statut": "en_attente",
       "montant_total": 2800,

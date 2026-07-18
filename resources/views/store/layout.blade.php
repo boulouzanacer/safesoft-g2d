@@ -16,26 +16,133 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    @php($storefrontThemeVars = data_get($storefront_theme_config ?? [], 'vars', []))
 
     <style>
         :root{
-            --store-primary:{{ data_get($storefrontThemeVars, '--store-primary', '#1D4ED8') }};
-            --store-primary-dark:{{ data_get($storefrontThemeVars, '--store-primary-dark', '#1E3A8A') }};
-            --store-bg:{{ data_get($storefrontThemeVars, '--store-bg', '#F4F8FF') }};
-            --store-card:{{ data_get($storefrontThemeVars, '--store-card', '#FFFFFF') }};
-            --store-card-soft:{{ data_get($storefrontThemeVars, '--store-card-soft', '#EFF6FF') }};
-            --store-text:{{ data_get($storefrontThemeVars, '--store-text', '#0F172A') }};
-            --store-muted:{{ data_get($storefrontThemeVars, '--store-muted', '#475569') }};
-            --store-border:{{ data_get($storefrontThemeVars, '--store-border', '#CBD5E1') }};
-            --store-accent:{{ data_get($storefrontThemeVars, '--store-accent', '#DBEAFE') }};
-            --store-accent-text:{{ data_get($storefrontThemeVars, '--store-accent-text', '#1D4ED8') }};
-            --store-hero-from:{{ data_get($storefrontThemeVars, '--store-hero-from', '#1D4ED8') }};
-            --store-hero-to:{{ data_get($storefrontThemeVars, '--store-hero-to', '#0EA5E9') }};
-            --store-button-text:{{ data_get($storefrontThemeVars, '--store-button-text', '#FFFFFF') }};
-            --store-shadow:{{ data_get($storefrontThemeVars, '--store-shadow', '0 22px 45px rgba(37, 99, 235, 0.15)') }};
-            --store-radius-xl:{{ data_get($storefrontThemeVars, '--store-radius-xl', '1rem') }};
-            --store-radius-2xl:{{ data_get($storefrontThemeVars, '--store-radius-2xl', '1.5rem') }};
+            --store-primary:#1D4ED8;
+            --store-primary-dark:#1E3A8A;
+            --store-bg:#F4F8FF;
+            --store-card:#FFFFFF;
+            --store-card-soft:#EFF6FF;
+            --store-text:#0F172A;
+            --store-muted:#475569;
+            --store-border:#BFDBFE;
+            --store-accent:#DBEAFE;
+            --store-accent-text:#1D4ED8;
+            --store-hero-from:#1D4ED8;
+            --store-hero-to:#0EA5E9;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 22px 45px rgba(37, 99, 235, 0.15);
+            --store-radius-xl:1rem;
+            --store-radius-2xl:1.5rem;
+        }
+        .store-theme--azure{
+            --store-primary:#1D4ED8;
+            --store-primary-dark:#1E3A8A;
+            --store-bg:#F4F8FF;
+            --store-card:#FFFFFF;
+            --store-card-soft:#EFF6FF;
+            --store-text:#0F172A;
+            --store-muted:#475569;
+            --store-border:#BFDBFE;
+            --store-accent:#DBEAFE;
+            --store-accent-text:#1D4ED8;
+            --store-hero-from:#1D4ED8;
+            --store-hero-to:#0EA5E9;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 22px 45px rgba(37, 99, 235, 0.15);
+            --store-radius-xl:1rem;
+            --store-radius-2xl:1.5rem;
+        }
+        .store-theme--emerald{
+            --store-primary:#059669;
+            --store-primary-dark:#065F46;
+            --store-bg:#F2FBF7;
+            --store-card:#FFFFFF;
+            --store-card-soft:#ECFDF5;
+            --store-text:#0F172A;
+            --store-muted:#4B5563;
+            --store-border:#A7F3D0;
+            --store-accent:#D1FAE5;
+            --store-accent-text:#047857;
+            --store-hero-from:#047857;
+            --store-hero-to:#34D399;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 22px 48px rgba(5, 150, 105, 0.16);
+            --store-radius-xl:1rem;
+            --store-radius-2xl:1.5rem;
+        }
+        .store-theme--sunset{
+            --store-primary:#EA580C;
+            --store-primary-dark:#9A3412;
+            --store-bg:#FFF7ED;
+            --store-card:#FFFFFF;
+            --store-card-soft:#FFF1F2;
+            --store-text:#431407;
+            --store-muted:#7C2D12;
+            --store-border:#FDBA74;
+            --store-accent:#FFE4E6;
+            --store-accent-text:#BE123C;
+            --store-hero-from:#EA580C;
+            --store-hero-to:#FB7185;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 24px 50px rgba(234, 88, 12, 0.16);
+            --store-radius-xl:1rem;
+            --store-radius-2xl:1.5rem;
+        }
+        .store-theme--violet{
+            --store-primary:#7C3AED;
+            --store-primary-dark:#4C1D95;
+            --store-bg:#F8F5FF;
+            --store-card:#FFFFFF;
+            --store-card-soft:#F5F3FF;
+            --store-text:#1F1635;
+            --store-muted:#5B5570;
+            --store-border:#DDD6FE;
+            --store-accent:#EDE9FE;
+            --store-accent-text:#6D28D9;
+            --store-hero-from:#6D28D9;
+            --store-hero-to:#A855F7;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 24px 52px rgba(124, 58, 237, 0.18);
+            --store-radius-xl:1.15rem;
+            --store-radius-2xl:1.75rem;
+        }
+        .store-theme--rose{
+            --store-primary:#DB2777;
+            --store-primary-dark:#9D174D;
+            --store-bg:#FFF7FB;
+            --store-card:#FFFFFF;
+            --store-card-soft:#FDF2F8;
+            --store-text:#3F1732;
+            --store-muted:#6B3358;
+            --store-border:#FBCFE8;
+            --store-accent:#FCE7F3;
+            --store-accent-text:#BE185D;
+            --store-hero-from:#DB2777;
+            --store-hero-to:#FB7185;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 24px 50px rgba(219, 39, 119, 0.16);
+            --store-radius-xl:1rem;
+            --store-radius-2xl:1.65rem;
+        }
+        .store-theme--graphite{
+            --store-primary:#111827;
+            --store-primary-dark:#020617;
+            --store-bg:#F8FAFC;
+            --store-card:#FFFFFF;
+            --store-card-soft:#F1F5F9;
+            --store-text:#0F172A;
+            --store-muted:#475569;
+            --store-border:#CBD5E1;
+            --store-accent:#E2E8F0;
+            --store-accent-text:#0F172A;
+            --store-hero-from:#111827;
+            --store-hero-to:#334155;
+            --store-button-text:#FFFFFF;
+            --store-shadow:0 22px 48px rgba(15, 23, 42, 0.18);
+            --store-radius-xl:.95rem;
+            --store-radius-2xl:1.35rem;
         }
         html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
         body{
@@ -68,7 +175,7 @@
             color:var(--store-text);
         }
         .store-input::placeholder{
-            color:color-mix(in srgb, var(--store-muted) 72%, white);
+            color:var(--store-muted);
         }
         .store-input:focus{
             outline:none;
@@ -101,9 +208,17 @@
             background:var(--store-accent);
             color:var(--store-accent-text);
         }
+        .store-logo-image{
+            border-color:var(--store-border);
+        }
+        .store-logo-fallback{
+            background:linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));
+        }
     </style>
 </head>
-<body class="min-h-screen">
+@php($storeThemeClassMap = ['azure_modern' => 'store-theme--azure', 'emerald_bloom' => 'store-theme--emerald', 'sunset_pop' => 'store-theme--sunset', 'violet_luxe' => 'store-theme--violet', 'rose_boutique' => 'store-theme--rose', 'graphite_pro' => 'store-theme--graphite'])
+@php($storeThemeClass = $storeThemeClassMap[$storefront_theme_key ?? 'azure_modern'] ?? 'store-theme--azure')
+<body class="min-h-screen {{ $storeThemeClass }}">
 @php($cartCount = is_array(session('cart')) ? count(session('cart')) : 0)
 @php($isStorefrontMode = (bool) ($storefront_mode ?? false))
 @php($storefrontHomeUrl = trim((string) ($storefront_home_url ?? '')))
@@ -122,11 +237,9 @@
                 @if($brandLogoUrl !== '')
                     <img src="{{ $brandLogoUrl }}"
                          alt="{{ $brandName }}"
-                         class="h-10 w-10 rounded-xl object-cover border bg-white"
-                         style="border-color: var(--store-border);">
+                         class="store-logo-image h-10 w-10 rounded-xl object-cover border bg-white">
                 @else
-                    <div class="h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white"
-                         style="background: linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));">
+                    <div class="store-logo-fallback h-10 w-10 rounded-xl flex items-center justify-center font-extrabold text-white">
                         {{ $headerBrandBoutique ? $brandInitial : 'G2D' }}
                     </div>
                 @endif

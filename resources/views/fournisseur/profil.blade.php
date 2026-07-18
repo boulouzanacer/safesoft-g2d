@@ -1,10 +1,6 @@
 @extends('layouts.fournisseur')
 
 @section('content')
-@php
-    $selectedTheme = old('storefront_theme', $frs->storefrontThemeKey());
-    $themeOptions = $storefront_theme_options ?? [];
-@endphp
 <div class="max-w-4xl space-y-4">
     @if(session('success'))
         <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-emerald-200">
@@ -128,8 +124,8 @@
                     </div>
 
                     @include('partials.storefront-theme-picker', [
-                        'themeOptions' => $themeOptions,
-                        'selectedTheme' => $selectedTheme,
+                        'themeOptions' => ($storefront_theme_options ?? []),
+                        'selectedTheme' => old('storefront_theme', $frs->storefrontThemeKey()),
                         'inputName' => 'storefront_theme',
                         'inputIdPrefix' => 'frs-storefront-theme',
                         'surfaceClass' => 'bg-black/20 border-white/10',
@@ -223,11 +219,19 @@
 
 </div>
 
+<div id="frsProfileConfig"
+     class="hidden"
+     data-communes-url-base="{{ url('/fournisseur/wilayas') }}"
+     data-current-commune="{{ (int) old('id_commune', $frs->id_commune) }}"></div>
+
 <script>
     (function () {
         const wilayaSelect = document.getElementById('wilayaSelectFrs');
         const communeSelect = document.getElementById('communeSelectFrs');
-        if (!wilayaSelect || !communeSelect) return;
+        const config = document.getElementById('frsProfileConfig');
+        if (!wilayaSelect || !communeSelect || !config) return;
+        const communesUrlBase = config.dataset.communesUrlBase || '';
+        const currentCommune = config.dataset.currentCommune || '';
 
         async function loadCommunes(wilayaId) {
             communeSelect.innerHTML = '<option value="">Chargement...</option>';
@@ -236,16 +240,15 @@
                 return;
             }
 
-            const res = await fetch('{{ url('/fournisseur/wilayas') }}/' + wilayaId + '/communes');
+            const res = await fetch(communesUrlBase + '/' + wilayaId + '/communes');
             const rows = await res.json();
-            const current = '{{ (int)old('id_commune', $frs->id_commune) }}';
 
             communeSelect.innerHTML = '<option value="">Choisir...</option>';
             rows.forEach(r => {
                 const opt = document.createElement('option');
                 opt.value = r.ID_COMMUNE;
                 opt.textContent = r.COMMUNE;
-                if (String(r.ID_COMMUNE) === String(current)) opt.selected = true;
+                if (String(r.ID_COMMUNE) === String(currentCommune)) opt.selected = true;
                 communeSelect.appendChild(opt);
             });
         }
