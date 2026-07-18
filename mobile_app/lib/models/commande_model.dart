@@ -9,7 +9,7 @@ class CommandeModel {
   final double montantTotal;
   final int syncedPme;
   final String? adresseLivraison;
-  final String? teleShipping;
+  final String? teleLivraison;
   final int? idWilaya;
   final int? idCommune;
   final String? notes;
@@ -24,7 +24,7 @@ class CommandeModel {
     required this.syncedPme,
     this.nomFrs,
     this.adresseLivraison,
-    this.teleShipping,
+    this.teleLivraison,
     this.idWilaya,
     this.idCommune,
     this.notes,
@@ -50,7 +50,7 @@ class CommandeModel {
           : double.tryParse('${json['montant_total']}') ?? 0,
       syncedPme: (json['synced_pme'] ?? 0) as int,
       adresseLivraison: json['adresse_livraison']?.toString(),
-      teleShipping: json['tele_shipping']?.toString(),
+      teleLivraison: json['tele_livraison']?.toString(),
       idWilaya: (json['id_wilaya'] is num)
           ? (json['id_wilaya'] as num).toInt()
           : int.tryParse('${json['id_wilaya']}'),

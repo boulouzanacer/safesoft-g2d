@@ -21,7 +21,7 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _adresseCtrl = TextEditingController();
-  final _teleShippingCtrl = TextEditingController();
+  final _teleLivraisonCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
 
   List<WilayaModel> _wilayas = [];
@@ -43,7 +43,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         _adresseCtrl.text = client.adresse!.trim();
       }
       if ((client?.telephone ?? '').trim().isNotEmpty) {
-        _teleShippingCtrl.text = client!.telephone!.trim();
+        _teleLivraisonCtrl.text = client!.telephone!.trim();
       }
       _loadWilayas();
     });
@@ -52,7 +52,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   @override
   void dispose() {
     _adresseCtrl.dispose();
-    _teleShippingCtrl.dispose();
+    _teleLivraisonCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
@@ -135,8 +135,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       return;
     }
 
-    final teleShipping = _teleShippingCtrl.text.trim();
-    if (teleShipping.isEmpty) {
+    final teleLivraison = _teleLivraisonCtrl.text.trim();
+    if (teleLivraison.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez saisir le téléphone de livraison')),
       );
@@ -149,7 +149,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final body = {
       'id_frs': frsId,
       'adresse_livraison': adresse,
-      'tele_shipping': teleShipping,
+      'tele_livraison': teleLivraison,
       'id_wilaya': _selectedWilaya!.idWilaya,
       'id_commune': _selectedCommune!.idCommune,
       'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
@@ -230,7 +230,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: _teleShippingCtrl,
+                  controller: _teleLivraisonCtrl,
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
                     labelText: 'Téléphone de livraison',

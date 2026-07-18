@@ -16,7 +16,7 @@ class CommandeStoreRequest extends FormRequest
         return [
             'id_frs' => ['required', 'integer', 'exists:frs,id'],
             'adresse_livraison' => ['required', 'string'],
-            'tele_shipping' => ['required', 'string', 'max:30'],
+            'tele_livraison' => ['required', 'string', 'max:30'],
             'id_wilaya' => ['required', 'integer', 'exists:wilaya,ID_WILAYA'],
             'id_commune' => ['required', 'integer', 'exists:commune,ID_COMMUNE'],
             'notes' => ['nullable', 'string'],

@@ -354,7 +354,7 @@
                                         {<br>
                                         &nbsp;&nbsp;"id_frs": 1,<br>
                                         &nbsp;&nbsp;"adresse_livraison": "...",<br>
-                                        &nbsp;&nbsp;"tele_shipping": "...",<br>
+                                        &nbsp;&nbsp;"tele_livraison": "...",<br>
                                         &nbsp;&nbsp;"id_wilaya": 1,<br>
                                         &nbsp;&nbsp;"id_commune": 1,<br>
                                         &nbsp;&nbsp;"notes": "...",<br>
@@ -738,7 +738,7 @@
       "statut": "en_attente",
       "montant_total": 2800,
       "adresse_livraison": "Alger centre",
-      "tele_shipping": "0550123456",
+      "tele_livraison": "0550123456",
       "id_wilaya": 16,
       "nom_wilaya": "Alger",
       "id_commune": 1601,

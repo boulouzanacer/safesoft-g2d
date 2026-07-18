@@ -22,7 +22,7 @@ class Cmd1 extends Model
         'statut',
         'montant_total',
         'adresse_livraison',
-        'tele_shipping',
+        'tele_livraison',
         'id_wilaya',
         'id_commune',
         'notes',

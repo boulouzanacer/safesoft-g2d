@@ -172,7 +172,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Téléphone : ${cmd.teleShipping?.trim().isNotEmpty == true ? cmd.teleShipping : '—'}',
+                                  'Téléphone : ${cmd.teleLivraison?.trim().isNotEmpty == true ? cmd.teleLivraison : '—'}',
                                 ),
                                 const SizedBox(height: 8),
                                 Text(cmd.adresseLivraison ?? '—'),

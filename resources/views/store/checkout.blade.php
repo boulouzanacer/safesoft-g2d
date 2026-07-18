@@ -35,11 +35,11 @@
 
                 <div>
                     <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Téléphone de livraison</label>
-                    <input name="tele_shipping"
-                           value="{{ old('tele_shipping', $client->telephone ?? '') }}"
+                    <input name="tele_livraison"
+                           value="{{ old('tele_livraison', $client->telephone ?? '') }}"
                            class="store-input w-full px-4 py-3"
                            required>
-                    @error('tele_shipping')
+                    @error('tele_livraison')
                         <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
                     @enderror
                 </div>
