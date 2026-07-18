@@ -19,7 +19,7 @@ class PmeClientUpsertRequest extends FormRequest
 
         return [
             'code_client' => ['nullable', 'string', 'max:50'],
-            'nom' => ['required', 'string', 'max:255'],
+            'nom' => [...$required, 'string', 'max:255'],
             'email' => [...$required, 'email', 'max:255'],
             'password' => $this->isMethod('post')
                 ? ['required', 'string', 'min:8']

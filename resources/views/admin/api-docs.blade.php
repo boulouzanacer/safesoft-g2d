@@ -639,13 +639,10 @@
                                         pour les clients venant du logiciel PME.
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">
-                                        Cas d'usage: mise a jour telephone, tarif ou statut de synchronisation.
+                                        Cas d'usage: mise a jour du code client, telephone, tarif ou statut de synchronisation.
                                     </div>
                                     <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
-  "telephone": "0550123456",
-  "type_client": "abonne",
-  "tarif": 3,
-  "synced_pme": 1
+  "code_client": "55666332459659"
 }</pre>
                                 </div>
                             </div>
