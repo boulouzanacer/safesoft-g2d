@@ -1072,6 +1072,7 @@ class StoreController extends Controller
 
         $data = $request->validate([
             'adresse_livraison' => ['required', 'string', 'max:255'],
+            'tele_shipping' => ['required', 'string', 'max:30'],
             'id_wilaya' => ['required', 'integer', 'exists:wilaya,ID_WILAYA'],
             'id_commune' => ['required', 'integer', 'exists:commune,ID_COMMUNE'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -1165,6 +1166,7 @@ class StoreController extends Controller
                 'statut' => 'en_attente',
                 'montant_total' => $montantTotal,
                 'adresse_livraison' => $data['adresse_livraison'],
+                'tele_shipping' => $data['tele_shipping'],
                 'id_wilaya' => (int) $data['id_wilaya'],
                 'id_commune' => (int) $data['id_commune'],
                 'notes' => $data['notes'] ?? null,

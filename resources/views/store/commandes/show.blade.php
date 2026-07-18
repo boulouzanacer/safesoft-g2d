@@ -67,6 +67,10 @@
         <div class="space-y-4">
             <div class="store-panel p-6">
                 <div class="text-lg font-extrabold tracking-wide">Livraison</div>
+                <div class="store-muted mt-3 text-xs font-bold">Téléphone</div>
+                <div class="mt-1 text-sm font-semibold" style="color: var(--store-text);">
+                    {{ $commande->tele_shipping ?? '—' }}
+                </div>
                 <div class="mt-3 text-sm leading-relaxed" style="color: var(--store-text);">
                     {{ $commande->adresse_livraison ?? '—' }}
                 </div>

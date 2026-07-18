@@ -27,12 +27,10 @@ class ClientModel {
 
   factory ClientModel.fromJson(Map<String, dynamic> json) {
     final nom = (json['nom'] ?? '').toString().trim();
-    final prenom = (json['prenom'] ?? '').toString().trim();
-    final fullName = [prenom, nom].where((value) => value.isNotEmpty).join(' ');
 
     return ClientModel(
       id: (json['id'] ?? 0) as int,
-      nom: fullName.isEmpty ? nom : fullName,
+      nom: nom,
       email: (json['email'] ?? '').toString(),
       telephone: json['telephone']?.toString(),
       adresse: json['adresse']?.toString(),

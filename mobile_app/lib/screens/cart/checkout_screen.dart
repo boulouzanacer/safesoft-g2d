@@ -21,6 +21,7 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _adresseCtrl = TextEditingController();
+  final _teleShippingCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
 
   List<WilayaModel> _wilayas = [];
@@ -41,6 +42,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (client?.adresse != null && client!.adresse!.trim().isNotEmpty) {
         _adresseCtrl.text = client.adresse!.trim();
       }
+      if ((client?.telephone ?? '').trim().isNotEmpty) {
+        _teleShippingCtrl.text = client!.telephone!.trim();
+      }
       _loadWilayas();
     });
   }
@@ -48,6 +52,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   @override
   void dispose() {
     _adresseCtrl.dispose();
+    _teleShippingCtrl.dispose();
     _notesCtrl.dispose();
     super.dispose();
   }
@@ -130,12 +135,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       return;
     }
 
+    final teleShipping = _teleShippingCtrl.text.trim();
+    if (teleShipping.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez saisir le téléphone de livraison')),
+      );
+      return;
+    }
+
     final frsId = cart.frsId;
     if (frsId == null) return;
 
     final body = {
       'id_frs': frsId,
       'adresse_livraison': adresse,
+      'tele_shipping': teleShipping,
       'id_wilaya': _selectedWilaya!.idWilaya,
       'id_commune': _selectedCommune!.idCommune,
       'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
@@ -213,6 +227,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   minLines: 3,
                   maxLines: 5,
                   decoration: const InputDecoration(labelText: 'Adresse complète'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _teleShippingCtrl,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: 'Téléphone de livraison',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(

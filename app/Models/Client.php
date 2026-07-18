@@ -48,30 +48,9 @@ class Client extends Authenticatable
         return trim((string) preg_replace('/\s+/', ' ', trim((string) $name)));
     }
 
-    public static function fullNameFromParts(?string $nom, ?string $prenom = null): string
-    {
-        $parts = [];
-
-        $prenom = static::normalizeFullName($prenom);
-        $nom = static::normalizeFullName($nom);
-
-        if ($prenom !== '') {
-            $parts[] = $prenom;
-        }
-
-        if ($nom !== '') {
-            $parts[] = $nom;
-        }
-
-        return trim(preg_replace('/\s+/', ' ', implode(' ', $parts)) ?? '');
-    }
-
     public function getDisplayNameAttribute(): string
     {
-        return static::fullNameFromParts(
-            (string) ($this->attributes['nom'] ?? ''),
-            (string) ($this->attributes['prenom'] ?? '')
-        );
+        return static::normalizeFullName((string) ($this->attributes['nom'] ?? ''));
     }
 
     public function getFirstNameAttribute(): string

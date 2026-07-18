@@ -153,7 +153,7 @@
             "url": { "raw": "{{baseUrl}}/api/v1/commandes", "host": ["{{baseUrl}}"], "path": ["api", "v1", "commandes"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_frs\": 1,\n  \"adresse_livraison\": \"Adresse\",\n  \"id_wilaya\": 16,\n  \"id_commune\": 535,\n  \"notes\": \"\",\n  \"panier\": [\n    { \"id_produit\": 1, \"quantite\": 1 }\n  ]\n}"
+              "raw": "{\n  \"id_frs\": 1,\n  \"adresse_livraison\": \"Adresse\",\n  \"tele_shipping\": \"0550123456\",\n  \"id_wilaya\": 16,\n  \"id_commune\": 535,\n  \"notes\": \"\",\n  \"panier\": [\n    { \"id_produit\": 1, \"quantite\": 1 }\n  ]\n}"
             }
           }
         },

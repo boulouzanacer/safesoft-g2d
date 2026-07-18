@@ -33,6 +33,17 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Téléphone de livraison</label>
+                    <input name="tele_shipping"
+                           value="{{ old('tele_shipping', $client->telephone ?? '') }}"
+                           class="store-input w-full px-4 py-3"
+                           required>
+                    @error('tele_shipping')
+                        <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Wilaya</label>

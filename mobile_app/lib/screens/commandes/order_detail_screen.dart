@@ -168,7 +168,16 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                               border: Border.all(
                                   color: Colors.black.withValues(alpha: 0.06)),
                             ),
-                            child: Text(cmd.adresseLivraison ?? '—'),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Téléphone : ${cmd.teleShipping?.trim().isNotEmpty == true ? cmd.teleShipping : '—'}',
+                                ),
+                                const SizedBox(height: 8),
+                                Text(cmd.adresseLivraison ?? '—'),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 14),
                           const Text('Produits',
