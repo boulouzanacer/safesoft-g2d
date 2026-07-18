@@ -739,11 +739,14 @@
       "montant_total": 2800,
       "adresse_livraison": "Alger centre",
       "id_wilaya": 16,
+      "nom_wilaya": "Alger",
       "id_commune": 1601,
+      "nom_commune": "Sidi M'Hamed",
       "notes": "",
       "synced_pme": 0,
       "lignes": [
         {
+          "id_cmd": 101,
           "id_produit": 1,
           "reference": "R1",
           "designation": "Prod 1",

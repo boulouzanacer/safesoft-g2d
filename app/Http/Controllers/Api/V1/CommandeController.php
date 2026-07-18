@@ -117,6 +117,7 @@ class CommandeController extends Controller
                     ->leftJoin('produit', 'produit.id', '=', 'cmd2.id_produit')
                     ->select([
                         'cmd2.id',
+                        'cmd2.id_cmd',
                         'cmd2.id_produit',
                         'cmd2.quantite',
                         'cmd2.prix_unitaire',
@@ -128,6 +129,8 @@ class CommandeController extends Controller
                     ->orderBy('cmd2.id')
                     ->get();
 
+                $cmd1->loadMissing(['wilaya', 'commune']);
+
                 return [
                     'commande' => [
                         'id' => $cmd1->id,
@@ -138,7 +141,9 @@ class CommandeController extends Controller
                         'montant_total' => (float) $cmd1->montant_total,
                         'adresse_livraison' => $cmd1->adresse_livraison,
                         'id_wilaya' => (int) $cmd1->id_wilaya,
+                        'nom_wilaya' => $cmd1->wilaya?->WILAYA,
                         'id_commune' => (int) $cmd1->id_commune,
+                        'nom_commune' => $cmd1->commune?->COMMUNE,
                         'notes' => $cmd1->notes,
                         'synced_pme' => (int) $cmd1->synced_pme,
                     ],
@@ -164,6 +169,7 @@ class CommandeController extends Controller
                 'cmd1.*',
                 'frs.nom_frs as nom_frs',
             ])
+            ->with(['wilaya', 'commune'])
             ->where('cmd1.id_client', $client->id)
             ->orderByDesc('cmd1.date_cmd')
             ->paginate(20);
@@ -177,6 +183,10 @@ class CommandeController extends Controller
                 'statut' => (string) $c->statut,
                 'montant_total' => (float) $c->montant_total,
                 'adresse_livraison' => $c->adresse_livraison,
+                'id_wilaya' => (int) $c->id_wilaya,
+                'nom_wilaya' => $c->wilaya?->WILAYA,
+                'id_commune' => (int) $c->id_commune,
+                'nom_commune' => $c->commune?->COMMUNE,
                 'synced_pme' => (int) $c->synced_pme,
             ];
         })->values();
@@ -197,6 +207,7 @@ class CommandeController extends Controller
         $client = $request->user();
 
         $cmd = Cmd1::query()
+            ->with(['wilaya', 'commune'])
             ->where('id', $id)
             ->where('id_client', $client->id)
             ->first();
@@ -209,6 +220,7 @@ class CommandeController extends Controller
             ->leftJoin('produit', 'produit.id', '=', 'cmd2.id_produit')
             ->select([
                 'cmd2.id',
+                'cmd2.id_cmd',
                 'cmd2.id_produit',
                 'cmd2.quantite',
                 'cmd2.prix_unitaire',
@@ -230,7 +242,9 @@ class CommandeController extends Controller
                 'montant_total' => (float) $cmd->montant_total,
                 'adresse_livraison' => $cmd->adresse_livraison,
                 'id_wilaya' => (int) $cmd->id_wilaya,
+                'nom_wilaya' => $cmd->wilaya?->WILAYA,
                 'id_commune' => (int) $cmd->id_commune,
+                'nom_commune' => $cmd->commune?->COMMUNE,
                 'notes' => $cmd->notes,
                 'synced_pme' => (int) $cmd->synced_pme,
             ],

@@ -38,6 +38,16 @@ class Cmd1 extends Model
         return $this->belongsTo(Fournisseur::class, 'id_frs', 'id');
     }
 
+    public function wilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class, 'id_wilaya', 'ID_WILAYA');
+    }
+
+    public function commune(): BelongsTo
+    {
+        return $this->belongsTo(Commune::class, 'id_commune', 'ID_COMMUNE');
+    }
+
     public function lignes(): HasMany
     {
         return $this->hasMany(Cmd2::class, 'id_cmd', 'id');
