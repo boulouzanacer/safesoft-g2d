@@ -201,7 +201,7 @@
         <div class="text-xs text-white/50">{{ __('Illimité • Sans chevauchement • Ignore le tarif client si activé') }}</div>
     </div>
 
-    <div class="mt-4" id="tierRowsWrap" style="{{ $tierEnabled ? '' : 'display:none;' }}">
+    <div class="mt-4 {{ $tierEnabled ? '' : 'hidden' }}" id="tierRowsWrap">
         <div class="grid grid-cols-12 gap-2 text-xs font-bold text-white/60">
             <div class="col-span-3">{{ __('Qté min') }}</div>
             <div class="col-span-3">{{ __('Qté max') }}</div>
@@ -323,7 +323,7 @@
 
         function render() {
             if (enabledInput) enabledInput.checked = !!enabled;
-            if (rowsWrap) rowsWrap.style.display = enabled ? '' : 'none';
+            if (rowsWrap) rowsWrap.classList.toggle('hidden', !enabled);
 
             rowsEl.innerHTML = '';
 
@@ -458,14 +458,16 @@
 
                 <button type="button"
                         class="absolute top-2 left-2 h-9 w-9 rounded-xl bg-black/50 text-white/90 hover:bg-black/70 flex items-center justify-center"
-                        onclick="window.__setPrimary('existing:{{ $img->id }}')"
+                        data-action="set-primary"
+                        data-key="existing:{{ $img->id }}"
                         title="{{ __('Définir comme principale') }}">
                     <i class="fa-solid fa-star"></i>
                 </button>
 
                 <button type="button"
                         class="absolute top-2 right-2 h-9 w-9 rounded-xl bg-black/50 text-white/90 hover:bg-black/70 flex items-center justify-center"
-                        onclick="window.__markDeleteExisting(this, {{ $img->id }})"
+                        data-action="delete-existing"
+                        data-existing-id="{{ $img->id }}"
                         title="{{ __('Supprimer') }}">
                     <i class="fa-solid fa-trash"></i>
                 </button>
@@ -524,6 +526,22 @@
             orderInputs.appendChild(input);
             rebuildOrderInputs();
         }
+
+        imageList?.addEventListener('click', (event) => {
+            const button = event.target.closest('button[data-action]');
+            if (!button) return;
+
+            const action = button.dataset.action || '';
+            if (action === 'set-primary') {
+                const key = button.dataset.key || '';
+                if (key) window.__setPrimary(key);
+            }
+
+            if (action === 'delete-existing') {
+                const id = button.dataset.existingId || '';
+                if (id) window.__markDeleteExisting(button, id);
+            }
+        });
 
         function fileToKey(index) {
             return 'new:' + index;
@@ -599,7 +617,7 @@
             if (e.target && e.target.matches('form')) rebuildOrderInputs();
         });
 
-        const initialPrimary = '{{ old('primary_image') }}';
+        const initialPrimary = primaryInput?.value || '';
         if (initialPrimary) window.__setPrimary(initialPrimary);
     })();
 </script>

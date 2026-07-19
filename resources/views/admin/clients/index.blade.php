@@ -94,7 +94,8 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                    onclick="return confirm('{{ __('Supprimer ce client sans boutique ?') }}')"
+                                                    data-confirm="{{ __('Supprimer ce client sans boutique ?') }}"
+                                                    onclick="return confirm(this.dataset.confirm || '')"
                                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
                                                     title="{{ __('Supprimer') }}">
                                                 <i class="fa-solid fa-trash"></i>

@@ -117,7 +117,8 @@
                                     <form method="POST" action="{{ url('/admin/fournisseurs/'.$f->id.'/regenerer-token') }}">
                                         @csrf
                                         <button type="submit"
-                                                onclick="return confirm('{{ __('Régénérer le token ?') }}')"
+                                                data-confirm="{{ __('Régénérer le token ?') }}"
+                                                onclick="return confirm(this.dataset.confirm || '')"
                                                 class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
                                                 title="{{ __('Régénérer token') }}"
                                                 aria-label="{{ __('Régénérer token') }}">
@@ -136,7 +137,8 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                onclick="return confirm('{{ __('Supprimer cette boutique ?') }}')"
+                                                data-confirm="{{ __('Supprimer cette boutique ?') }}"
+                                                onclick="return confirm(this.dataset.confirm || '')"
                                                 class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
                                                 title="{{ __('Supprimer') }}"
                                                 aria-label="{{ __('Supprimer') }}">
