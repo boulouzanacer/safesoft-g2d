@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <script>
         window.tailwind = window.tailwind || {};
@@ -48,7 +48,18 @@
         html:not(.dark) .text-amber-200{color:rgb(180 83 9 / 1);}
         html:not(.dark) .text-sky-200{color:rgb(3 105 161 / 1);}
         html:not(.dark) .text-violet-200{color:rgb(109 40 217 / 1);}
-        html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+        :root{
+            --font-latin:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+            --font-arabic:Tajawal,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+            --font-ui:var(--font-latin);
+        }
+        html:lang(ar),
+        html[dir="rtl"]{
+            --font-ui:var(--font-arabic);
+        }
+        html,body,button,input,select,textarea{
+            font-family:var(--font-ui);
+        }
         [dir="rtl"] .admin-sidebar{
             left:auto;
             right:0;

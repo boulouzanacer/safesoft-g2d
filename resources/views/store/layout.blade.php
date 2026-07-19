@@ -7,7 +7,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script>
         window.tailwind = window.tailwind || {};
         window.tailwind.config = {
@@ -144,7 +144,18 @@
             --store-radius-xl:.95rem;
             --store-radius-2xl:1.35rem;
         }
-        html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+        :root{
+            --font-latin:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+            --font-arabic:Tajawal,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+            --font-ui:var(--font-latin);
+        }
+        html:lang(ar),
+        html[dir="rtl"]{
+            --font-ui:var(--font-arabic);
+        }
+        html,body,button,input,select,textarea{
+            font-family:var(--font-ui);
+        }
         body{
             background:
                 radial-gradient(circle at top left, rgba(255,255,255,.55), transparent 32%),

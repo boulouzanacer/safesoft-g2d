@@ -1,22 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
 class AppTheme {
   static const double _radius = 12;
 
-  static ThemeData light() {
+  static bool _isArabic(Locale? locale) => locale?.languageCode == 'ar';
+
+  static TextTheme _textTheme({
+    required TextTheme base,
+    required Color color,
+    Locale? locale,
+  }) {
+    final themed = _isArabic(locale)
+        ? GoogleFonts.tajawalTextTheme(base)
+        : GoogleFonts.interTextTheme(base);
+
+    return themed.apply(
+      bodyColor: color,
+      displayColor: color,
+    );
+  }
+
+  static ThemeData light({Locale? locale}) {
     final base = ThemeData.light(useMaterial3: true);
+    final textTheme = _textTheme(
+      base: base.textTheme,
+      color: AppColors.textLight,
+      locale: locale,
+    );
+
     return base.copyWith(
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.primary,
         surface: AppColors.cardLight,
       ),
       scaffoldBackgroundColor: AppColors.bgLight,
-      textTheme: base.textTheme.apply(
-        bodyColor: AppColors.textLight,
-        displayColor: AppColors.textLight,
-      ),
+      textTheme: textTheme,
+      primaryTextTheme: textTheme,
       cardTheme: const CardThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(_radius)),
@@ -47,21 +69,38 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
+      appBarTheme: AppBarTheme(
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        selectedLabelStyle: textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 
-  static ThemeData dark() {
+  static ThemeData dark({Locale? locale}) {
     final base = ThemeData.dark(useMaterial3: true);
+    final textTheme = _textTheme(
+      base: base.textTheme,
+      color: AppColors.textDark,
+      locale: locale,
+    );
+
     return base.copyWith(
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.primary,
         surface: AppColors.cardDark,
       ),
       scaffoldBackgroundColor: AppColors.bgDark,
-      textTheme: base.textTheme.apply(
-        bodyColor: AppColors.textDark,
-        displayColor: AppColors.textDark,
-      ),
+      textTheme: textTheme,
+      primaryTextTheme: textTheme,
       cardTheme: const CardThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(_radius)),
@@ -90,6 +129,19 @@ class AppTheme {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(_radius)),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        selectedLabelStyle: textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

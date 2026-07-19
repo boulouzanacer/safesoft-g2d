@@ -180,8 +180,8 @@ class GrosLinkApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'GrosLink',
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.light(locale: locale),
+      darkTheme: AppTheme.dark(locale: locale),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       locale: locale,
       supportedLocales: AppI18n.supportedLocales,
