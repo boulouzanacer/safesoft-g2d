@@ -5,9 +5,9 @@
     <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-                <div class="text-2xl font-extrabold tracking-wide">API Documentation</div>
+                <div class="text-2xl font-extrabold tracking-wide">{{ __('API Documentation') }}</div>
                 <div class="mt-1 text-sm text-white/70">
-                    Base URL:
+                    {{ __('Base URL') }}:
                     <span class="font-mono text-white break-all">{{ url('/api/v1') }}</span>
                 </div>
             </div>
@@ -18,18 +18,18 @@
                 </span>
                 <span class="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-200">
                     <i class="fa-solid fa-gauge-high"></i>
-                    Throttling enabled
+                    {{ __('Throttling enabled') }}
                 </span>
                 <span class="inline-flex items-center gap-2 rounded-full border border-sky-400/20 bg-sky-500/10 px-3 py-1 text-xs font-bold text-sky-200">
                     <i class="fa-solid fa-lock"></i>
-                    Sanctum (mobile)
+                    {{ __('Sanctum (mobile)') }}
                 </span>
             </div>
         </div>
 
         <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
-                <div class="font-extrabold tracking-wide">Headers</div>
+                <div class="font-extrabold tracking-wide">{{ __('Headers') }}</div>
                 <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                     Accept: application/json<br>
                     Content-Type: application/json<br>
@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
-                <div class="font-extrabold tracking-wide">Response format</div>
+                <div class="font-extrabold tracking-wide">{{ __('Response format') }}</div>
                 <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                     {<br>
                     &nbsp;&nbsp;"success": true|false,<br>
@@ -49,7 +49,7 @@
                     }
                 </div>
                 <div class="mt-3 text-xs text-white/60">
-                    Notes: <span class="font-mono text-white/80">data</span> shape depends on endpoint. For validation errors (422), check <span class="font-mono text-white/80">errors</span>.
+                    {{ __('Notes') }}: <span class="font-mono text-white/80">data</span> {{ __('shape depends on endpoint. For validation errors (422), check') }} <span class="font-mono text-white/80">errors</span>.
                 </div>
             </div>
         </div>
@@ -58,8 +58,8 @@
     <div class="space-y-4">
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <div class="text-lg font-extrabold tracking-wide">Mobile API (v1)</div>
-                    <span class="text-xs text-white/60">Prefix: /api/v1</span>
+                    <div class="text-lg font-extrabold tracking-wide">{{ __('Mobile API (v1)') }}</div>
+                    <span class="text-xs text-white/60">{{ __('Prefix') }}: /api/v1</span>
                 </div>
 
                 <div class="mt-4 space-y-3">
@@ -67,7 +67,7 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-emerald-500/15 border border-emerald-400/20 px-2.5 py-1 text-xs font-extrabold text-emerald-200">AUTH</span>
-                                <span class="font-bold">Authentication</span>
+                                <span class="font-bold">{{ __('Authentication') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
@@ -76,24 +76,24 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">POST /auth/register</span>
-                                        <span class="text-xs text-white/60">Public</span>
+                                        <span class="text-xs text-white/60">{{ __('Public') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
                                         { "nom": "...", "email": "...", "password": "...", "telephone": "..." }<br>
-                                        Optional: adresse, id_wilaya, id_commune
+                                        {{ __('Optional') }}: adresse, id_wilaya, id_commune
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">Inscription client <span class="font-mono">type_client=simple</span> avec vérification email par code (6 chiffres).</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">POST /auth/login</span>
-                                        <span class="text-xs text-white/60">Public</span>
+                                        <span class="text-xs text-white/60">{{ __('Public') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
                                         { "email": "...", "password": "..." }<br>
-                                        Response contains: token + client
+                                        {{ __('Response contains') }}: token + client
                                     </div>
-                                    <div class="mt-2 text-xs text-white/60">If simple client email not verified, returns 403.</div>
+                                    <div class="mt-2 text-xs text-white/60">{{ __('If simple client email not verified, returns 403.') }}</div>
                                 </div>
                             </div>
 
@@ -101,21 +101,21 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">POST /auth/verify-email</span>
-                                        <span class="text-xs text-white/60">Public</span>
+                                        <span class="text-xs text-white/60">{{ __('Public') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
                                         { "email": "...", "code": "123456" }<br>
-                                        Response contains: token + client
+                                        {{ __('Response contains') }}: token + client
                                     </div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">POST /auth/resend-email-code</span>
-                                        <span class="text-xs text-white/60">Public</span>
+                                        <span class="text-xs text-white/60">{{ __('Public') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
                                         { "email": "..." }<br>
-                                        Resends code (expires in 10 min)
+                                        {{ __('Resends code (expires in 10 min)') }}
                                     </div>
                                 </div>
                             </div>
@@ -124,17 +124,17 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /auth/me</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 font-mono text-xs leading-relaxed">Returns current client profile (+ fournisseur if abonnee)</div>
-                                    <div class="mt-2 text-xs text-white/60">Includes: <span class="font-mono">type_client</span>, <span class="font-mono">tarif</span>, <span class="font-mono">id_frs</span>.</div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed">{{ __('Returns current client profile (+ fournisseur if abonnee)') }}</div>
+                                    <div class="mt-2 text-xs text-white/60">{{ __('Includes') }}: <span class="font-mono">type_client</span>, <span class="font-mono">tarif</span>, <span class="font-mono">id_frs</span>.</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">POST /auth/logout</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 font-mono text-xs leading-relaxed">Revokes current token</div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed">{{ __('Revokes current token') }}</div>
                                 </div>
                             </div>
 
@@ -142,18 +142,18 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">PUT /auth/profil</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
                                         { "nom": "...", "adresse": "...", "id_wilaya": 1, "id_commune": 1 }<br>
-                                        Optional: telephone
+                                        {{ __('Optional') }}: telephone
                                     </div>
-                                    <div class="mt-2 text-xs text-white/60">Note: <span class="font-mono">tarif</span> is managed by PME sync/admin, not by this endpoint.</div>
+                                    <div class="mt-2 text-xs text-white/60">{{ __('Note') }}: <span class="font-mono">tarif</span> {{ __('is managed by PME sync/admin, not by this endpoint.') }}</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">PUT /auth/password</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed">
                                         { "current_password": "...", "password": "...", "password_confirmation": "..." }
@@ -167,13 +167,13 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-sky-500/15 border border-sky-400/20 px-2.5 py-1 text-xs font-extrabold text-sky-200">CATALOG</span>
-                                <span class="font-bold">Boutiques & Produits</span>
+                                <span class="font-bold">{{ __('Boutiques & Produits') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
                         <div class="mt-4 space-y-3 text-sm text-white/80">
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                                <div class="font-bold">Catalog rules</div>
+                                <div class="font-bold">{{ __('Catalog rules') }}</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     - If no token (public): products show <span class="font-mono">prix=PV_1</span> and hide <span class="font-mono">abonne_only=1</span> products.<br>
                                     - If token of an abonnee: API computes <span class="font-mono">prix</span> from client <span class="font-mono">tarif</span> (1|2|3) and can return abonnee-only products.<br>
@@ -184,7 +184,7 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /boutiques/categories</span>
-                                        <span class="text-xs text-white/60">Public (token optional)</span>
+                                        <span class="text-xs text-white/60">{{ __('Public (token optional)') }}</span>
                                     </div>
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                         Retourne toute la liste des catégories boutiques définies dans l'administration,
@@ -192,7 +192,7 @@
                                         Cet endpoint est utile pour alimenter les filtres catégories dans l'application mobile.
                                     </div>
                                     <div class="mt-2 text-xs text-white/60">
-                                        Champs retournés :
+                                        {{ __('Champs retournés') }} :
                                         <span class="font-mono">id</span>,
                                         <span class="font-mono">name</span>,
                                         <span class="font-mono">slug</span>,
@@ -220,7 +220,7 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /boutiques</span>
-                                        <span class="text-xs text-white/60">Public (token optional)</span>
+                                        <span class="text-xs text-white/60">{{ __('Public (token optional)') }}</span>
                                     </div>
                                     <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                         Retourne la liste des boutiques visibles et actives.
@@ -268,10 +268,10 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /boutiques/{id}</span>
-                                        <span class="text-xs text-white/60">Public (token optional)</span>
+                                        <span class="text-xs text-white/60">{{ __('Public (token optional)') }}</span>
                                     </div>
                                     <div class="mt-3 text-xs text-white/70">
-                                        Single boutique detail + stats. If abonnee token with different <span class="font-mono">id_frs</span>, returns 403.
+                                        {{ __('Single boutique detail + stats. If abonnee token with different') }} <span class="font-mono">id_frs</span>, {{ __('returns 403.') }}
                                     </div>
                                 </div>
                             </div>
@@ -279,12 +279,12 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                     <span class="font-bold">GET /produits</span>
-                                    <span class="text-xs text-white/60">Public (token optional)</span>
+                                    <span class="text-xs text-white/60">{{ __('Public (token optional)') }}</span>
                                 </div>
                                 <div class="mt-3 font-mono text-xs leading-relaxed break-words">
-                                    Query params: frs_id (optional), categorie (optional), search (optional), page (optional)<br>
-                                    Returns: data.items[] + data.pagination<br>
-                                    Each item fields: pv_1, pv_2, pv_3, prix (computed), abonne_only, stock, images[]
+                                    {{ __('Query params') }}: frs_id (optional), categorie (optional), search (optional), page (optional)<br>
+                                    {{ __('Returns') }}: data.items[] + data.pagination<br>
+                                    {{ __('Each item fields') }}: pv_1, pv_2, pv_3, prix (computed), abonne_only, stock, images[]
                                 </div>
                             </div>
 
@@ -292,16 +292,16 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /produits/categories</span>
-                                        <span class="text-xs text-white/60">Public (token optional)</span>
+                                        <span class="text-xs text-white/60">{{ __('Public (token optional)') }}</span>
                                     </div>
-                                    <div class="mt-3 font-mono text-xs leading-relaxed">Query param: frs_id (optional). If abonnee with id_frs, restricted to that boutique.</div>
+                                    <div class="mt-3 font-mono text-xs leading-relaxed">{{ __('Query param') }}: frs_id (optional). {{ __('If abonnee with id_frs, restricted to that boutique.') }}</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /produits/{id}</span>
-                                        <span class="text-xs text-white/60">Public (token optional)</span>
+                                        <span class="text-xs text-white/60">{{ __('Public (token optional)') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Product detail + images + pricing fields (pv_1..pv_3 + prix computed)</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Product detail + images + pricing fields (pv_1..pv_3 + prix computed)') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -311,7 +311,7 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-violet-500/15 border border-violet-400/20 px-2.5 py-1 text-xs font-extrabold text-violet-200">GEO</span>
-                                <span class="font-bold">Geo (Wilayas / Communes)</span>
+                                <span class="font-bold">{{ __('Geo (Wilayas / Communes)') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
@@ -320,16 +320,16 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /wilayas</span>
-                                        <span class="text-xs text-white/60">Public</span>
+                                        <span class="text-xs text-white/60">{{ __('Public') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Returns list of wilayas (cached)</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Returns list of wilayas (cached)') }}</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /communes/{wilaya}</span>
-                                        <span class="text-xs text-white/60">Public</span>
+                                        <span class="text-xs text-white/60">{{ __('Public') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Returns communes for a wilaya (cached)</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Returns communes for a wilaya (cached)') }}</div>
                                 </div>
                             </div>
                         </div>
@@ -348,7 +348,7 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">POST /commandes</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
                                     <div class="mt-3 font-mono text-xs leading-relaxed break-words">
                                         {<br>
@@ -365,17 +365,17 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /commandes</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Lists current client orders</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Lists current client orders') }}</div>
                                 </div>
                             </div>
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                     <span class="font-bold">GET /commandes/{id}</span>
-                                    <span class="text-xs text-white/60">Bearer required</span>
+                                    <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                 </div>
-                                <div class="mt-3 text-xs text-white/70">Order detail (header + lines)</div>
+                                <div class="mt-3 text-xs text-white/70">{{ __('Order detail (header + lines)') }}</div>
                             </div>
                         </div>
                     </details>
@@ -384,7 +384,7 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-rose-500/15 border border-rose-400/20 px-2.5 py-1 text-xs font-extrabold text-rose-200">NOTIF</span>
-                                <span class="font-bold">Notifications & FCM</span>
+                                <span class="font-bold">{{ __('Notifications & FCM') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
@@ -393,16 +393,16 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">GET /notifications</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Returns last 50 notifications + non_lues</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Returns last 50 notifications + non_lues') }}</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">PUT /notifications/{id}/lu</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Mark one as read</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Mark one as read') }}</div>
                                 </div>
                             </div>
 
@@ -410,23 +410,23 @@
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">PUT /notifications/tout-lire</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Mark all as read</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Mark all as read') }}</div>
                                 </div>
                                 <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                         <span class="font-bold">DELETE /notifications/{id}</span>
-                                        <span class="text-xs text-white/60">Bearer required</span>
+                                        <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                     </div>
-                                    <div class="mt-3 text-xs text-white/70">Delete notification</div>
+                                    <div class="mt-3 text-xs text-white/70">{{ __('Delete notification') }}</div>
                                 </div>
                             </div>
 
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                     <span class="font-bold">POST /fcm/token</span>
-                                    <span class="text-xs text-white/60">Bearer required</span>
+                                    <span class="text-xs text-white/60">{{ __('Bearer required') }}</span>
                                 </div>
                                 <div class="mt-3 font-mono text-xs leading-relaxed">
                                     { "token": "...", "device_type": "android" | "ios" }
@@ -439,30 +439,30 @@
             </div>
 
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
-                <div class="text-lg font-extrabold tracking-wide">Implementation (Flutter)</div>
+                <div class="text-lg font-extrabold tracking-wide">{{ __('Implementation (Flutter)') }}</div>
                 <div class="mt-2 text-sm text-white/70">
-                    Use your mobile base URL (LAN/device) and always attach the Bearer token after login.
+                    {{ __('Use your mobile base URL (LAN/device) and always attach the Bearer token after login.') }}
                 </div>
 
                 <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
-                        <div class="font-bold">1) Configure base URL</div>
+                        <div class="font-bold">{{ __('1) Configure base URL') }}</div>
                         <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                             DEV: API_BASE_URL = http://&lt;IP&gt;:8000/api/v1<br>
                             PROD: API_BASE_URL = https://g2d-dz.com/api/v1
                         </div>
                         <div class="mt-2 text-xs text-white/60">
-                            Example: flutter run --dart-define=API_BASE_URL=http://192.168.1.104:8000/api/v1
+                            {{ __('Example') }}: flutter run --dart-define=API_BASE_URL=http://192.168.1.104:8000/api/v1
                         </div>
                     </div>
 
                     <div class="rounded-2xl border border-white/10 bg-black/20 p-4 sm:p-5">
-                        <div class="font-bold">2) Handle auth token</div>
+                        <div class="font-bold">{{ __('2) Handle auth token') }}</div>
                         <div class="mt-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:p-4 font-mono text-xs leading-relaxed break-words">
                             Authorization: Bearer &lt;token_from_login&gt;
                         </div>
                         <div class="mt-2 text-xs text-white/60">
-                            Token is returned by /auth/login and /auth/register. Pass it also to catalog endpoints to get abonnee pricing/visibility.
+                            {{ __('Token is returned by /auth/login and /auth/register. Pass it also to catalog endpoints to get abonnee pricing/visibility.') }}
                         </div>
                     </div>
                 </div>
@@ -470,24 +470,24 @@
 
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <div class="text-lg font-extrabold tracking-wide">PME API (integration)</div>
-                    <span class="text-xs text-white/60">Prefix: /api/v1/pme</span>
+                    <div class="text-lg font-extrabold tracking-wide">{{ __('PME API (integration)') }}</div>
+                    <span class="text-xs text-white/60">{{ __('Prefix') }}: /api/v1/pme</span>
                 </div>
 
                 <div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
-                    <div class="font-bold">Authentication</div>
+                    <div class="font-bold">{{ __('Authentication') }}</div>
                     <div class="mt-2 font-mono text-xs leading-relaxed break-all">
                         Base URL: {{ url('/api/v1/pme') }}<br>
                         Authorization: Bearer &lt;boutique_token&gt;<br>
                         Accept: application/json
                     </div>
                     <div class="mt-3 text-xs text-white/65 leading-relaxed">
-                        Each boutique only sees and modifies its own PME data. All client, product and order endpoints are automatically restricted by the boutique token.
+                        {{ __('Each boutique only sees and modifies its own PME data. All client, product and order endpoints are automatically restricted by the boutique token.') }}
                     </div>
                 </div>
 
                 <div class="mt-4 rounded-xl border border-sky-400/20 bg-sky-500/10 p-4 text-sm text-sky-100">
-                    <div class="font-bold">Api key create boutique</div>
+                    <div class="font-bold">{{ __('Api key create boutique') }}</div>
                     <div class="mt-2 text-xs leading-relaxed">
                         Les endpoints publics <span class="font-mono">POST /api/v1/pme/fournisseurs</span> et
                         <span class="font-mono">POST /api/v1/pme/fournisseurs/info</span> exigent maintenant une Api Key active de type
@@ -503,13 +503,13 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-sky-500/15 border border-sky-400/20 px-2.5 py-1 text-xs font-extrabold text-sky-200">CLIENTS</span>
-                                <span class="font-bold">Clients PME</span>
+                                <span class="font-bold">{{ __('Clients PME') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
                         <div class="mt-4 space-y-3">
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                                <div class="font-bold">Objectif</div>
+                                <div class="font-bold">{{ __('Objectif') }}</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Cette rubrique permet a votre logiciel PME de lister, creer, modifier, supprimer et synchroniser en masse les clients de la boutique authentifiee.
                                     Tous les enregistrements sont automatiquement limites a la boutique du token PME. Le champ
@@ -526,7 +526,7 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                     <span class="font-bold">GET /clients</span>
-                                    <span class="text-xs text-white/60">Lister les clients</span>
+                                    <span class="text-xs text-white/60">{{ __('Lister les clients') }}</span>
                                 </div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Utilisez cet endpoint pour recuperer les clients de la boutique connectee. Filtres supportes:
@@ -534,7 +534,7 @@
                                     Limite actuelle: 500 lignes, triees par <span class="font-mono">updated_at DESC</span>.
                                 </div>
                                 <div class="mt-2 text-xs text-white/60">
-                                    Exemple usage: recuperer uniquement les clients simples non synchronises.
+                                    {{ __('Exemple usage: recuperer uniquement les clients simples non synchronises.') }}
                                 </div>
                                 <div class="mt-3 font-mono text-xs leading-relaxed break-all">{{ url('/api/v1/pme/clients?synced=0&type_client=simple') }}</div>
                                 <pre class="mt-3 w-full max-w-full rounded-xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words overflow-x-hidden">{
@@ -564,7 +564,7 @@
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                     <span class="font-bold">GET /clients/{id}</span>
-                                    <span class="text-xs text-white/60">Detail client</span>
+                                    <span class="text-xs text-white/60">{{ __('Detail client') }}</span>
                                 </div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Retourne le detail d'un client unique appartenant a la boutique du token PME.
@@ -698,13 +698,13 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-amber-500/15 border border-amber-400/20 px-2.5 py-1 text-xs font-extrabold text-amber-200">COMMANDES</span>
-                                <span class="font-bold">Commandes PME</span>
+                                <span class="font-bold">{{ __('Commandes PME') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
                         <div class="mt-4 space-y-3">
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                                <div class="font-bold">Objectif</div>
+                                <div class="font-bold">{{ __('Objectif') }}</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Cette rubrique permet d'exporter les commandes web vers le logiciel PME, soit en JSON, soit en CSV.
                                     Les commandes sont filtrees par boutique et par etat de synchronisation
@@ -836,13 +836,13 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-emerald-500/15 border border-emerald-400/20 px-2.5 py-1 text-xs font-extrabold text-emerald-200">PRODUITS</span>
-                                <span class="font-bold">Produits PME</span>
+                                <span class="font-bold">{{ __('Produits PME') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
                         <div class="mt-4 space-y-3">
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                                <div class="font-bold">Objectif</div>
+                                <div class="font-bold">{{ __('Objectif') }}</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     La partie produits permet maintenant de lister les produits de la boutique du token PME,
                                     d'envoyer un produit unitaire, de marquer un produit comme synchronise,
@@ -1119,13 +1119,13 @@
                         <summary class="cursor-pointer list-none flex items-start justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-3 min-w-0">
                                 <span class="inline-flex items-center rounded-lg bg-violet-500/15 border border-violet-400/20 px-2.5 py-1 text-xs font-extrabold text-violet-200">FOURNISSEUR</span>
-                                <span class="font-bold">Boutique PME</span>
+                                <span class="font-bold">{{ __('Boutique PME') }}</span>
                             </div>
                             <i class="fa-solid fa-chevron-down text-white/60 transition group-open:rotate-180 shrink-0"></i>
                         </summary>
                         <div class="mt-4 space-y-3">
                             <div class="rounded-xl border border-white/10 bg-black/30 p-4">
-                                <div class="font-bold">Objectif</div>
+                                <div class="font-bold">{{ __('Objectif') }}</div>
                                 <div class="mt-2 text-xs text-white/70 leading-relaxed">
                                     Cette rubrique sert a mettre a jour les informations de la boutique depuis le logiciel PME:
                                     nom, telephone, adresse, geolocalisation, visibilite et logo.
@@ -1268,15 +1268,15 @@
                 </div>
             </div>
             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 sm:p-6">
-                <div class="text-lg font-extrabold tracking-wide">Common errors</div>
+                <div class="text-lg font-extrabold tracking-wide">{{ __('Common errors') }}</div>
                 <div class="mt-3 space-y-3 text-sm text-white/80">
                     <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                         <div class="font-bold text-rose-200">401 Non autorisé</div>
-                        <div class="mt-1 text-xs text-white/70">Missing/invalid Bearer token</div>
+                        <div class="mt-1 text-xs text-white/70">{{ __('Missing/invalid Bearer token') }}</div>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                         <div class="font-bold text-amber-200">422 Validation échouée</div>
-                        <div class="mt-1 text-xs text-white/70">Check response.errors for field messages</div>
+                        <div class="mt-1 text-xs text-white/70">{{ __('Check response.errors for field messages') }}</div>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-black/30 p-4">
                         <div class="font-bold text-sky-200">404 Ressource introuvable</div>
