@@ -4,4 +4,5 @@ class AppConstants {
   static const String storageClientKey = 'auth_client';
   static const String onboardingSeenKey = 'onboarding_seen';
   static const String storageThemeKey = 'theme_mode';
+  static const String storageLocaleKey = 'app_locale';
 }

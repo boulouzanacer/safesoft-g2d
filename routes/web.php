@@ -20,6 +20,7 @@ use App\Http\Controllers\Fournisseur\TokenController as FrsTokenController;
 use App\Http\Controllers\Fournisseur\ProfileController as FrsProfileController;
 use App\Http\Controllers\Fournisseur\PrevendeurController as FrsPrevendeurController;
 use App\Http\Controllers\Fournisseur\VisitPlanningController as FrsVisitPlanningController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\StoreController;
 
 Route::get('/', [StoreController::class, 'index']);
@@ -38,6 +39,7 @@ Route::post('/register/verify-email', [ClientAuthController::class, 'verifyEmail
 Route::post('/register/resend-email-code', [ClientAuthController::class, 'resendEmailCode']);
 Route::post('/register/restart', [ClientAuthController::class, 'restartRegister']);
 Route::post('/logout', [ClientAuthController::class, 'logout']);
+Route::post('/locale', [LocaleController::class, 'update']);
 
 Route::get('/panier', [StoreController::class, 'panier']);
 Route::post('/panier/add', [StoreController::class, 'panierAdd']);

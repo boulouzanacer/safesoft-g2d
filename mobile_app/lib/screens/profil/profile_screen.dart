@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_i18n.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -17,6 +19,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _row({
+    required BuildContext context,
     required IconData icon,
     required String title,
     VoidCallback? onTap,
@@ -26,7 +29,12 @@ class ProfileScreen extends ConsumerWidget {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(title, style: TextStyle(color: color)),
-      trailing: trailing ?? const Icon(Icons.chevron_right),
+      trailing: trailing ??
+          Icon(
+            Directionality.of(context) == TextDirection.rtl
+                ? Icons.chevron_left
+                : Icons.chevron_right,
+          ),
       onTap: onTap,
     );
   }
@@ -37,9 +45,10 @@ class ProfileScreen extends ConsumerWidget {
     final client = auth.client;
     final notif = ref.watch(notificationProvider);
     final isDark = ref.watch(themeProvider);
+    final locale = ref.watch(localeProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
+      appBar: AppBar(title: Text(context.tr('Profil'))),
       body: Builder(
         builder: (context) {
           final children = <Widget>[
@@ -54,13 +63,13 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Non connecté',
+                  Text(context.tr('Non connecté'),
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                          const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () => context.go('/login'),
-                    child: const Text('Se connecter'),
+                    child: Text(context.tr('Se connecter')),
                   ),
                 ],
               ),
@@ -121,8 +130,8 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           child: Text(
                             client.typeClient == 'abonne'
-                                ? 'Abonné'
-                                : 'Client Simple',
+                                ? context.tr('Abonné')
+                                : context.tr('Client Simple'),
                             style: TextStyle(
                               color: client.typeClient == 'abonne'
                                   ? Colors.blue
@@ -148,18 +157,21 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               children: [
                 _row(
+                  context: context,
                   icon: Icons.person_outline,
-                  title: 'Mes informations',
+                  title: context.tr('Mes informations'),
                   onTap: client == null ? null : () => context.push('/profile/edit'),
                 ),
                 _row(
+                  context: context,
                   icon: Icons.receipt_long_outlined,
-                  title: 'Mes commandes',
+                  title: context.tr('Mes commandes'),
                   onTap: () => context.go('/home/commandes'),
                 ),
                 _row(
+                  context: context,
                   icon: Icons.notifications_none,
-                  title: 'Notifications',
+                  title: context.tr('Notifications'),
                   trailing: notif.nonLues > 0
                       ? Row(
                           mainAxisSize: MainAxisSize.min,
@@ -180,36 +192,66 @@ class ProfileScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.chevron_right),
+                            Icon(
+                              context.isRtlLanguage
+                                  ? Icons.chevron_left
+                                  : Icons.chevron_right,
+                            ),
                           ],
                         )
-                      : const Icon(Icons.chevron_right),
+                      : Icon(
+                          context.isRtlLanguage
+                              ? Icons.chevron_left
+                              : Icons.chevron_right,
+                        ),
                   onTap: () => context.push('/notifications'),
+                ),
+                ListTile(
+                  leading: const Text('🌐', style: TextStyle(fontSize: 20)),
+                  title: Text(context.tr('Langue')),
+                  subtitle: Text(context.tr('Choisir la langue')),
+                  trailing: Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final option in AppI18n.localeOptions)
+                        ChoiceChip(
+                          label: Text('${option['flag']} ${option['label']}'),
+                          selected: locale.languageCode == option['code'],
+                          onSelected: (_) => ref
+                              .read(localeProvider.notifier)
+                              .setLocale(option['code']!),
+                        ),
+                    ],
+                  ),
                 ),
                 SwitchListTile(
                   value: isDark,
                   onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
                   secondary: const Icon(Icons.dark_mode_outlined),
-                  title: const Text('Mode sombre'),
+                  title: Text(context.tr('Mode sombre')),
                 ),
                 _row(
+                  context: context,
                   icon: Icons.key_outlined,
-                  title: 'Changer mot de passe',
+                  title: context.tr('Changer mot de passe'),
                   onTap: client == null ? null : () => context.push('/profile/password'),
                 ),
                 _row(
+                  context: context,
                   icon: Icons.support_agent_outlined,
-                  title: 'Support',
+                  title: context.tr('Support'),
                   onTap: () {
                     showDialog<void>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Support'),
-                        content: const Text('Contactez-nous : support@safesoft.dz'),
+                        title: Text(context.tr('Support')),
+                        content: Text(
+                          context.tr('Contactez-nous : support@safesoft.dz'),
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(ctx).pop(),
-                            child: const Text('OK'),
+                            child: Text(context.tr('OK')),
                           ),
                         ],
                       ),
@@ -217,8 +259,9 @@ class ProfileScreen extends ConsumerWidget {
                   },
                 ),
                 _row(
+                  context: context,
                   icon: Icons.logout,
-                  title: 'Déconnexion',
+                  title: context.tr('Déconnexion'),
                   color: Colors.red,
                   trailing: const Icon(Icons.logout, color: Colors.red),
                   onTap: client == null

@@ -40,11 +40,11 @@
                     @forelse($clients as $c)
                         <tr class="hover:bg-white/5 cursor-pointer"
                             onclick="window.location='{{ url('/fournisseur/clients/'.$c->id) }}'">
-                            <td class="py-3 px-4 font-semibold">{{ $c->code_client ?? '-' }}</td>
+                            <td class="keep-ltr py-3 px-4 font-semibold">{{ $c->code_client ?? '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->display_name ?: '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->prevendeur_nom ?? '-' }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->email }}</td>
-                            <td class="py-3 px-4 text-white/80">{{ $c->telephone }}</td>
+                            <td class="keep-ltr py-3 px-4 text-white/80">{{ $c->telephone }}</td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $c->type_client === 'abonne' ? 'bg-sky-500/15 text-sky-300 border border-sky-400/20' : 'bg-white/10 text-white/70 border border-white/10' }}">
                                     {{ $c->type_client }}

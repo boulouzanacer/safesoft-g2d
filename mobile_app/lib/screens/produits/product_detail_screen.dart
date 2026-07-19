@@ -5,10 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../../core/constants/api_constants.dart';
+import '../../l10n/app_i18n.dart';
 import '../../models/produit_model.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/produit_provider.dart';
 import '../../widgets/common/error_state.dart';
+import '../../widgets/common/ltr_value.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final int id;
@@ -86,11 +88,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final async = ref.watch(produitDetailProvider(widget.id));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Détail produit')),
+      appBar: AppBar(title: Text(context.tr('Détail produit'))),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => ErrorState(
-          message: 'Impossible de charger le produit',
+          message: context.tr('Impossible de charger le produit'),
           onRetry: () => ref.invalidate(produitDetailProvider(widget.id)),
         ),
         data: (p) {
@@ -185,25 +187,38 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             fontSize: 18, fontWeight: FontWeight.w900),
                       ),
                       const SizedBox(height: 6),
-                      Text('Référence : ${p.reference}'),
+                      Row(
+                        children: [
+                          Text('${context.tr('Référence')} : '),
+                          LtrText(p.reference),
+                        ],
+                      ),
                       const SizedBox(height: 2),
                       Text('Catégorie : ${p.categorie}'),
                       const SizedBox(height: 14),
-                      Text(
+                      LtrText(
                         _price(unit),
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w900),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Total: ${_price(total)}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withValues(alpha: 0.8),
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.color
+                                ?.withValues(alpha: 0.8),
+                          ),
+                          children: [
+                            TextSpan(text: '${context.tr('Total:')} '),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: LtrText(_price(total)),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -226,7 +241,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Tarifs par quantité',
+                                Text(context.tr('Tarifs par quantité'),
                                     style:
                                         TextStyle(fontWeight: FontWeight.w900)),
                                 const SizedBox(height: 10),
@@ -239,8 +254,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                         const EdgeInsets.only(bottom: 8.0),
                                     child: Row(
                                       children: [
-                                        Expanded(child: Text('$range pièces')),
-                                        Text(_price(t.price),
+                                        Expanded(child: Text('$range ${context.tr('pièces')}')),
+                                        LtrText(_price(t.price),
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.w800)),
                                       ],

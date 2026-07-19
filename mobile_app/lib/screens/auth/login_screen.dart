@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/storage_service.dart';
 import '../../core/utils/validators.dart';
+import '../../l10n/app_i18n.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/gradient_button.dart';
 
@@ -67,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     style:
                         TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 6),
-                const Text('Connexion Abonné',
+                Text(context.tr('Connexion Abonné'),
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -106,15 +107,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       TextFormField(
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(labelText: 'Email'),
-                        validator: Validators.email,
+                        decoration: InputDecoration(labelText: context.tr('Email')),
+                        validator: (value) => Validators.email(context, value),
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _passCtrl,
                         obscureText: !_showPassword,
                         decoration: InputDecoration(
-                          labelText: 'Mot de passe',
+                          labelText: context.tr('Mot de passe'),
                           suffixIcon: IconButton(
                             onPressed: () =>
                                 setState(() => _showPassword = !_showPassword),
@@ -123,7 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 : Icons.visibility),
                           ),
                         ),
-                        validator: (v) => Validators.password(v),
+                        validator: (v) => Validators.password(context, v),
                       ),
                       const SizedBox(height: 16),
                       SizedBox(
@@ -136,7 +137,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   width: 18,
                                   child:
                                       CircularProgressIndicator(strokeWidth: 2))
-                              : const Text('Se connecter'),
+                              : Text(context.tr('Se connecter')),
                         ),
                       ),
                     ],
@@ -145,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: () => context.go('/register'),
-                  child: const Text('Pas encore inscrit ? Créer un compte'),
+                  child: Text(context.tr('Pas encore inscrit ? Créer un compte')),
                 ),
               ],
             ),

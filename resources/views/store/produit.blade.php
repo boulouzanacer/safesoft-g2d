@@ -39,7 +39,7 @@
 
         <div class="store-panel p-6">
             <div class="text-2xl font-extrabold tracking-wide">{{ $produit->designation }}</div>
-            <div class="store-muted mt-1 text-sm">Ref: {{ $produit->reference }}</div>
+            <div class="store-muted mt-1 text-sm">Ref: <span class="keep-ltr-inline">{{ $produit->reference }}</span></div>
             <div class="store-muted mt-1 text-sm">Boutique: {{ $produit->fournisseur?->nom_frs ?? '—' }}</div>
 
             @php
@@ -59,7 +59,7 @@
             @endphp
 
             <div class="mt-4 flex items-center justify-between gap-3">
-                <div class="text-2xl font-extrabold">
+                <div class="keep-ltr text-2xl font-extrabold">
                     <span id="unitPrice">{{ number_format($initialUnit, 2, '.', ' ') }}</span> DA
                 </div>
                 <span class="store-soft store-muted text-xs font-bold px-2.5 py-1 rounded-full">
@@ -67,7 +67,7 @@
                 </span>
             </div>
             <div class="store-muted mt-1 text-xs">
-                Total: <span class="font-bold" style="color: var(--store-text);"><span id="totalPrice">{{ number_format($initialUnit * $initialQty, 2, '.', ' ') }}</span> DA</span>
+                {{ __('Total') }}: <span class="keep-ltr-inline font-bold" style="color: var(--store-text);"><span id="totalPrice">{{ number_format($initialUnit * $initialQty, 2, '.', ' ') }}</span> DA</span>
             </div>
 
             <div class="mt-2 text-sm {{ (int)$produit->stock > 0 ? 'text-emerald-700' : 'text-red-600' }}">
@@ -91,7 +91,7 @@
                                         {{ (int)$t['quantity_min'] }}-{{ (int)$t['quantity_max'] }} pièces
                                     @endif
                                 </div>
-                                <div class="font-extrabold">{{ number_format((float)$t['price'], 2, '.', ' ') }} DA</div>
+                                <div class="keep-ltr font-extrabold">{{ number_format((float)$t['price'], 2, '.', ' ') }} DA</div>
                             </div>
                         @endforeach
                     </div>

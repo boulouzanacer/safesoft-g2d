@@ -92,7 +92,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/80">Achat Client</div>
-                    <div class="mt-2 text-3xl font-extrabold text-sky-100 break-words">{{ number_format($achatClient, 2, '.', ' ') }}</div>
+                    <div class="keep-ltr mt-2 text-3xl font-extrabold text-sky-100 break-words">{{ number_format($achatClient, 2, '.', ' ') }}</div>
                 </div>
                 <div class="h-12 w-12 shrink-0 rounded-2xl bg-sky-500/15 text-sky-200 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-cart-shopping"></i>
@@ -105,7 +105,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200/80">Versement Client</div>
-                    <div class="mt-2 text-3xl font-extrabold text-emerald-100 break-words">{{ number_format($versementClient, 2, '.', ' ') }}</div>
+                    <div class="keep-ltr mt-2 text-3xl font-extrabold text-emerald-100 break-words">{{ number_format($versementClient, 2, '.', ' ') }}</div>
                 </div>
                 <div class="h-12 w-12 shrink-0 rounded-2xl bg-emerald-500/15 text-emerald-200 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-wallet"></i>
@@ -118,7 +118,7 @@
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Solde Client</div>
-                    <div class="mt-2 text-3xl font-extrabold break-words">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
+                    <div class="keep-ltr mt-2 text-3xl font-extrabold break-words">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
                 </div>
                 <div class="h-12 w-12 shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-scale-balanced"></i>
@@ -140,11 +140,11 @@
             <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Code Client</div>
-                    <div class="mt-2 font-extrabold break-words">{{ $client->code_client ?: '-' }}</div>
+                    <div class="keep-ltr mt-2 font-extrabold break-words">{{ $client->code_client ?: '-' }}</div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Telephone</div>
-                    <div class="mt-2 font-extrabold break-words">{{ $client->telephone ?: '-' }}</div>
+                    <div class="keep-ltr mt-2 font-extrabold break-words">{{ $client->telephone ?: '-' }}</div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Type</div>
@@ -193,7 +193,7 @@
             <div class="mt-4 space-y-3 text-sm">
                 <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                     <span class="text-white/60">Client ID</span>
-                    <span class="font-extrabold">#{{ $client->id }}</span>
+                    <span class="keep-ltr-inline font-extrabold">#{{ $client->id }}</span>
                 </div>
                 <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
                     <span class="text-white/60">Orders</span>
@@ -334,14 +334,14 @@
                             };
                         @endphp
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 px-4 font-semibold whitespace-nowrap">#{{ $c->id }}</td>
-                            <td class="py-3 px-4 text-white/80 whitespace-nowrap">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="keep-ltr py-3 px-4 font-semibold whitespace-nowrap">#{{ $c->id }}</td>
+                            <td class="keep-ltr py-3 px-4 text-white/80 whitespace-nowrap">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
                             <td class="py-3 px-4">
                                 <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold {{ $badge }}">
                                     {{ $c->statut }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float) $c->montant_total, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float) $c->montant_total, 2, '.', ' ') }}</td>
                             <td class="py-3 px-4 text-right">
                                 <a href="{{ url('/fournisseur/commandes/'.$c->id) }}"
                                    class="inline-flex items-center rounded-xl px-3 py-2 text-xs font-bold border border-white/10 hover:bg-white/10">

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_i18n.dart';
+
 class HorizontalCategorySelector extends StatefulWidget {
   final List<String> categories;
   final String allLabel;
@@ -115,6 +117,11 @@ class _HorizontalCategorySelectorState extends State<HorizontalCategorySelector>
   Widget build(BuildContext context) {
     final surface = Theme.of(context).colorScheme.surface;
     final shadowColor = Colors.black.withValues(alpha: 0.08);
+    final isRtl = context.isRtlLanguage;
+    final leadingAlignment = isRtl ? Alignment.centerRight : Alignment.centerLeft;
+    final trailingAlignment = isRtl ? Alignment.centerLeft : Alignment.centerRight;
+    final leadingSlide = isRtl ? _rightSlide : _leftSlide;
+    final trailingSlide = isRtl ? _leftSlide : _rightSlide;
 
     return Padding(
       padding: widget.padding,
@@ -156,7 +163,7 @@ class _HorizontalCategorySelectorState extends State<HorizontalCategorySelector>
               ),
             ),
             _buildFade(
-              alignment: Alignment.centerLeft,
+              alignment: leadingAlignment,
               colors: [
                 surface,
                 surface.withValues(alpha: 0),
@@ -164,7 +171,7 @@ class _HorizontalCategorySelectorState extends State<HorizontalCategorySelector>
               visible: _canScrollLeft,
             ),
             _buildFade(
-              alignment: Alignment.centerRight,
+              alignment: trailingAlignment,
               colors: [
                 surface.withValues(alpha: 0),
                 surface,
@@ -172,23 +179,29 @@ class _HorizontalCategorySelectorState extends State<HorizontalCategorySelector>
               visible: _canScrollRight,
             ),
             _buildArrowButton(
-              alignment: Alignment.centerLeft,
+              alignment: leadingAlignment,
               visible: _canScrollLeft,
               shadowColor: shadowColor,
               onTap: () => _scrollBy(-180),
               icon: SlideTransition(
-                position: _leftSlide,
-                child: const Icon(Icons.chevron_left, size: 18),
+                position: leadingSlide,
+                child: Icon(
+                  isRtl ? Icons.chevron_right : Icons.chevron_left,
+                  size: 18,
+                ),
               ),
             ),
             _buildArrowButton(
-              alignment: Alignment.centerRight,
+              alignment: trailingAlignment,
               visible: _canScrollRight,
               shadowColor: shadowColor,
               onTap: () => _scrollBy(180),
               icon: SlideTransition(
-                position: _rightSlide,
-                child: const Icon(Icons.chevron_right, size: 18),
+                position: trailingSlide,
+                child: Icon(
+                  isRtl ? Icons.chevron_left : Icons.chevron_right,
+                  size: 18,
+                ),
               ),
             ),
           ],

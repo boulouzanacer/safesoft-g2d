@@ -5,8 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/api_constants.dart';
+import '../../l10n/app_i18n.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../widgets/common/ltr_value.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -47,7 +49,7 @@ class CartScreen extends ConsumerWidget {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Panier')),
+      appBar: AppBar(title: Text(context.tr('Panier'))),
       body: items.isEmpty
           ? Padding(
               padding: const EdgeInsets.all(20),
@@ -57,8 +59,8 @@ class CartScreen extends ConsumerWidget {
                   children: [
                     const Icon(Icons.shopping_cart_outlined, size: 64),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Votre panier est vide',
+                    Text(
+                      context.tr('Votre panier est vide'),
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                     ),
@@ -67,7 +69,7 @@ class CartScreen extends ConsumerWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () => context.go('/home/produits'),
-                        child: const Text('Parcourir les produits'),
+                        child: Text(context.tr('Parcourir les produits')),
                       ),
                     ),
                   ],
@@ -152,13 +154,13 @@ class CartScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${_price(it.prixUnitaire)} / unité',
+                                  '${_price(it.prixUnitaire)} / ${context.tr('unité')}',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w700),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Sous-total: ${_price(it.sousTotal)}',
+                                  '${context.tr('Sous-total:')} ${_price(it.sousTotal)}',
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .textTheme
@@ -190,10 +192,9 @@ class CartScreen extends ConsumerWidget {
                                               .withValues(alpha: 0.12),
                                         ),
                                       ),
-                                      child: Text(
+                                      child: LtrText(
                                         '${it.quantite}',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w800),
+                                        style: const TextStyle(fontWeight: FontWeight.w800),
                                       ),
                                     ),
                                     IconButton(
@@ -241,28 +242,28 @@ class CartScreen extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        const Text('Sous-total :'),
+                        Text(context.tr('Sous-total :')),
                         const Spacer(),
-                        Text(_price(cart.montantTotal),
+                        LtrText(_price(cart.montantTotal),
                             style:
                                 const TextStyle(fontWeight: FontWeight.w700)),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    const Row(
+                    Row(
                       children: [
-                        Text('Livraison :'),
-                        Spacer(),
-                        Text('À calculer'),
+                        Text(context.tr('Livraison :')),
+                        const Spacer(),
+                        Text(context.tr('À calculer')),
                       ],
                     ),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        const Text('TOTAL :',
+                        Text(context.tr('TOTAL :'),
                             style: TextStyle(fontWeight: FontWeight.w800)),
                         const Spacer(),
-                        Text(_price(cart.montantTotal),
+                        LtrText(_price(cart.montantTotal),
                             style:
                                 const TextStyle(fontWeight: FontWeight.w900)),
                       ],
@@ -274,10 +275,12 @@ class CartScreen extends ConsumerWidget {
                         onPressed: () => auth.isAuthenticated
                             ? context.push('/checkout')
                             : context.go('/login'),
-                        icon: const Icon(Icons.arrow_forward),
+                        icon: Icon(
+                          context.isRtlLanguage ? Icons.arrow_back : Icons.arrow_forward,
+                        ),
                         label: Text(auth.isAuthenticated
-                            ? 'Passer la commande'
-                            : 'Se connecter pour commander'),
+                            ? context.tr('Passer la commande')
+                            : context.tr('Se connecter pour commander')),
                       ),
                     ),
                   ],

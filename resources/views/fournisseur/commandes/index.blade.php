@@ -76,10 +76,10 @@
                             };
                         @endphp
                         <tr class="hover:bg-white/5 cursor-pointer" onclick="window.location='{{ url('/fournisseur/commandes/'.$c->id) }}'">
-                            <td class="py-3 px-4 font-semibold">#{{ $c->id }}</td>
+                            <td class="keep-ltr py-3 px-4 font-semibold">#{{ $c->id }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $c->client_nom ?: '-' }}</td>
-                            <td class="py-3 px-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
-                            <td class="py-3 px-4 text-right font-extrabold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 px-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="keep-ltr py-3 px-4 text-right font-extrabold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
                             </td>

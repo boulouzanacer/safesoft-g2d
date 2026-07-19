@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/constants/api_constants.dart';
+import '../../l10n/app_i18n.dart';
 import '../../models/produit_model.dart';
 import '../../providers/cart_provider.dart';
+import '../common/ltr_value.dart';
 
 class ProductCard extends ConsumerWidget {
   final ProduitModel produit;
@@ -95,7 +97,7 @@ class ProductCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    'Ref: ${produit.reference}',
+                    '${context.tr('Ref:')} ${produit.reference}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -108,7 +110,7 @@ class ProductCard extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 3),
-                  Text(
+                  LtrText(
                     _price(produit.prix),
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),

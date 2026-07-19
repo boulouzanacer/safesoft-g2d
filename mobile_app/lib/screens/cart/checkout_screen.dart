@@ -6,11 +6,13 @@ import 'package:intl/intl.dart';
 
 import '../../core/network/api_response.dart';
 import '../../core/network/dio_client.dart';
+import '../../l10n/app_i18n.dart';
 import '../../models/commune_model.dart';
 import '../../models/wilaya_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/commande_provider.dart';
+import '../../widgets/common/ltr_value.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -99,10 +101,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Stock insuffisant'),
+        title: Text(context.tr('Stock insuffisant')),
         content: Text(name != null ? '$name\n\n$message' : message),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('OK')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(context.tr('OK'))),
         ],
       ),
     );
@@ -122,7 +124,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     if (items.isEmpty) return;
     if (_selectedWilaya == null || _selectedCommune == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner wilaya et commune')),
+        SnackBar(content: Text(context.tr('Veuillez sélectionner wilaya et commune'))),
       );
       return;
     }
@@ -130,7 +132,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final adresse = _adresseCtrl.text.trim();
     if (adresse.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir une adresse complète')),
+        SnackBar(content: Text(context.tr('Veuillez saisir une adresse complète'))),
       );
       return;
     }
@@ -138,7 +140,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final teleLivraison = _teleLivraisonCtrl.text.trim();
     if (teleLivraison.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir le téléphone de livraison')),
+        SnackBar(content: Text(context.tr('Veuillez saisir le téléphone de livraison'))),
       );
       return;
     }
@@ -166,7 +168,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       return;
     }
 
-    final err = ref.read(commandeProvider).error ?? 'Erreur';
+    final err = ref.read(commandeProvider).error ?? context.tr('Erreur');
     if (err.toLowerCase().contains('stock insuffisant')) {
       await _showStockError(err, items);
       return;
@@ -183,13 +185,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkout')),
+      appBar: AppBar(title: Text(context.tr('Checkout'))),
       body: items.isEmpty
-          ? const Center(child: Text('Panier vide'))
+          ? Center(child: Text(context.tr('Panier vide')))
           : Builder(
               builder: (context) {
                 final children = <Widget>[
-                const Text('Livraison',
+                Text(context.tr('Livraison'),
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 10),
@@ -198,8 +200,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   selectedItem: _selectedWilaya,
                   itemAsString: (w) => '${w.idWilaya} - ${w.wilaya}',
                   popupProps: const PopupProps.menu(showSearchBox: true),
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
-                    dropdownSearchDecoration: InputDecoration(labelText: 'Wilaya'),
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(labelText: context.tr('Wilaya')),
                   ),
                   onChanged: (w) async {
                     setState(() {
@@ -216,8 +218,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   selectedItem: _selectedCommune,
                   itemAsString: (c) => c.commune,
                   popupProps: const PopupProps.menu(showSearchBox: true),
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
-                    dropdownSearchDecoration: InputDecoration(labelText: 'Commune'),
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(labelText: context.tr('Commune')),
                   ),
                   onChanged: (c) => setState(() => _selectedCommune = c),
                 ),
@@ -226,14 +228,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   controller: _adresseCtrl,
                   minLines: 3,
                   maxLines: 5,
-                  decoration: const InputDecoration(labelText: 'Adresse complète'),
+                  decoration: InputDecoration(labelText: context.tr('Adresse complète')),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _teleLivraisonCtrl,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Téléphone de livraison',
+                  textDirection: TextDirection.ltr,
+                  decoration: InputDecoration(
+                    labelText: context.tr('Téléphone de livraison'),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -241,11 +244,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   controller: _notesCtrl,
                   minLines: 2,
                   maxLines: 4,
-                  decoration: const InputDecoration(
-                      labelText: 'Notes pour le fournisseur (optionnel)'),
+                  decoration: InputDecoration(
+                      labelText: context.tr('Notes pour le fournisseur (optionnel)')),
                 ),
                 const SizedBox(height: 18),
-                const Text('Résumé commande',
+                Text(context.tr('Résumé commande'),
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 10),
@@ -266,9 +269,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                Text('x${e.quantite}'),
+                                LtrText('x${e.quantite}'),
                                 const SizedBox(width: 12),
-                                Text(_price(e.sousTotal),
+                                LtrText(_price(e.sousTotal),
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w700)),
                               ],
@@ -278,10 +281,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         const Divider(),
                         Row(
                           children: [
-                            const Text('Total',
+                            Text(context.tr('Total'),
                                 style: TextStyle(fontWeight: FontWeight.w900)),
                             const Spacer(),
-                            Text(_price(cart.montantTotal),
+                            LtrText(_price(cart.montantTotal),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w900)),
                           ],
@@ -296,7 +299,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text('Se connecter'),
+                      child: Text(context.tr('Se connecter')),
                     ),
                   )
                 else
@@ -310,7 +313,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                               width: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Confirmer la commande'),
+                          : Text(context.tr('Confirmer la commande')),
                     ),
                   ),
                 ];

@@ -37,7 +37,7 @@
                     <label class="block text-sm font-semibold mb-1" style="color: var(--store-text);">Téléphone de livraison</label>
                     <input name="tele_livraison"
                            value="{{ old('tele_livraison', $client->telephone ?? '') }}"
-                           class="store-input w-full px-4 py-3"
+                           class="store-input keep-ltr w-full px-4 py-3"
                            required>
                     @error('tele_livraison')
                         <div class="mt-1 text-xs text-red-700">{{ $message }}</div>
@@ -109,14 +109,14 @@
                             <div class="font-bold truncate">{{ $p->designation }}</div>
                             <div class="store-muted">x{{ (int)$it['qty'] }}</div>
                         </div>
-                        <div class="font-extrabold">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>
+                        <div class="keep-ltr font-extrabold">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>
                     </div>
                 @endforeach
             </div>
 
             <div class="mt-4 pt-4 border-t flex items-center justify-between" style="border-color: var(--store-border);">
                 <span class="store-muted">Total</span>
-                <span class="font-extrabold" style="color: var(--store-text);">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
+                <span class="keep-ltr-inline font-extrabold" style="color: var(--store-text);">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
             </div>
 
             <div class="store-muted mt-3 text-xs">

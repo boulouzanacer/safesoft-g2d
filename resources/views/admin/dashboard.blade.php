@@ -81,7 +81,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-white/60">CA Total</div>
-                    <div class="text-3xl font-extrabold mt-1">{{ number_format($ca_total, 2, '.', ' ') }}</div>
+                    <div class="keep-ltr text-3xl font-extrabold mt-1">{{ number_format($ca_total, 2, '.', ' ') }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
                      style="background: linear-gradient(135deg, #a855f7, #7c3aed);">
@@ -150,8 +150,8 @@
                             };
                         @endphp
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 pr-4 font-semibold">#{{ $c->id }}</td>
-                            <td class="py-3 pr-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="keep-ltr py-3 pr-4 font-semibold">#{{ $c->id }}</td>
+                            <td class="keep-ltr py-3 pr-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
                             <td class="py-3 pr-4 text-white/80">
                                 @if((int)($c->client_id ?? 0) > 0)
                                     <a href="{{ url('/admin/clients/'.$c->client_id) }}"
@@ -167,7 +167,7 @@
                             <td class="py-3 pr-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
                             </td>
-                            <td class="py-3 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
                         </tr>
                     @empty
                         <tr>

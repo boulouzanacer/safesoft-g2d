@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ ($is_rtl ?? false) ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Boutique' }} - {{ config('branding.platform_name') }}</title>
+    <title>{{ __($title ?? 'Boutique') }} - {{ config('branding.platform_name') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -214,6 +214,19 @@
         .store-logo-fallback{
             background:linear-gradient(135deg, var(--store-primary), var(--store-primary-dark));
         }
+        [dir="rtl"] .store-text-left{text-align:right;}
+        [dir="rtl"] .store-language-wrap{justify-content:flex-start;}
+        .keep-ltr{
+            direction:ltr;
+            unicode-bidi:isolate;
+            text-align:left;
+        }
+        .keep-ltr-inline{
+            direction:ltr;
+            unicode-bidi:isolate;
+            display:inline-block;
+            text-align:left;
+        }
     </style>
 </head>
 @php($storeThemeClassMap = ['azure_modern' => 'store-theme--azure', 'emerald_bloom' => 'store-theme--emerald', 'sunset_pop' => 'store-theme--sunset', 'violet_luxe' => 'store-theme--violet', 'rose_boutique' => 'store-theme--rose', 'graphite_pro' => 'store-theme--graphite'])
@@ -230,7 +243,7 @@
 @php($platformLogoUrl = trim((string) ($platformBranding['logo_url'] ?? '')))
 @php($brandLogoUrl = trim((string) ($headerBrandBoutique->logo_url ?? '')) !== '' ? trim((string) $headerBrandBoutique->logo_url) : $platformLogoUrl)
 @php($brandName = trim((string) ($headerBrandBoutique->nom_frs ?? '')) !== '' ? trim((string) $headerBrandBoutique->nom_frs) : config('branding.platform_name'))
-@php($brandSubtitle = trim((string) ($headerBrandBoutique->boutiqueCategory->name ?? '')) !== '' ? trim((string) $headerBrandBoutique->boutiqueCategory->name) : ($headerBrandBoutique ? 'Boutique' : 'Store'))
+@php($brandSubtitle = trim((string) ($headerBrandBoutique->boutiqueCategory->name ?? '')) !== '' ? trim((string) $headerBrandBoutique->boutiqueCategory->name) : ($headerBrandBoutique ? __('Boutique') : __('Store')))
 @php($brandInitial = strtoupper(mb_substr($brandName, 0, 1)))
 <div class="min-h-screen flex flex-col">
     <header class="store-topbar sticky top-0 z-40 border-b backdrop-blur">
@@ -256,21 +269,22 @@
                 <a href="{{ url('/boutiques') }}"
                    class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                     <i class="fa-solid fa-store text-[var(--store-primary)]"></i>
-                    <span>Boutiques</span>
+                    <span>{{ __('Boutiques') }}</span>
                 </a>
                 <a href="{{ url('/produits') }}"
                    class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                     <i class="fa-solid fa-box-open text-[var(--store-primary)]"></i>
-                    <span>Produits</span>
+                    <span>{{ __('Produits') }}</span>
                 </a>
             </nav>
             @endunless
 
-            <div class="flex items-center gap-2">
+            <div class="store-language-wrap flex items-center gap-2 flex-wrap justify-end">
+                @include('partials.language-switcher', ['compact' => true])
                 <a href="{{ url('/panier') }}"
                    class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                     <i class="fa-solid fa-cart-shopping text-[var(--store-primary)]"></i>
-                    <span>Panier</span>
+                    <span>{{ __('Panier') }}</span>
                     <span class="store-soft ml-1 inline-flex items-center justify-center min-w-[22px] h-5 px-1.5 rounded-full text-xs font-extrabold">
                         {{ $cartCount }}
                     </span>
@@ -280,14 +294,14 @@
                     @unless($isStorefrontMode)
                         <a href="{{ url('/profil') }}"
                            class="store-surface inline-flex items-center justify-center h-11 w-11 hover:opacity-95"
-                           title="Mon profil"
-                           aria-label="Mon profil">
+                           title="{{ __('Mon profil') }}"
+                           aria-label="{{ __('Mon profil') }}">
                             <i class="fa-solid fa-user-circle text-lg text-[var(--store-primary)]"></i>
                         </a>
                         <a href="{{ url('/mes-commandes') }}"
                            class="store-surface hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                             <i class="fa-solid fa-receipt text-[var(--store-primary)]"></i>
-                            <span>Mes commandes</span>
+                            <span>{{ __('Mes commandes') }}</span>
                         </a>
                     @endunless
                     <form method="POST" action="{{ url('/logout') }}">
@@ -295,19 +309,19 @@
                         <button type="submit"
                                 class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                             <i class="fa-solid fa-right-from-bracket text-red-600"></i>
-                            <span class="hidden sm:inline">Déconnexion</span>
+                            <span class="hidden sm:inline">{{ __('Déconnexion') }}</span>
                         </button>
                     </form>
                 @else
                     <a href="{{ url('/login') }}"
                        class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                         <i class="fa-solid fa-user text-[var(--store-primary)]"></i>
-                        <span>Connexion</span>
+                        <span>{{ __('Connexion') }}</span>
                     </a>
                     <a href="{{ url('/register') }}"
                        class="store-button-primary inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold">
                         <i class="fa-solid fa-user-plus"></i>
-                        <span class="hidden sm:inline">Créer compte</span>
+                        <span class="hidden sm:inline">{{ __('Créer compte') }}</span>
                     </a>
                 @endif
             </div>
@@ -318,17 +332,17 @@
         <div class="max-w-7xl mx-auto px-4 py-6">
             @if(session('success'))
                 <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800">
-                    {{ session('success') }}
+                    {{ __(session('success')) }}
                 </div>
             @endif
             @if(session('info'))
                 <div class="mb-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sky-800">
-                    {{ session('info') }}
+                    {{ __(session('info')) }}
                 </div>
             @endif
             @if(session('error'))
                 <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-                    {{ session('error') }}
+                    {{ __(session('error')) }}
                 </div>
             @endif
 

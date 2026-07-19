@@ -23,7 +23,7 @@
                 </div>
                 <div class="min-w-0">
                     <div class="text-2xl font-extrabold tracking-wide break-words">Commande #{{ $commande->id }}</div>
-                    <div class="mt-1 text-sm text-white/60">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y H:i') }}</div>
+                    <div class="keep-ltr mt-1 text-sm text-white/60">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y H:i') }}</div>
                     <div class="mt-3 flex flex-wrap items-center gap-2">
                         <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold {{ $statusBadge }}">
                             {{ $current }}
@@ -53,7 +53,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div class="rounded-3xl border border-sky-400/20 bg-gradient-to-br from-sky-500/20 to-sky-500/5 p-5">
             <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/80">Montant total</div>
-            <div class="mt-2 text-3xl font-extrabold text-sky-100">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</div>
+            <div class="keep-ltr mt-2 text-3xl font-extrabold text-sky-100">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</div>
             <div class="mt-3 text-xs text-sky-100/70">Valeur globale de la commande.</div>
         </div>
         <div class="rounded-3xl border border-indigo-400/20 bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 p-5">
@@ -68,8 +68,8 @@
         </div>
         <div class="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-amber-500/20 to-amber-500/5 p-5">
             <div class="text-xs font-bold uppercase tracking-[0.2em] text-amber-200/80">Date</div>
-            <div class="mt-2 text-xl font-extrabold text-amber-100">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y') }}</div>
-            <div class="mt-3 text-xs text-amber-100/70">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('H:i') }}</div>
+            <div class="keep-ltr mt-2 text-xl font-extrabold text-amber-100">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y') }}</div>
+            <div class="keep-ltr mt-3 text-xs text-amber-100/70">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('H:i') }}</div>
         </div>
     </div>
 
@@ -110,7 +110,7 @@
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Téléphone livraison</div>
-                    <div class="mt-2 font-semibold text-white/85 break-words">{{ trim((string)($commande->tele_livraison ?? '')) !== '' ? $commande->tele_livraison : '-' }}</div>
+                    <div class="keep-ltr mt-2 font-semibold text-white/85 break-words">{{ trim((string)($commande->tele_livraison ?? '')) !== '' ? $commande->tele_livraison : '-' }}</div>
                 </div>
                 @if(trim((string)($commande->notes ?? '')) !== '')
                     <div class="rounded-2xl border border-white/10 bg-black/20 p-4 md:col-span-2">
@@ -185,7 +185,7 @@
                 <div class="font-extrabold tracking-wide">Produits commandés</div>
                 <div class="text-sm text-white/50">{{ $lignes->count() }} ligne(s)</div>
             </div>
-            <div class="text-sm font-extrabold text-white/80">Total {{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</div>
+            <div class="text-sm font-extrabold text-white/80">Total <span class="keep-ltr-inline">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</span></div>
         </div>
 
         <div class="overflow-x-auto">
@@ -205,16 +205,16 @@
                                 <div class="font-semibold break-words">{{ $l->produit_designation ?? 'Produit' }}</div>
                                 <div class="text-xs text-white/60 break-words">{{ $l->produit_reference }}</div>
                             </td>
-                            <td class="py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ (int)$l->quantite }}</td>
-                            <td class="py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$l->prix_unitaire, 2, '.', ' ') }}</td>
-                            <td class="py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$l->sous_total, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ (int)$l->quantite }}</td>
+                            <td class="keep-ltr py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$l->prix_unitaire, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$l->sous_total, 2, '.', ' ') }}</td>
                         </tr>
                     @endforeach
                 </tbody>
                 <tfoot>
                     <tr class="border-t border-white/10">
                         <td colspan="3" class="py-4 px-4 text-right font-extrabold">Total</td>
-                        <td class="py-4 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</td>
+                        <td class="keep-ltr py-4 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</td>
                     </tr>
                 </tfoot>
             </table>

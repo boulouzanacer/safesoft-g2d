@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:badges/badges.dart' as badges;
 
+import '../../l10n/app_i18n.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/notification_provider.dart';
 
@@ -52,13 +53,13 @@ class HomeShell extends ConsumerWidget {
         onTap: (i) => _onTap(context, i),
         type: BottomNavigationBarType.fixed,
         items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Accueil',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home_outlined),
+            label: context.tr('Accueil'),
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.storefront_outlined),
-            label: 'Produits',
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.storefront_outlined),
+            label: context.tr('Produits'),
           ),
           BottomNavigationBarItem(
             icon: TweenAnimationBuilder<double>(
@@ -79,7 +80,7 @@ class HomeShell extends ConsumerWidget {
                       child: const Icon(Icons.shopping_cart_outlined),
                     ),
             ),
-            label: 'Panier',
+            label: context.tr('Panier'),
           ),
           BottomNavigationBarItem(
             icon: notifCount <= 0
@@ -91,7 +92,7 @@ class HomeShell extends ConsumerWidget {
                     ),
                     child: const Icon(Icons.person_outline),
                   ),
-            label: 'Profil',
+            label: context.tr('Profil'),
           ),
         ],
       ),

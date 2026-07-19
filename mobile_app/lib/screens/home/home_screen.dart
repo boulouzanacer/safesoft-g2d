@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../l10n/app_i18n.dart';
 import '../../models/boutique_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/produit_provider.dart';
@@ -72,7 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _onSearchChanged(v, frsId: frsId);
       },
       decoration: InputDecoration(
-        hintText: 'Rechercher un produit',
+        hintText: context.tr('Rechercher un produit'),
         prefixIcon: const Icon(Icons.search),
         suffixIcon: _searchCtrl.text.isEmpty
             ? null
@@ -101,12 +102,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         if (onTap != null)
-          TextButton(onPressed: onTap, child: const Text('Voir tout')),
+          TextButton(onPressed: onTap, child: Text(context.tr('Voir tout'))),
       ],
     );
   }
 
   Widget _boutiqueCard(BoutiqueModel b) {
+    final arrowIcon =
+        context.isRtlLanguage ? Icons.arrow_back_ios_new : Icons.arrow_forward_ios;
+
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () => context.push('/boutiques/${b.id}'),
@@ -131,7 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios, size: 14),
+                Icon(arrowIcon, size: 14),
               ],
             ),
             const SizedBox(height: 6),
@@ -148,7 +152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const Spacer(),
             Text(
-              '${b.nbProduits} produits',
+              '${b.nbProduits} ${context.tr('produits')}',
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ],
@@ -187,7 +191,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Accueil'),
+        title: Text(context.tr('Accueil')),
         actions: [
           IconButton(
             onPressed: () => context.push('/notifications'),
@@ -206,7 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             final children = <Widget>[
               if (isAbonne) ...[
                 Text(
-                  'Bienvenue, ${client?.firstName ?? ''}',
+                  '${context.tr('Bienvenue, ')}${client?.firstName ?? ''}',
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.w900),
                 ),
@@ -226,7 +230,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _searchBar(frsId: frsId),
               const SizedBox(height: 16),
               if (!isAbonne) ...[
-                _sectionTitle('Nos Boutiques'),
+                _sectionTitle(context.tr('Nos Boutiques')),
                 const SizedBox(height: 10),
                 boutiquesAsync.when(
                   loading: () => SizedBox(
@@ -250,7 +254,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   error: (_, __) => TextButton(
                     onPressed: () => ref.invalidate(boutiquesProvider),
-                    child: const Text('Réessayer'),
+                    child: Text(context.tr('Réessayer')),
                   ),
                   data: (boutiques) => SizedBox(
                     height: 110,
@@ -263,12 +267,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                _sectionTitle('Tous les produits',
+                _sectionTitle(context.tr('Tous les produits'),
                     onTap: () => context.go('/home/produits')),
                 const SizedBox(height: 10),
               ] else ...[
-                const Text(
-                  'Catégories',
+                Text(
+                  context.tr('Catégories'),
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 10),
@@ -276,10 +280,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   loading: () => const LinearProgressIndicator(minHeight: 2),
                   error: (_, __) => TextButton(
                     onPressed: () => ref.invalidate(categoriesProvider(frsId)),
-                    child: const Text('Réessayer'),
+                    child: Text(context.tr('Réessayer')),
                   ),
                   data: (cats) => HorizontalCategorySelector(
                     categories: cats,
+                    allLabel: context.tr('Tous'),
                     selectedValue: _selectedCategorie,
                     onChanged: (value) async {
                       setState(() => _selectedCategorie = value);
@@ -302,7 +307,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               else if (produitsState.error != null &&
                   produitsState.produits.isEmpty)
                 ErrorState(
-                  message: produitsState.error ?? 'Erreur',
+                  message: produitsState.error ?? context.tr('Erreur'),
                   onRetry: () => ref
                       .read(produitProvider(ProduitListQuery(frsId: frsId))
                           .notifier)
@@ -315,10 +320,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       Icon(Icons.inventory_2_outlined, size: 52),
                       SizedBox(height: 10),
-                      Text('Aucun produit'),
+                      Text(context.tr('Aucun produit')),
                       SizedBox(height: 6),
                       Text(
-                        'Essayez de modifier votre recherche.',
+                        context.tr('Essayez de modifier votre recherche.'),
                         textAlign: TextAlign.center,
                       ),
                     ],

@@ -40,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
             if ($shared === null) {
                 $platformBranding = app(PlatformBranding::class);
+                $locale = app()->getLocale();
+                $locales = (array) config('locales.supported', []);
 
                 $shared = [
                     'current_admin' => session()->has('admin_id')
@@ -49,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
                         ? Fournisseur::query()->find((int) session('frs_id'))
                         : null,
                     'platform_branding' => $platformBranding->viewData(),
+                    'current_locale' => $locale,
+                    'locale_options' => $locales,
+                    'is_rtl' => (bool) ($locales[$locale]['rtl'] ?? false),
                 ];
             }
 

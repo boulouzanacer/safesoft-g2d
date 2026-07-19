@@ -15,7 +15,7 @@
                 </div>
             @endif
             <div class="text-3xl font-extrabold tracking-wide">{{ config('branding.platform_name') }}</div>
-            <div class="text-sm opacity-90 mt-1">Administration</div>
+            <div class="text-sm opacity-90 mt-1">{{ __('Administration') }}</div>
         </div>
 
         <div class="bg-white shadow-2xl rounded-2xl p-8">
@@ -33,7 +33,7 @@
                 @csrf
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">{{ __('Email') }}</label>
                     <input name="email"
                            type="email"
                            value="{{ old('email') }}"
@@ -43,7 +43,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">{{ __('Password') }}</label>
                     <div class="relative">
                         <input name="password"
                                :type="show ? 'text' : 'password'"
@@ -61,13 +61,13 @@
                 <button type="submit"
                         class="w-full rounded-xl py-3 font-bold text-white shadow-lg"
                         style="background: linear-gradient(135deg, #1E6FD9 0%, #0A3D7A 100%);">
-                    Se connecter
+                    {{ __('Se connecter') }}
                 </button>
             </form>
 
             <div class="mt-6 text-center">
                 <a href="{{ url('/fournisseur/login') }}" class="text-sm text-slate-500 hover:text-slate-700">
-                    Accès Boutique
+                    {{ __('Accès Boutique') }}
                 </a>
             </div>
         </div>

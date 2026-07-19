@@ -4,7 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/api_constants.dart';
+import '../../l10n/app_i18n.dart';
 import '../../providers/commande_provider.dart';
+import '../../widgets/common/ltr_value.dart';
 
 class OrderDetailScreen extends ConsumerStatefulWidget {
   final int id;
@@ -115,7 +117,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
         (state.currentCommande?.id == widget.id) ? state.currentCommande : null;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Commande #${widget.id}')),
+      appBar: AppBar(title: Text('${context.tr('Commande')} #${widget.id}')),
       body: state.isLoading && cmd == null
           ? const Center(child: CircularProgressIndicator())
           : state.error != null && cmd == null
@@ -124,11 +126,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                     onPressed: () => ref
                         .read(commandeProvider.notifier)
                         .fetchCommande(widget.id),
-                    child: const Text('Réessayer'),
+                    child: Text(context.tr('Réessayer')),
                   ),
                 )
               : (cmd == null
-                  ? const Center(child: Text('Commande introuvable'))
+                  ? Center(child: Text(context.tr('Commande introuvable')))
                   : Builder(
                       builder: (context) {
                         final children = <Widget>[
@@ -143,20 +145,25 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('N° commande : #${cmd.id}',
+                                LtrText('N° ${context.tr('commande')} : #${cmd.id}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w900)),
                                 const SizedBox(height: 6),
-                                Text('Date : ${_formatDate(cmd.dateCmd)}'),
+                                Row(
+                                  children: [
+                                    Text('${context.tr('Date')} : '),
+                                    LtrText(_formatDate(cmd.dateCmd)),
+                                  ],
+                                ),
                                 const SizedBox(height: 4),
-                                Text('Fournisseur : ${cmd.nomFrs ?? ''}'),
+                                Text('${context.tr('Fournisseur')} : ${cmd.nomFrs ?? ''}'),
                                 const SizedBox(height: 12),
                                 _timeline(cmd.statut),
                               ],
                             ),
                           ),
                           const SizedBox(height: 14),
-                          const Text('Adresse de livraison',
+                          Text(context.tr('Adresse de livraison'),
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w800)),
                           const SizedBox(height: 8),
@@ -171,8 +178,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Téléphone : ${cmd.teleLivraison?.trim().isNotEmpty == true ? cmd.teleLivraison : '—'}',
+                                Row(
+                                  children: [
+                                    Text('${context.tr('Téléphone')} : '),
+                                    LtrText(cmd.teleLivraison?.trim().isNotEmpty == true ? cmd.teleLivraison! : '—'),
+                                  ],
                                 ),
                                 const SizedBox(height: 8),
                                 Text(cmd.adresseLivraison ?? '—'),
@@ -180,7 +190,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                             ),
                           ),
                           const SizedBox(height: 14),
-                          const Text('Produits',
+                          Text(context.tr('Produits'),
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w800)),
                           const SizedBox(height: 8),
@@ -239,13 +249,13 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                                                 fontWeight: FontWeight.w800),
                                           ),
                                           const SizedBox(height: 4),
-                                          Text(
+                                          LtrText(
                                               '${l.quantite} × ${_price(l.prixUnitaire)}'),
                                         ],
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(
+                                    LtrText(
                                       _price(l.sousTotal),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w900),
@@ -258,18 +268,18 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                           const Divider(height: 32),
                           Row(
                             children: [
-                              const Text('Total',
+                              Text(context.tr('Total'),
                                   style:
                                       TextStyle(fontWeight: FontWeight.w900)),
                               const Spacer(),
-                              Text(_price(cmd.montantTotal),
+                              LtrText(_price(cmd.montantTotal),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w900)),
                             ],
                           ),
                           if ((cmd.notes ?? '').trim().isNotEmpty) ...[
                             const SizedBox(height: 14),
-                            const Text('Notes',
+                            Text(context.tr('Notes'),
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w800)),
                             const SizedBox(height: 8),

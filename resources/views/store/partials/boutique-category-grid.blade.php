@@ -3,8 +3,8 @@
     $selectedCategoryId = $selectedCategoryId ?? null;
     $currentUrl = $currentUrl ?? url()->current();
     $query = $query ?? '';
-    $title = $title ?? 'Choisir une catégorie';
-    $subtitle = $subtitle ?? 'Sélectionnez une catégorie de boutique pour filtrer les résultats.';
+    $title = $title ?? __('Choisir une catégorie');
+    $subtitle = $subtitle ?? __('Sélectionnez une catégorie de boutique pour filtrer les résultats.');
     $selectedCategory = $categories->first(fn ($category) => (int) $category->id === (int) $selectedCategoryId);
 @endphp
 
@@ -97,6 +97,24 @@
                 right:.15rem;
                 animation:store-category-nudge-right 1.5s ease-in-out infinite alternate;
             }
+            [dir="rtl"] .store-category-arrow--left{
+                left:auto;
+                right:.15rem;
+            }
+            [dir="rtl"] .store-category-arrow--right{
+                right:auto;
+                left:.15rem;
+            }
+            [dir="rtl"] .store-category-fade--left{
+                left:auto;
+                right:0;
+                background:linear-gradient(270deg, var(--store-bg) 18%, rgba(255,255,255,0));
+            }
+            [dir="rtl"] .store-category-fade--right{
+                right:auto;
+                left:0;
+                background:linear-gradient(90deg, var(--store-bg) 18%, rgba(255,255,255,0));
+            }
             .store-category-helper{
                 display:inline-flex;
                 align-items:center;
@@ -128,6 +146,8 @@
                     var track = rail.querySelector('[data-category-track]');
                     var prev = rail.querySelector('[data-category-prev]');
                     var next = rail.querySelector('[data-category-next]');
+                    var isRtl = rail.dataset.isRtl === '1';
+                    var directionFactor = isRtl ? -1 : 1;
 
                     if (!track || !prev || !next) {
                         return;
@@ -166,11 +186,11 @@
                     };
 
                     prev.addEventListener('click', function () {
-                        track.scrollBy({ left: -getStep(), behavior: 'smooth' });
+                        track.scrollBy({ left: -getStep() * directionFactor, behavior: 'smooth' });
                     });
 
                     next.addEventListener('click', function () {
-                        track.scrollBy({ left: getStep(), behavior: 'smooth' });
+                        track.scrollBy({ left: getStep() * directionFactor, behavior: 'smooth' });
                     });
 
                     track.addEventListener('pointerdown', function (event) {
@@ -232,37 +252,37 @@
     <div class="mt-5 space-y-4">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <div class="text-sm font-extrabold tracking-wide text-[color:var(--store-text)]">{{ $title }}</div>
-                <div class="store-muted text-xs">{{ $subtitle }}</div>
+                <div class="text-sm font-extrabold tracking-wide text-[color:var(--store-text)]">{{ __($title) }}</div>
+                <div class="store-muted text-xs">{{ __($subtitle) }}</div>
             </div>
             <div class="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
                 <span class="store-category-helper">
                     <i class="fa-solid fa-left-right"></i>
-                    <span>Glissez ou utilisez les flèches</span>
+                    <span>{{ __('Glissez ou utilisez les flèches') }}</span>
                 </span>
                 <div class="store-soft inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-xs">
-                    <span class="store-muted font-semibold">Sélection :</span>
-                    <span class="font-bold text-[color:var(--store-text)]">{{ $selectedCategory?->name ?? 'Toutes les catégories' }}</span>
+                    <span class="store-muted font-semibold">{{ __('Sélection :') }}</span>
+                    <span class="font-bold text-[color:var(--store-text)]">{{ $selectedCategory?->name ?? __('Toutes les catégories') }}</span>
                 </div>
             </div>
         </div>
 
-        <div class="store-category-rail" data-category-rail>
+        <div class="store-category-rail" data-category-rail data-is-rtl="{{ ($is_rtl ?? false) ? '1' : '0' }}">
             <div class="store-category-fade store-category-fade--left"></div>
             <div class="store-category-fade store-category-fade--right"></div>
 
             <button type="button"
                     class="store-category-arrow store-category-arrow--left"
                     data-category-prev
-                    aria-label="Voir les catégories précédentes">
-                <i class="fa-solid fa-chevron-left"></i>
+                    aria-label="{{ __('Voir les catégories précédentes') }}">
+                <i class="fa-solid {{ ($is_rtl ?? false) ? 'fa-chevron-right' : 'fa-chevron-left' }}"></i>
             </button>
 
             <button type="button"
                     class="store-category-arrow store-category-arrow--right"
                     data-category-next
-                    aria-label="Voir les catégories suivantes">
-                <i class="fa-solid fa-chevron-right"></i>
+                    aria-label="{{ __('Voir les catégories suivantes') }}">
+                <i class="fa-solid {{ ($is_rtl ?? false) ? 'fa-chevron-left' : 'fa-chevron-right' }}"></i>
             </button>
 
             <div class="store-category-track" data-category-track>
@@ -279,7 +299,7 @@
                         @endif
                     </div>
                     <div class="mt-2 h-8 overflow-hidden text-[11px] font-semibold leading-4 sm:text-xs {{ ! $selectedCategoryId ? 'text-[var(--store-primary)]' : 'text-[color:var(--store-text)] group-hover:text-slate-900' }}">
-                        Toutes les catégories
+                        {{ __('Toutes les catégories') }}
                     </div>
                 </a>
 

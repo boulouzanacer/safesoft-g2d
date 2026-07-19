@@ -1,21 +1,31 @@
+import 'package:flutter/widgets.dart';
+
+import '../../l10n/app_i18n.dart';
+
 class Validators {
-  static String? requiredField(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Champ obligatoire';
+  static String? requiredField(BuildContext context, String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return context.tr('Champ obligatoire');
+    }
     return null;
   }
 
-  static String? email(String? value) {
+  static String? email(BuildContext context, String? value) {
     final v = value?.trim() ?? '';
-    if (v.isEmpty) return 'Email obligatoire';
+    if (v.isEmpty) return context.tr('Email obligatoire');
     final re = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-    if (!re.hasMatch(v)) return 'Email invalide';
+    if (!re.hasMatch(v)) return context.tr('Email invalide');
     return null;
   }
 
-  static String? password(String? value, {int min = 8}) {
+  static String? password(BuildContext context, String? value, {int min = 8}) {
     final v = value ?? '';
-    if (v.length < min) return 'Mot de passe min $min caractères';
+    if (v.length < min) {
+      return context.trArgs(
+        'Mot de passe min {min} caractères',
+        replacements: {'min': '$min'},
+      );
+    }
     return null;
   }
 }
-

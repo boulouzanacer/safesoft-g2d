@@ -1,0 +1,130 @@
+{
+    "Administration": "الإدارة",
+    "Dashboard": "لوحة التحكم",
+    "Boutiques": "المتاجر",
+    "Catégories Boutiques": "فئات المتاجر",
+    "Clients": "العملاء",
+    "Produits": "المنتجات",
+    "Commandes": "الطلبات",
+    "API Doc": "توثيق API",
+    "Api Keys": "مفاتيح API",
+    "Paramètres": "الإعدادات",
+    "Déconnexion": "تسجيل الخروج",
+    "Clair": "فاتح",
+    "Sombre": "داكن",
+    "Admin": "مدير",
+    "Profil": "الملف الشخصي",
+    "Espace Boutique": "مساحة المتجر",
+    "Mon Dashboard": "لوحة تحكمي",
+    "Mes Produits": "منتجاتي",
+    "Mes Clients": "عملائي",
+    "Mes Prevendeurs": "مندوبو البيع",
+    "Mes Commandes": "طلباتي",
+    "Planning de visite": "جدولة الزيارات",
+    "Mon Token PME": "رمز PME الخاص بي",
+    "Mon Profil": "ملفي الشخصي",
+    "Mon profil": "ملفي الشخصي",
+    "Actif": "نشط",
+    "Inactif": "غير نشط",
+    "Boutique": "متجر",
+    "Store": "المتجر",
+    "Panier": "السلة",
+    "Connexion": "تسجيل الدخول",
+    "Créer compte": "إنشاء حساب",
+    "Mes commandes": "طلباتي",
+    "Créer un compte": "إنشاء حساب",
+    "Accédez au store et passez vos commandes.": "ادخل إلى المتجر وأكمل طلباتك.",
+    "Email": "البريد الإلكتروني",
+    "Mot de passe": "كلمة المرور",
+    "Se connecter": "تسجيل الدخول",
+    "Pas de compte ?": "ليس لديك حساب؟",
+    "Compte client simple (abonnement géré par l'administration).": "حساب عميل عادي (يتم تسيير الاشتراك من طرف الإدارة).",
+    "Un code de vérification a été envoyé à": "تم إرسال رمز التحقق إلى",
+    "Code (6 chiffres)": "الرمز (6 أرقام)",
+    "Vérifier mon email": "تأكيد بريدي الإلكتروني",
+    "Renvoyer le code": "إعادة إرسال الرمز",
+    "Adresse email incorrecte? Recréer le compte": "عنوان البريد غير صحيح؟ أعد إنشاء الحساب",
+    "Nom client": "اسم العميل",
+    "Téléphone": "الهاتف",
+    "Adresse (optionnel)": "العنوان (اختياري)",
+    "Wilaya": "الولاية",
+    "Commune": "البلدية",
+    "Confirmer": "تأكيد",
+    "Créer mon compte": "إنشاء حسابي",
+    "Déjà un compte ?": "لديك حساب بالفعل؟",
+    "Chargement...": "جار التحميل...",
+    "Erreur": "خطأ",
+    "Password": "كلمة المرور",
+    "Accès Boutique": "دخول المتجر",
+    "Accès Administration": "دخول الإدارة",
+    "Boutiques & Produits": "المتاجر والمنتجات",
+    "Recherchez une boutique ou découvrez des produits selon la catégorie de boutique.": "ابحث عن متجر أو اكتشف المنتجات حسب فئة المتجر.",
+    "produit(s)": "منتج",
+    "Total": "الإجمالي",
+    "Rechercher une boutique ou un produit...": "ابحث عن متجر أو منتج...",
+    "Rechercher": "بحث",
+    "Choisissez une catégorie visuellement pour affiner les boutiques et produits affichés.": "اختر فئة بصرياً لتصفية المتاجر والمنتجات المعروضة.",
+    "Aperçu rapide des boutiques disponibles": "نظرة سريعة على المتاجر المتاحة",
+    "Afficher tous": "عرض الكل",
+    "Aucune boutique trouvée.": "لم يتم العثور على أي متجر.",
+    "Sélection aléatoire des produits des boutiques correspondantes": "مجموعة عشوائية من منتجات المتاجر المطابقة",
+    "Aucun produit trouvé.": "لم يتم العثور على أي منتج.",
+    "Toutes les boutiques": "جميع المتاجر",
+    "Recherche par nom de boutique et filtre par catégorie de boutique.": "البحث باسم المتجر والتصفية حسب فئة المتجر.",
+    "Retour accueil": "العودة للرئيسية",
+    "Rechercher une boutique...": "ابحث عن متجر...",
+    "Filtrer par catégorie": "تصفية حسب الفئة",
+    "Sélectionnez une catégorie de boutique pour afficher une liste plus claire et ciblée.": "اختر فئة متجر لعرض قائمة أوضح وأكثر دقة.",
+    "Résultats": "النتائج",
+    "boutique(s)": "متجر",
+    "Tous les produits": "جميع المنتجات",
+    "Recherche produit avec filtre par catégorie de boutique.": "البحث عن منتج مع التصفية حسب فئة المتجر.",
+    "Rechercher un produit ou une boutique...": "ابحث عن منتج أو متجر...",
+    "Choisissez une catégorie de boutique pour filtrer les produits de façon plus visuelle.": "اختر فئة متجر لتصفية المنتجات بشكل بصري أوضح.",
+    "Choisir une catégorie": "اختر فئة",
+    "Sélectionnez une catégorie de boutique pour filtrer les résultats.": "اختر فئة متجر لتصفية النتائج.",
+    "Glissez ou utilisez les flèches": "اسحب أو استخدم الأسهم",
+    "Sélection :": "التحديد:",
+    "Toutes les catégories": "كل الفئات",
+    "Voir les catégories précédentes": "عرض الفئات السابقة",
+    "Voir les catégories suivantes": "عرض الفئات التالية",
+    "Compte désactivé.": "الحساب معطل.",
+    "Identifiants invalides.": "بيانات الدخول غير صحيحة.",
+    "Email non vérifié. Veuillez vérifier votre boîte mail.": "البريد الإلكتروني غير مؤكد. يرجى التحقق من بريدك.",
+    "Un code de vérification a été envoyé par email.": "تم إرسال رمز التحقق عبر البريد الإلكتروني.",
+    "Email déjà vérifié. Vous pouvez vous connecter.": "تم تأكيد البريد الإلكتروني مسبقاً. يمكنك تسجيل الدخول.",
+    "Code invalide.": "الرمز غير صالح.",
+    "Code expiré. Cliquez sur \"Renvoyer le code\".": "انتهت صلاحية الرمز. اضغط على \"إعادة إرسال الرمز\".",
+    "Code incorrect.": "الرمز غير صحيح.",
+    "Email vérifié. Bienvenue.": "تم تأكيد البريد الإلكتروني. مرحباً بك.",
+    "Code renvoyé.": "تمت إعادة إرسال الرمز.",
+    "Vous pouvez corriger votre adresse email et recréer le compte.": "يمكنك تصحيح بريدك الإلكتروني وإعادة إنشاء الحساب."
+    ,"Gérez ici l'identité visuelle globale de la plateforme. Ce logo s'affiche dans l'administration, l'espace Boutique et les écrans de connexion quand aucune identité boutique spécifique ne doit prendre le dessus.": "قم بإدارة الهوية البصرية العامة للمنصة من هنا. يظهر هذا الشعار في الإدارة ومساحة المتجر وشاشات تسجيل الدخول عندما لا تكون هناك هوية متجر خاصة لها الأولوية."
+    ,"Branding plateforme": "هوية المنصة"
+    ,"Logo plateforme": "شعار المنصة"
+    ,"Formats acceptés: JPG, PNG, WEBP, SVG. Taille maximale: 4 Mo.": "الصيغ المقبولة: JPG وPNG وWEBP وSVG. الحجم الأقصى: 4 ميغابايت."
+    ,"Supprimer le logo actuel et revenir aux initiales": "حذف الشعار الحالي والعودة إلى الأحرف الأولى"
+    ,"Enregistrer le logo": "حفظ الشعار"
+    ,"Si vous chargez un nouveau logo, il remplace automatiquement l'ancien.": "إذا قمت برفع شعار جديد، فسيستبدل القديم تلقائياً."
+    ,"Aperçu": "معاينة"
+    ,"Administration / Espace Boutique": "الإدارة / مساحة المتجر"
+    ,"Important": "مهم"
+    ,"Le logo plateforme sert uniquement d'identité globale. Les logos propres aux boutiques continuent de s'afficher dans les storefronts et les fiches boutique.": "يُستخدم شعار المنصة كهوية عامة فقط. وتستمر شعارات المتاجر الخاصة في الظهور داخل واجهات المتاجر وبطاقات المتجر."
+    ,"Informations": "المعلومات"
+    ,"Nom": "الاسم"
+    ,"Logo (optionnel)": "الشعار (اختياري)"
+    ,"Adresse": "العنوان"
+    ,"Latitude (optionnel)": "خط العرض (اختياري)"
+    ,"Longitude (optionnel)": "خط الطول (اختياري)"
+    ,"Utiliser ma position": "استخدام موقعي"
+    ,"Ouvrir sur Maps": "فتح في الخرائط"
+    ,"Visible sur le site et l’app mobile": "مرئي على الموقع والتطبيق"
+    ,"Theme de ma boutique": "ثيم متجري"
+    ,"Choisissez l apparence publique de votre boutique. Le changement s applique aussi sur votre lien special.": "اختر المظهر العام لمتجرك. يتم تطبيق التغيير أيضاً على رابطك الخاص."
+    ,"Choisir...": "اختر..."
+    ,"Enregistrer": "حفظ"
+    ,"Ancien": "القديم"
+    ,"Nouveau": "الجديد"
+    ,"Confirmation": "التأكيد"
+    ,"Mettre à jour": "تحديث"
+}

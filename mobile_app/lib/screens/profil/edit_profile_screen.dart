@@ -178,6 +178,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     controller: _telCtrl,
                     decoration: const InputDecoration(labelText: 'Téléphone'),
                     keyboardType: TextInputType.phone,
+                    textDirection: TextDirection.ltr,
                   ),
                   const SizedBox(height: 12),
                   DropdownSearch<WilayaModel>(

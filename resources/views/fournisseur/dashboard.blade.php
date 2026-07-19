@@ -151,7 +151,7 @@
                    id="storefrontLinkInput"
                    value="{{ $storefront_url }}"
                    readonly
-                   class="min-w-0 w-full lg:w-[420px] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none">
+                   class="keep-ltr min-w-0 w-full lg:w-[420px] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80 outline-none">
             <button type="button"
                     id="copyStorefrontLinkButton"
                     class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white"
@@ -201,7 +201,7 @@
             @forelse($clients_a_visiter as $visite)
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="font-bold">{{ $visite->nom ?: '-' }}</div>
-                    <div class="text-xs text-white/60 mt-1">Code: {{ $visite->code_client ?: '-' }}</div>
+                    <div class="text-xs text-white/60 mt-1">Code: <span class="keep-ltr-inline">{{ $visite->code_client ?: '-' }}</span></div>
                 </div>
             @empty
                 <div class="text-white/60">Aucune visite generee pour aujourd'hui.</div>
@@ -217,7 +217,7 @@
         <div class="space-y-3">
             @forelse($prochaines_visites as $item)
                 <div class="flex items-center justify-between text-sm rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-                    <span>{{ \Illuminate\Support\Carbon::parse($item->visit_date)->format('d/m/Y') }}</span>
+                    <span class="keep-ltr-inline">{{ \Illuminate\Support\Carbon::parse($item->visit_date)->format('d/m/Y') }}</span>
                     <span class="font-extrabold">{{ $item->total }} visite(s)</span>
                 </div>
             @empty
@@ -259,13 +259,13 @@
                             };
                         @endphp
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 pr-4 font-semibold">#{{ $c->id }}</td>
-                            <td class="py-3 pr-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="keep-ltr py-3 pr-4 font-semibold">#{{ $c->id }}</td>
+                            <td class="keep-ltr py-3 pr-4 text-white/80">{{ \Illuminate\Support\Carbon::parse($c->date_cmd)->format('d/m/Y H:i') }}</td>
                             <td class="py-3 pr-4 text-white/80">{{ $c->client_nom ?: '-' }}</td>
                             <td class="py-3 pr-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
                             </td>
-                            <td class="py-3 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
                         </tr>
                     @empty
                         <tr>

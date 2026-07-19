@@ -7,6 +7,7 @@ import '../../core/network/api_response.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/utils/storage_service.dart';
 import '../../core/utils/validators.dart';
+import '../../l10n/app_i18n.dart';
 import '../../models/commune_model.dart';
 import '../../models/wilaya_model.dart';
 import '../../providers/auth_provider.dart';
@@ -91,13 +92,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_selectedWilaya == null || _selectedCommune == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Veuillez sélectionner wilaya et commune')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('Veuillez sélectionner wilaya et commune'))),
+      );
       return;
     }
     if (!_cgu) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Veuillez accepter les CGU')));
+        SnackBar(content: Text(context.tr('Veuillez accepter les CGU'))),
+      );
       return;
     }
 
@@ -125,7 +128,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Inscription')),
+      appBar: AppBar(title: Text(context.tr('Inscription'))),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -149,28 +152,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ],
                 TextFormField(
                   controller: _nomCtrl,
-                  decoration: const InputDecoration(labelText: 'Nom client'),
-                  validator: Validators.requiredField,
+                  decoration: InputDecoration(labelText: context.tr('Nom client')),
+                  validator: (value) => Validators.requiredField(context, value),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  validator: Validators.email,
+                  decoration: InputDecoration(labelText: context.tr('Email')),
+                  validator: (value) => Validators.email(context, value),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _telCtrl,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: 'Téléphone'),
+                  decoration: InputDecoration(labelText: context.tr('Téléphone')),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _passCtrl,
                   obscureText: !_showPassword,
                   decoration: InputDecoration(
-                    labelText: 'Mot de passe',
+                    labelText: context.tr('Mot de passe'),
                     suffixIcon: IconButton(
                       onPressed: () =>
                           setState(() => _showPassword = !_showPassword),
@@ -179,14 +182,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           : Icons.visibility),
                     ),
                   ),
-                  validator: (v) => Validators.password(v),
+                  validator: (v) => Validators.password(context, v),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _confirmCtrl,
                   obscureText: !_showConfirm,
                   decoration: InputDecoration(
-                    labelText: 'Confirmer mot de passe',
+                    labelText: context.tr('Confirmer mot de passe'),
                     suffixIcon: IconButton(
                       onPressed: () =>
                           setState(() => _showConfirm = !_showConfirm),
@@ -196,10 +199,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ),
                   validator: (v) {
-                    final err = Validators.password(v);
+                    final err = Validators.password(context, v);
                     if (err != null) return err;
                     if (v != _passCtrl.text) {
-                      return 'Les mots de passe ne correspondent pas';
+                      return context.tr('Les mots de passe ne correspondent pas');
                     }
                     return null;
                   },
@@ -210,9 +213,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   selectedItem: _selectedWilaya,
                   itemAsString: (w) => '${w.idWilaya} - ${w.wilaya}',
                   popupProps: const PopupProps.menu(showSearchBox: true),
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownDecoratorProps: DropDownDecoratorProps(
                     dropdownSearchDecoration:
-                        InputDecoration(labelText: 'Wilaya'),
+                        InputDecoration(labelText: context.tr('Wilaya')),
                   ),
                   onChanged: (w) async {
                     setState(() {
@@ -231,17 +234,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   selectedItem: _selectedCommune,
                   itemAsString: (c) => c.commune,
                   popupProps: const PopupProps.menu(showSearchBox: true),
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownDecoratorProps: DropDownDecoratorProps(
                     dropdownSearchDecoration:
-                        InputDecoration(labelText: 'Commune'),
+                        InputDecoration(labelText: context.tr('Commune')),
                   ),
                   onChanged: (c) => setState(() => _selectedCommune = c),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _adresseCtrl,
-                  decoration:
-                      const InputDecoration(labelText: 'Adresse (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: context.tr('Adresse (optionnel)'),
+                  ),
                   minLines: 2,
                   maxLines: 4,
                 ),
@@ -250,7 +254,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   value: _cgu,
                   onChanged: (v) => setState(() => _cgu = v ?? false),
                   contentPadding: EdgeInsets.zero,
-                  title: const Text("J'accepte les CGU"),
+                  title: Text(context.tr("J'accepte les CGU")),
                 ),
                 const SizedBox(height: 12),
                 GradientButton(
@@ -260,12 +264,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           height: 18,
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text("S'inscrire"),
+                      : Text(context.tr("S'inscrire")),
                 ),
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => context.go('/login'),
-                  child: const Text('J’ai déjà un compte'),
+                  child: Text(context.tr('J’ai déjà un compte')),
                 ),
                 ];
 

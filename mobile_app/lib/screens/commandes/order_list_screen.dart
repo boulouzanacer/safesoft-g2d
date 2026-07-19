@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../l10n/app_i18n.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/commande_provider.dart';
+import '../../widgets/common/ltr_value.dart';
 import '../../widgets/common/error_state.dart';
 import '../../widgets/skeletons/order_card_skeleton.dart';
 
@@ -40,7 +42,7 @@ class OrderListScreen extends ConsumerWidget {
     final auth = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mes commandes')),
+      appBar: AppBar(title: Text(context.tr('Mes commandes'))),
       body: !auth.isAuthenticated
           ? Center(
               child: Padding(
@@ -50,11 +52,11 @@ class OrderListScreen extends ConsumerWidget {
                   children: [
                     const Icon(Icons.lock_outline, size: 52),
                     const SizedBox(height: 10),
-                    const Text('Connectez-vous pour voir vos commandes'),
+                    Text(context.tr('Connectez-vous pour voir vos commandes')),
                     const SizedBox(height: 12),
                     ElevatedButton(
                       onPressed: () => context.go('/login'),
-                      child: const Text('Se connecter'),
+                      child: Text(context.tr('Se connecter')),
                     ),
                   ],
                 ),
@@ -71,27 +73,27 @@ class OrderListScreen extends ConsumerWidget {
                 )
               : state.error != null
                   ? ErrorState(
-                      message: state.error ?? 'Erreur',
+                      message: state.error ?? context.tr('Erreur'),
                       onRetry: () => ref
                           .read(commandeProvider.notifier)
                           .fetchMesCommandes(),
                     )
                   : (state.commandes.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.receipt_long_outlined, size: 60),
-                                SizedBox(height: 12),
+                                const Icon(Icons.receipt_long_outlined, size: 60),
+                                const SizedBox(height: 12),
                                 Text(
-                                  'Aucune commande',
-                                  style: TextStyle(fontWeight: FontWeight.w900),
+                                  context.tr('Aucune commande'),
+                                  style: const TextStyle(fontWeight: FontWeight.w900),
                                 ),
-                                SizedBox(height: 6),
+                                const SizedBox(height: 6),
                                 Text(
-                                  'Vos commandes apparaîtront ici après validation.',
+                                  context.tr('Vos commandes apparaîtront ici après validation.'),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -126,7 +128,7 @@ class OrderListScreen extends ConsumerWidget {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            'Commande #${c.id}',
+                                            '${context.tr('Commande')} #${c.id}',
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.w900),
                                           ),
@@ -152,7 +154,7 @@ class OrderListScreen extends ConsumerWidget {
                                       ],
                                     ),
                                     const SizedBox(height: 6),
-                                    Text(_formatDate(c.dateCmd),
+                                    LtrText(_formatDate(c.dateCmd),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Theme.of(context)
@@ -162,9 +164,9 @@ class OrderListScreen extends ConsumerWidget {
                                               ?.withValues(alpha: 0.7),
                                         )),
                                     const SizedBox(height: 8),
-                                    Text('Fournisseur : ${c.nomFrs ?? ''}'),
+                                    Text('${context.tr('Fournisseur')} : ${c.nomFrs ?? ''}'),
                                     const SizedBox(height: 6),
-                                    Text(
+                                    LtrText(
                                       '${NumberFormat('#,##0.00', 'fr_FR').format(c.montantTotal)} DA',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w900),

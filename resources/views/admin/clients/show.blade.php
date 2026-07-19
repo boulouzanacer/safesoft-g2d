@@ -53,17 +53,17 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="rounded-3xl border border-sky-400/20 bg-gradient-to-br from-sky-500/20 to-sky-500/5 p-5">
             <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/80">Achat Client</div>
-            <div class="mt-2 text-3xl font-extrabold text-sky-100">{{ number_format($achatClient, 2, '.', ' ') }}</div>
+            <div class="keep-ltr mt-2 text-3xl font-extrabold text-sky-100">{{ number_format($achatClient, 2, '.', ' ') }}</div>
             <div class="mt-3 text-xs text-sky-100/70">Montant total des achats.</div>
         </div>
         <div class="rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-5">
             <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200/80">Versement Client</div>
-            <div class="mt-2 text-3xl font-extrabold text-emerald-100">{{ number_format($versementClient, 2, '.', ' ') }}</div>
+            <div class="keep-ltr mt-2 text-3xl font-extrabold text-emerald-100">{{ number_format($versementClient, 2, '.', ' ') }}</div>
             <div class="mt-3 text-xs text-emerald-100/70">Montant total des versements.</div>
         </div>
         <div class="rounded-3xl border bg-gradient-to-br p-5 {{ $soldeBadge }}">
             <div class="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Solde Client</div>
-            <div class="mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
+            <div class="keep-ltr mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
             <div class="mt-3 text-xs text-white/70">
                 {{ $soldeClient > 0 ? 'Solde a recouvrer.' : ($soldeClient < 0 ? 'Client crediteur.' : 'Compte equilibre.') }}
             </div>
@@ -80,11 +80,11 @@
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Code client</div>
-                    <div class="mt-2 font-extrabold break-words">{{ $client->code_client ?: '-' }}</div>
+                    <div class="keep-ltr mt-2 font-extrabold break-words">{{ $client->code_client ?: '-' }}</div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Telephone</div>
-                    <div class="mt-2 font-extrabold break-words">{{ $client->telephone ?: '-' }}</div>
+                    <div class="keep-ltr mt-2 font-extrabold break-words">{{ $client->telephone ?: '-' }}</div>
                 </div>
                 <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <div class="text-xs font-bold uppercase tracking-wide text-white/50">Tarif</div>
@@ -170,15 +170,15 @@
                             };
                         @endphp
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 px-4 font-semibold whitespace-nowrap">#{{ $commande->id }}</td>
-                            <td class="py-3 px-4 text-white/80 whitespace-nowrap">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y H:i') }}</td>
+                            <td class="keep-ltr py-3 px-4 font-semibold whitespace-nowrap">#{{ $commande->id }}</td>
+                            <td class="keep-ltr py-3 px-4 text-white/80 whitespace-nowrap">{{ \Illuminate\Support\Carbon::parse($commande->date_cmd)->format('d/m/Y H:i') }}</td>
                             <td class="py-3 px-4 text-white/80 break-words">{{ $commande->frs_nom ?: '-' }}</td>
                             <td class="py-3 px-4">
                                 <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold {{ $badge }}">
                                     {{ $commande->statut }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</td>
+                            <td class="keep-ltr py-3 px-4 text-right font-extrabold whitespace-nowrap">{{ number_format((float)$commande->montant_total, 2, '.', ' ') }}</td>
                         </tr>
                     @empty
                         <tr>

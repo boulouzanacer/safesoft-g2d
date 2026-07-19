@@ -89,7 +89,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-sky-500">Achat Client</div>
-                                    <div class="mt-2 text-3xl font-extrabold text-sky-700">{{ number_format($achatClient, 2, '.', ' ') }}</div>
+                                    <div class="keep-ltr mt-2 text-3xl font-extrabold text-sky-700">{{ number_format($achatClient, 2, '.', ' ') }}</div>
                                 </div>
                                 <div class="h-12 w-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-bag-shopping"></i>
@@ -102,7 +102,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-500">Versement Client</div>
-                                    <div class="mt-2 text-3xl font-extrabold text-emerald-700">{{ number_format($versementClient, 2, '.', ' ') }}</div>
+                                    <div class="keep-ltr mt-2 text-3xl font-extrabold text-emerald-700">{{ number_format($versementClient, 2, '.', ' ') }}</div>
                                 </div>
                                 <div class="h-12 w-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-credit-card"></i>
@@ -115,7 +115,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <div class="text-xs font-bold uppercase tracking-[0.2em]">Solde Client</div>
-                                    <div class="mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
+                                    <div class="keep-ltr mt-2 text-3xl font-extrabold">{{ number_format($soldeClient, 2, '.', ' ') }}</div>
                                 </div>
                                 <div class="h-12 w-12 rounded-2xl bg-white/70 flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-scale-balanced"></i>
@@ -154,7 +154,7 @@
                             </div>
                             <div class="sm:col-span-2">
                                 <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Code client</div>
-                                <div class="mt-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900">{{ trim((string) ($tab['code_client'] ?? '')) !== '' ? $tab['code_client'] : '-' }}</div>
+                                <div class="keep-ltr mt-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900">{{ trim((string) ($tab['code_client'] ?? '')) !== '' ? $tab['code_client'] : '-' }}</div>
                             </div>
                         </div>
                     </div>
@@ -178,7 +178,7 @@
                     </div>
                     <div>
                         <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Telephone</div>
-                        <div class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">{{ $client->telephone ?: '-' }}</div>
+                        <div class="keep-ltr mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900">{{ $client->telephone ?: '-' }}</div>
                     </div>
                     <div>
                         <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Email verifie</div>

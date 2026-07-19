@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_i18n.dart';
+
 class OfflineBanner extends StatefulWidget {
   final Widget child;
 
@@ -43,23 +45,22 @@ class _OfflineBannerState extends State<OfflineBanner> {
       children: [
         widget.child,
         if (_offline)
-          Positioned(
+          PositionedDirectional(
             top: MediaQuery.of(context).padding.top,
-            left: 0,
-            right: 0,
-            child: const Material(
+            start: 0,
+            end: 0,
+            child: Material(
               color: Colors.amber,
               child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 child: Row(
                   children: [
-                    Icon(Icons.wifi_off, size: 18),
-                    SizedBox(width: 10),
+                    const Icon(Icons.wifi_off, size: 18),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Mode hors ligne',
-                        style: TextStyle(fontWeight: FontWeight.w800),
+                        context.tr('Mode hors ligne'),
+                        style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
                     ),
                   ],
@@ -71,4 +72,3 @@ class _OfflineBannerState extends State<OfflineBanner> {
     );
   }
 }
-

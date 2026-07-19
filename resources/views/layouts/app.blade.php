@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      dir="{{ ($is_rtl ?? false) ? 'rtl' : 'ltr' }}"
       x-data="themeSwitcher()"
       x-init="init()"
       :class="{ 'dark': dark }">
@@ -16,6 +17,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+        [dir="rtl"] .app-theme-toggle{right:auto;left:1rem;}
+    </style>
     <script>
         function themeSwitcher() {
             return {
@@ -42,11 +47,15 @@
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
     <button type="button"
-            class="fixed top-4 right-4 z-50 inline-flex items-center gap-2 rounded-xl bg-white/80 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur hover:bg-white dark:bg-slate-900/70 dark:hover:bg-slate-900"
+            class="app-theme-toggle fixed top-4 right-4 z-50 inline-flex items-center gap-2 rounded-xl bg-white/80 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur hover:bg-white dark:bg-slate-900/70 dark:hover:bg-slate-900"
             @click="toggle()">
         <i class="fa-solid" :class="dark ? 'fa-sun' : 'fa-moon'"></i>
-        <span x-text="dark ? 'Clair' : 'Sombre'"></span>
+        <span x-text="dark ? '{{ __('Clair') }}' : '{{ __('Sombre') }}'"></span>
     </button>
+
+    <div class="fixed top-4 z-50 {{ ($is_rtl ?? false) ? 'right-4' : 'left-4' }}">
+        @include('partials.language-switcher')
+    </div>
 
     @yield('content')
 </body>

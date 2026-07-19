@@ -1,10 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/network/dio_client.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/app_i18n.dart';
+import 'providers/locale_provider.dart';
 import 'providers/theme_provider.dart';
 import 'services/notification_service.dart';
 import 'widgets/common/offline_banner.dart';
@@ -172,6 +175,7 @@ class GrosLinkApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(themeProvider);
+    final locale = ref.watch(localeProvider);
     final router = _router();
 
     return MaterialApp.router(
@@ -179,6 +183,13 @@ class GrosLinkApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+      locale: locale,
+      supportedLocales: AppI18n.supportedLocales,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
       builder: (context, child) {
         return OfflineBanner(child: child ?? const SizedBox.shrink());

@@ -118,7 +118,7 @@
         <label class="block text-sm font-semibold text-white/70 mb-1">Téléphone</label>
         <input name="telephone"
                value="{{ old('telephone', $frs?->telephone ?? '') }}"
-               class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
+               class="keep-ltr w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
     </div>
 
     <div>
