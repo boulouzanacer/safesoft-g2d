@@ -21,7 +21,7 @@
                 <input id="clientsSearchInput"
                        name="q"
                        value="{{ $q }}"
-                       placeholder="Rechercher nom/email..."
+                       placeholder="{{ __('Rechercher nom/email...') }}"
                        class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--admin-primary)]">
             </div>
         </div>
@@ -31,7 +31,7 @@
                     name="fournisseur"
                     @disabled($without_fournisseur)
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-                <option value="">Toutes les boutiques</option>
+                <option value="">{{ __('Toutes les boutiques') }}</option>
                 @foreach($fournisseurs as $f)
                     <option value="{{ $f->id }}" @selected((string)$selected_fournisseur === (string)$f->id)>{{ $f->nom_frs }}</option>
                 @endforeach
@@ -45,10 +45,10 @@
                    value="1"
                    @checked($without_fournisseur)
                    class="h-4 w-4 rounded border-white/20 bg-transparent text-[var(--admin-primary)] focus:ring-[var(--admin-primary)]">
-            <span class="text-sm text-white/85">Sans boutique</span>
+            <span class="text-sm text-white/85">{{ __('Sans boutique') }}</span>
         </label>
 
-        <button type="submit" class="hidden">Filtrer</button>
+        <button type="submit" class="hidden">{{ __('Filtrer') }}</button>
     </form>
 
     <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] overflow-hidden">
@@ -56,13 +56,13 @@
             <table class="min-w-full text-sm">
                 <thead class="text-white/60">
                     <tr>
-                        <th class="text-left py-3 px-4 font-semibold">Nom</th>
-                        <th class="text-left py-3 px-4 font-semibold">Email</th>
-                        <th class="text-left py-3 px-4 font-semibold">Type</th>
-                        <th class="text-left py-3 px-4 font-semibold">Boutique</th>
-                        <th class="text-left py-3 px-4 font-semibold">Synced PME</th>
-                        <th class="text-left py-3 px-4 font-semibold">Statut</th>
-                        <th class="text-right py-3 px-4 font-semibold">Actions</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Nom') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Email') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Type') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Boutique') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Synced PME') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Statut') }}</th>
+                        <th class="text-right py-3 px-4 font-semibold">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -74,19 +74,19 @@
                             <td class="py-3 px-4 text-white/80">{{ $c->frs_nom ?? '-' }}</td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)($c->synced_pme ?? 0) === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                                    {{ (int)($c->synced_pme ?? 0) === 1 ? 'Synced' : 'Not Synced' }}
+                                    {{ (int)($c->synced_pme ?? 0) === 1 ? __('Synced') : __('Not Synced') }}
                                 </span>
                             </td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$c->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                                    {{ (int)$c->actif === 1 ? 'Actif' : 'Inactif' }}
+                                    {{ (int)$c->actif === 1 ? __('Actif') : __('Inactif') }}
                                 </span>
                             </td>
                             <td class="py-3 px-4">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ url('/admin/clients/'.$c->id) }}"
                                        class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-sky-400/20 text-sky-300 hover:bg-sky-500/10"
-                                       title="Détail">
+                                       title="{{ __('Détail') }}">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
                                     @if($c->id_frs === null)
@@ -94,9 +94,9 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                    onclick="return confirm('Supprimer ce client sans boutique ?')"
+                                                    onclick="return confirm('{{ __('Supprimer ce client sans boutique ?') }}')"
                                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
-                                                    title="Supprimer">
+                                                    title="{{ __('Supprimer') }}">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
@@ -108,7 +108,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-10 text-center text-white/60">Aucun client</td>
+                            <td colspan="7" class="py-10 text-center text-white/60">{{ __('Aucun client') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

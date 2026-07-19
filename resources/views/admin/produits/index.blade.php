@@ -9,7 +9,7 @@
                 <input id="produitsSearchInput"
                        name="q"
                        value="{{ $q }}"
-                       placeholder="Rechercher référence/désignation/catégorie..."
+                       placeholder="{{ __('Rechercher référence/désignation/catégorie...') }}"
                        class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--admin-primary)]">
             </div>
         </div>
@@ -18,14 +18,14 @@
             <select id="produitsFournisseurSelect"
                     name="fournisseur"
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-                <option value="">Toutes les boutiques</option>
+                <option value="">{{ __('Toutes les boutiques') }}</option>
                 @foreach($fournisseurs as $f)
                     <option value="{{ $f->id }}" @selected((string)$selected_fournisseur === (string)$f->id)>{{ $f->nom_frs }}</option>
                 @endforeach
             </select>
         </div>
 
-        <button type="submit" class="hidden">Filtrer</button>
+        <button type="submit" class="hidden">{{ __('Filtrer') }}</button>
     </form>
 
     <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] overflow-hidden">
@@ -33,33 +33,33 @@
             <table class="min-w-full text-sm">
                 <thead class="text-white/60">
                     <tr>
-                        <th class="text-left py-3 px-4 font-semibold">Réf</th>
-                        <th class="text-left py-3 px-4 font-semibold">Désignation</th>
-                        <th class="text-left py-3 px-4 font-semibold">Catégorie</th>
-                        <th class="text-left py-3 px-4 font-semibold">Boutique</th>
-                        <th class="text-right py-3 px-4 font-semibold">PV 1</th>
-                        <th class="text-right py-3 px-4 font-semibold">Stock</th>
-                        <th class="text-left py-3 px-4 font-semibold">Statut</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Réf') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Désignation') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Catégorie') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Boutique') }}</th>
+                        <th class="text-right py-3 px-4 font-semibold">{{ __('PV 1') }}</th>
+                        <th class="text-right py-3 px-4 font-semibold">{{ __('Stock') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Statut') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
                     @forelse($produits as $p)
                         <tr class="hover:bg-white/5">
-                            <td class="py-3 px-4 font-semibold">{{ $p->reference }}</td>
+                            <td class="py-3 px-4 font-semibold keep-ltr">{{ $p->reference }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $p->designation }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $p->categorie }}</td>
                             <td class="py-3 px-4 text-white/80">{{ $p->frs_nom }}</td>
-                            <td class="py-3 px-4 text-right font-bold">{{ number_format((float)$p->pv_1, 2, '.', ' ') }}</td>
-                            <td class="py-3 px-4 text-right font-bold">{{ (int)$p->stock }}</td>
+                            <td class="py-3 px-4 text-right font-bold keep-ltr">{{ number_format((float)$p->pv_1, 2, '.', ' ') }}</td>
+                            <td class="py-3 px-4 text-right font-bold keep-ltr">{{ (int)$p->stock }}</td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$p->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                                    {{ (int)$p->actif === 1 ? 'Actif' : 'Inactif' }}
+                                    {{ (int)$p->actif === 1 ? __('Actif') : __('Inactif') }}
                                 </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-10 text-center text-white/60">Aucun produit</td>
+                            <td colspan="7" class="py-10 text-center text-white/60">{{ __('Aucun produit') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

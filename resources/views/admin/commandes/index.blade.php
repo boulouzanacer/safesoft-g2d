@@ -7,9 +7,9 @@
             <select id="commandesStatutSelect"
                     name="statut"
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-                <option value="">Tous statuts</option>
+                <option value="">{{ __('Tous statuts') }}</option>
                 @foreach($statuts as $s)
-                    <option value="{{ $s }}" @selected((string)$selected_statut === (string)$s)>{{ $s }}</option>
+                    <option value="{{ $s }}" @selected((string)$selected_statut === (string)$s)>{{ __($s) }}</option>
                 @endforeach
             </select>
         </div>
@@ -18,7 +18,7 @@
             <select id="commandesFournisseurSelect"
                     name="fournisseur"
                     class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-                <option value="">Toutes les boutiques</option>
+                <option value="">{{ __('Toutes les boutiques') }}</option>
                 @foreach($fournisseurs as $f)
                     <option value="{{ $f->id }}" @selected((string)$selected_fournisseur === (string)$f->id)>{{ $f->nom_frs }}</option>
                 @endforeach
@@ -41,7 +41,7 @@
                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
         </div>
 
-        <button type="submit" class="hidden">Filtrer</button>
+        <button type="submit" class="hidden">{{ __('Filtrer') }}</button>
     </form>
 
     <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] overflow-hidden">
@@ -50,11 +50,11 @@
                 <thead class="text-white/60">
                     <tr>
                         <th class="text-left py-3 px-4 font-semibold">#</th>
-                        <th class="text-left py-3 px-4 font-semibold">Date</th>
-                        <th class="text-left py-3 px-4 font-semibold">Client</th>
-                        <th class="text-left py-3 px-4 font-semibold">Boutique</th>
-                        <th class="text-left py-3 px-4 font-semibold">Statut</th>
-                        <th class="text-right py-3 px-4 font-semibold">Montant</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Date') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Client') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Boutique') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Statut') }}</th>
+                        <th class="text-right py-3 px-4 font-semibold">{{ __('Montant') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -86,13 +86,13 @@
                             </td>
                             <td class="py-3 px-4 text-white/80">{{ $c->frs_nom }}</td>
                             <td class="py-3 px-4">
-                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ __($statut) }}</span>
                             </td>
                             <td class="py-3 px-4 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-10 text-center text-white/60">Aucune commande</td>
+                            <td colspan="6" class="py-10 text-center text-white/60">{{ __('Aucune commande') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

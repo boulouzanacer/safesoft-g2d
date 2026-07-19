@@ -9,7 +9,7 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
                     <input name="q"
                            value="{{ $q }}"
-                           placeholder="Rechercher désignation ou référence..."
+                           placeholder="{{ __('Rechercher désignation ou référence...') }}"
                            class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--frs-primary)]">
                 </div>
             </div>
@@ -17,7 +17,7 @@
             <div>
                 <select name="categorie"
                         class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]">
-                    <option value="">Toutes catégories</option>
+                    <option value="">{{ __('Toutes catégories') }}</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat }}" @selected($categorie === $cat)>{{ $cat }}</option>
                     @endforeach
@@ -27,11 +27,11 @@
             <div class="md:col-span-3 flex gap-2">
                 <button class="flex-1 rounded-2xl px-4 py-3 font-bold text-white"
                         style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
-                    Filtrer
+                    {{ __('Filtrer') }}
                 </button>
                 <a href="{{ url('/fournisseur/produits') }}"
                    class="rounded-2xl px-4 py-3 font-bold border border-white/10 hover:bg-white/10">
-                    Reset
+                    {{ __('Réinitialiser') }}
                 </a>
             </div>
         </form>
@@ -40,7 +40,7 @@
            class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white"
            style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
             <i class="fa-solid fa-plus"></i>
-            Nouveau produit
+            {{ __('Nouveau produit') }}
         </a>
     </div>
 
@@ -55,10 +55,10 @@
             @php
                 $stock = (int) $p->stock;
                 $stockBadge = $stock === 0
-                    ? ['Rupture', 'bg-red-500/15 text-red-300 border border-red-400/20']
+                    ? [__('Rupture'), 'bg-red-500/15 text-red-300 border border-red-400/20']
                     : ($stock < 5
-                        ? ['Stock faible', 'bg-amber-500/15 text-amber-300 border border-amber-400/20']
-                        : ['Disponible', 'bg-sky-500/15 text-sky-200 border border-sky-400/20']);
+                        ? [__('Stock faible'), 'bg-amber-500/15 text-amber-300 border border-amber-400/20']
+                        : [__('Disponible'), 'bg-sky-500/15 text-sky-200 border border-sky-400/20']);
             @endphp
 
             <div class="rounded-2xl border border-white/10 bg-[var(--frs-card)] overflow-hidden">
@@ -81,23 +81,23 @@
 
                 <div class="p-3">
                     <div class="font-extrabold text-sm leading-tight truncate">{{ $p->designation }}</div>
-                    <div class="text-[11px] text-white/60 mt-0.5 truncate">{{ $p->reference }} • {{ $p->categorie }}</div>
+                    <div class="text-[11px] text-white/60 mt-0.5 truncate"><span class="keep-ltr-inline">{{ $p->reference }}</span> • {{ $p->categorie }}</div>
 
                     <div class="mt-2 flex items-center justify-between text-[11px]">
-                        <div class="text-white/60">Prix</div>
-                        <div class="font-extrabold">{{ number_format((float)$p->pv_1, 2, '.', ' ') }}</div>
+                        <div class="text-white/60">{{ __('Prix') }}</div>
+                        <div class="font-extrabold keep-ltr-inline">{{ number_format((float)$p->pv_1, 2, '.', ' ') }}</div>
                     </div>
 
                     <div class="mt-2 flex items-center justify-end gap-2">
                         <a href="{{ url('/fournisseur/produits/'.$p->id) }}"
                            class="h-8 w-8 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
-                           title="Détails">
+                           title="{{ __('Détails') }}">
                             <i class="fa-solid fa-eye"></i>
                         </a>
 
                         <a href="{{ url('/fournisseur/produits/'.$p->id.'/edit') }}"
                            class="h-8 w-8 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
-                           title="Modifier">
+                           title="{{ __('Modifier') }}">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </a>
 
@@ -105,7 +105,7 @@
                             @csrf
                             <button type="submit"
                                     class="h-8 w-8 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
-                                    title="Activer/Désactiver">
+                                    title="{{ __('Activer/Désactiver') }}">
                                 <i class="fa-solid {{ (int)$p->actif === 1 ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
                             </button>
                         </form>
@@ -114,9 +114,9 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                    onclick="return confirm('Supprimer ce produit ?')"
+                                    onclick="return confirm(@js(__('Supprimer ce produit ?')))"
                                     class="h-8 w-8 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
-                                    title="Supprimer">
+                                    title="{{ __('Supprimer') }}">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </form>
@@ -125,7 +125,7 @@
             </div>
         @empty
             <div class="col-span-full rounded-2xl border border-white/10 bg-[var(--frs-card)] p-10 text-center text-white/60">
-                Aucun produit.
+                {{ __('Aucun produit.') }}
             </div>
         @endforelse
     </div>

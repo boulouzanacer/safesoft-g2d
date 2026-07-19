@@ -16,10 +16,10 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <div class="text-2xl font-extrabold tracking-wide">Panier</div>
+            <div class="text-2xl font-extrabold tracking-wide">{{ __('Panier') }}</div>
             <div class="store-muted mt-1 text-sm">
                 @if($boutique)
-                    Boutique: <span class="font-semibold" style="color: var(--store-text);">{{ $boutique->nom_frs }}</span>
+                    {{ __('Boutique') }}: <span class="font-semibold" style="color: var(--store-text);">{{ $boutique->nom_frs }}</span>
                 @else
                     —
                 @endif
@@ -29,7 +29,7 @@
             <a href="{{ $continueUrl }}"
                class="store-surface inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold hover:opacity-95">
                 <i class="fa-solid fa-store text-[var(--store-primary)]"></i>
-                Continuer
+                {{ __('Continuer') }}
             </a>
             @if(count($items) > 0)
                 <form method="POST" action="{{ url('/panier/clear') }}">
@@ -37,7 +37,7 @@
                     <button type="submit"
                             class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold border border-red-200 bg-red-50 text-red-700 hover:bg-red-100">
                         <i class="fa-solid fa-trash-can"></i>
-                        Vider
+                        {{ __('Vider') }}
                     </button>
                 </form>
             @endif
@@ -46,7 +46,7 @@
 
     @if(count($items) === 0)
         <div class="store-panel p-10 text-center store-muted">
-            Votre panier est vide.
+            {{ __('Votre panier est vide.') }}
         </div>
     @else
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -69,12 +69,12 @@
                                     <a href="{{ $productBaseUrl ? str_replace('__PRODUCT__', (string) $p->id, $productBaseUrl) : url('/produits/'.$p->id) }}" class="font-extrabold hover:underline block truncate">
                                         {{ $p->designation }}
                                     </a>
-                                    <div class="store-muted mt-1 text-sm">Ref: {{ $p->reference }}</div>
-                                    <div class="store-muted mt-1 text-xs">{{ number_format((float)$it['prix_unitaire'], 2, '.', ' ') }} DA</div>
+                                    <div class="store-muted mt-1 text-sm">{{ __('Réf') }}: <span class="keep-ltr-inline">{{ $p->reference }}</span></div>
+                                    <div class="store-muted mt-1 text-xs keep-ltr-inline">{{ number_format((float)$it['prix_unitaire'], 2, '.', ' ') }} DA</div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="font-extrabold">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>
-                                    <div class="store-muted text-xs">Stock: {{ (int)$p->stock }}</div>
+                                    <div class="font-extrabold keep-ltr-inline">{{ number_format((float)$it['line_total'], 2, '.', ' ') }} DA</div>
+                                    <div class="store-muted text-xs">{{ __('Stock') }}: <span class="keep-ltr-inline">{{ (int)$p->stock }}</span></div>
                                 </div>
                             </div>
 
@@ -90,7 +90,7 @@
                                            class="store-input w-24 px-3 py-2">
                                     <button type="submit"
                                             class="store-surface rounded-xl px-3 py-2 text-sm font-bold hover:opacity-95">
-                                        Mettre à jour
+                                        {{ __('Mettre à jour') }}
                                     </button>
                                 </form>
 
@@ -99,7 +99,7 @@
                                     <input type="hidden" name="produit_id" value="{{ $p->id }}">
                                     <button type="submit"
                                             class="rounded-xl px-3 py-2 text-sm font-bold border border-red-200 bg-red-50 text-red-700 hover:bg-red-100">
-                                        Supprimer
+                                        {{ __('Supprimer') }}
                                     </button>
                                 </form>
                             </div>
@@ -109,22 +109,22 @@
             </div>
 
             <div class="store-panel p-6 h-fit">
-                <div class="text-lg font-extrabold tracking-wide">Récapitulatif</div>
+                <div class="text-lg font-extrabold tracking-wide">{{ __('Récapitulatif') }}</div>
                 <div class="store-muted mt-4 flex items-center justify-between">
-                    <span>Total</span>
-                    <span class="font-extrabold" style="color: var(--store-text);">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
+                    <span>{{ __('Total') }}</span>
+                    <span class="font-extrabold keep-ltr-inline" style="color: var(--store-text);">{{ number_format((float)$total, 2, '.', ' ') }} DA</span>
                 </div>
 
                 <div class="mt-5">
                     <a href="{{ url('/checkout') }}"
                        class="store-button-primary w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-extrabold">
                         <i class="fa-solid fa-lock"></i>
-                        Commander
+                        {{ __('Commander') }}
                     </a>
                 </div>
 
                 <div class="store-muted mt-3 text-xs">
-                    Les commandes sont créées pour une seule boutique à la fois.
+                    {{ __('Les commandes sont créées pour une seule boutique à la fois.') }}
                 </div>
             </div>
         </div>

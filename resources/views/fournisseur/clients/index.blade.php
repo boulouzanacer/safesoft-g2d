@@ -7,16 +7,16 @@
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/50"></i>
             <input name="q"
                    value="{{ $q }}"
-                   placeholder="Rechercher nom, code, email ou téléphone..."
+                   placeholder="{{ __('Rechercher nom, code, email ou téléphone...') }}"
                    class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--frs-primary)]">
         </div>
         <button class="rounded-2xl px-4 py-3 font-bold text-white"
                 style="background: linear-gradient(135deg, var(--frs-primary), #0A3D7A);">
-            Filtrer
+            {{ __('Filtrer') }}
         </button>
         <a href="{{ url('/fournisseur/clients') }}"
            class="rounded-2xl px-4 py-3 font-bold border border-white/10 hover:bg-white/10">
-            Reset
+            {{ __('Réinitialiser') }}
         </a>
     </form>
 
@@ -25,15 +25,15 @@
             <table class="min-w-full text-sm">
                 <thead class="text-white/60">
                     <tr>
-                        <th class="text-left py-3 px-4 font-semibold">Code</th>
-                        <th class="text-left py-3 px-4 font-semibold">Nom</th>
-                        <th class="text-left py-3 px-4 font-semibold">Prevendeur</th>
-                        <th class="text-left py-3 px-4 font-semibold">Email</th>
-                        <th class="text-left py-3 px-4 font-semibold">Téléphone</th>
-                        <th class="text-left py-3 px-4 font-semibold">Type</th>
-                        <th class="text-left py-3 px-4 font-semibold">Synced PME</th>
-                        <th class="text-left py-3 px-4 font-semibold">Commune</th>
-                        <th class="text-right py-3 px-4 font-semibold">Nb commandes</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Code') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Nom') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Prevendeur') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Email') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Téléphone') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Type') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Synced PME') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Commune') }}</th>
+                        <th class="text-right py-3 px-4 font-semibold">{{ __('Nb commandes') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -52,7 +52,7 @@
                             </td>
                             <td class="py-3 px-4">
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)($c->synced_pme ?? 0) === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                                    {{ (int)($c->synced_pme ?? 0) === 1 ? 'Synced' : 'Not Synced' }}
+                                    {{ (int)($c->synced_pme ?? 0) === 1 ? __('Synced') : __('Not Synced') }}
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-white/80">{{ $c->commune_nom ?? '-' }}</td>
@@ -60,7 +60,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-10 text-center text-white/60">Aucun client</td>
+                            <td colspan="9" class="py-10 text-center text-white/60">{{ __('Aucun client') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

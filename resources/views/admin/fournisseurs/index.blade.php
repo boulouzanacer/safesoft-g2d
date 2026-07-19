@@ -15,17 +15,17 @@
                 <input id="fournisseursSearchInput"
                        name="q"
                        value="{{ $q }}"
-                       placeholder="Rechercher nom ou email..."
+                       placeholder="{{ __('Rechercher nom ou email...') }}"
                        class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] pl-11 pr-4 py-3 outline-none focus:border-[var(--admin-primary)]">
             </div>
-            <button type="submit" class="hidden">Filtrer</button>
+            <button type="submit" class="hidden">{{ __('Filtrer') }}</button>
         </form>
 
         <a href="{{ url('/admin/fournisseurs?create=1') }}"
            class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white"
            style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
             <i class="fa-solid fa-plus"></i>
-            Nouvelle boutique
+            {{ __('Nouvelle boutique') }}
         </a>
     </div>
 
@@ -37,12 +37,12 @@
 
     @if(session('regenerated_token'))
         <div class="rounded-2xl border border-sky-400/20 bg-sky-500/10 px-4 py-3 text-sky-200">
-            Token régénéré.
+            {{ __('Token régénéré.') }}
             <button type="button"
                     class="ml-2 underline"
                     data-token="{{ e(session('regenerated_token', '')) }}"
                     @click="openTokenFromButton($event)">
-                Voir token
+                {{ __('Voir token') }}
             </button>
         </div>
     @endif
@@ -52,15 +52,15 @@
             <table class="min-w-full text-sm">
                 <thead class="text-white/60">
                     <tr>
-                        <th class="text-left py-3 px-4 font-semibold">Nom</th>
-                        <th class="text-left py-3 px-4 font-semibold">Catégorie</th>
-                        <th class="text-left py-3 px-4 font-semibold">Email</th>
-                        <th class="text-left py-3 px-4 font-semibold">Tel</th>
-                        <th class="text-left py-3 px-4 font-semibold">Wilaya</th>
-                        <th class="text-left py-3 px-4 font-semibold">Expiration</th>
-                        <th class="text-left py-3 px-4 font-semibold">Statut</th>
-                        <th class="text-left py-3 px-4 font-semibold">Token</th>
-                        <th class="text-right py-3 px-4 font-semibold">Actions</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Nom') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Catégorie') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Email') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Tel') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Wilaya') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Expiration') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Statut') }}</th>
+                        <th class="text-left py-3 px-4 font-semibold">{{ __('Token') }}</th>
+                        <th class="text-right py-3 px-4 font-semibold">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -75,17 +75,17 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-white/80">{{ $f->expires_at ? $f->expires_at->format('d/m/Y') : '-' }}</span>
                                     <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $f->isExpired() ? 'bg-red-500/15 text-red-300 border border-red-400/20' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' }}">
-                                        {{ $f->isExpired() ? 'Expire' : 'Valide' }}
+                                        {{ $f->isExpired() ? __('Expire') : __('Valide') }}
                                     </span>
                                 </div>
                             </td>
                             <td class="py-3 px-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$f->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                                        {{ (int)$f->actif === 1 ? 'Actif' : 'Inactif' }}
+                                        {{ (int)$f->actif === 1 ? __('Actif') : __('Inactif') }}
                                     </span>
                                     <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)($f->is_visible ?? 0) === 1 ? 'bg-sky-500/15 text-sky-200 border border-sky-400/20' : 'bg-slate-500/15 text-slate-200 border border-slate-400/20' }}">
-                                        {{ (int)($f->is_visible ?? 0) === 1 ? 'Visible' : 'Non visible' }}
+                                        {{ (int)($f->is_visible ?? 0) === 1 ? __('Visible') : __('Non visible') }}
                                     </span>
                                 </div>
                             </td>
@@ -96,7 +96,7 @@
                                             class="text-[var(--admin-primary)] hover:opacity-90 text-sm font-semibold"
                                             data-token="{{ e($f->token) }}"
                                             @click="openTokenFromButton($event)">
-                                        Voir Token
+                                        {{ __('Voir Token') }}
                                     </button>
                                 </div>
                             </td>
@@ -117,18 +117,18 @@
                                     <form method="POST" action="{{ url('/admin/fournisseurs/'.$f->id.'/regenerer-token') }}">
                                         @csrf
                                         <button type="submit"
-                                                onclick="return confirm('Régénérer le token ?')"
+                                                onclick="return confirm('{{ __('Régénérer le token ?') }}')"
                                                 class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
-                                                title="Régénérer token"
-                                                aria-label="Régénérer token">
+                                                title="{{ __('Régénérer token') }}"
+                                                aria-label="{{ __('Régénérer token') }}">
                                             <i class="fa-solid fa-arrows-rotate"></i>
                                         </button>
                                     </form>
 
                                     <a href="{{ url('/admin/fournisseurs?edit='.$f->id) }}"
                                        class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
-                                       title="Éditer"
-                                       aria-label="Éditer">
+                                       title="{{ __('Éditer') }}"
+                                       aria-label="{{ __('Éditer') }}">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
 
@@ -136,10 +136,10 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                onclick="return confirm('Supprimer cette boutique ?')"
+                                                onclick="return confirm('{{ __('Supprimer cette boutique ?') }}')"
                                                 class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10"
-                                                title="Supprimer"
-                                                aria-label="Supprimer">
+                                                title="{{ __('Supprimer') }}"
+                                                aria-label="{{ __('Supprimer') }}">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
@@ -148,7 +148,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-10 text-center text-white/60">Aucune boutique</td>
+                            <td colspan="9" class="py-10 text-center text-white/60">{{ __('Aucune boutique') }}</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -165,8 +165,8 @@
         <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <div class="text-2xl font-extrabold tracking-wide">Créer une boutique</div>
-                    <div class="text-sm text-white/60">Le token sera généré automatiquement.</div>
+                    <div class="text-2xl font-extrabold tracking-wide">{{ __('Créer une boutique') }}</div>
+                    <div class="text-sm text-white/60">{{ __('Le token sera généré automatiquement.') }}</div>
                 </div>
                 <button type="button" class="text-white/60 hover:text-white" @click="closeModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -187,7 +187,7 @@
                     <button type="submit"
                             class="rounded-2xl px-6 py-3 font-extrabold text-white"
                             style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
-                        Créer
+                        {{ __('Créer') }}
                     </button>
                 </div>
             </form>
@@ -200,7 +200,7 @@
             <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <div class="text-2xl font-extrabold tracking-wide">Éditer boutique</div>
+                        <div class="text-2xl font-extrabold tracking-wide">{{ __('Éditer boutique') }}</div>
                         <div class="text-sm text-white/60">{{ $editing_fournisseur->nom_frs }}</div>
                     </div>
                     <button type="button" class="text-white/60 hover:text-white" @click="closeModal()">
@@ -223,7 +223,7 @@
                         <button type="submit"
                                 class="rounded-2xl px-6 py-3 font-extrabold text-white"
                                 style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
-                            Enregistrer
+                            {{ __('Enregistrer') }}
                         </button>
                     </div>
                 </form>
@@ -231,13 +231,13 @@
                 <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <div class="text-lg font-extrabold tracking-wide">Domaines personnalisés</div>
+                            <div class="text-lg font-extrabold tracking-wide">{{ __('Domaines personnalisés') }}</div>
                             <div class="mt-1 text-sm text-white/60">
-                                Gère ici les domaines publics de cette boutique, par exemple <span class="font-mono text-white/80">www.boutika.com</span>.
+                                {{ __('Gère ici les domaines publics de cette boutique, par exemple') }} <span class="font-mono text-white/80">www.boutika.com</span>.
                             </div>
                         </div>
                         <div class="text-xs text-white/50">
-                            DNS conseillé: <span class="font-mono text-white/80">CNAME</span> vers <span class="font-mono text-white/80">g2d-dz.com</span>
+                            {{ __('DNS conseillé') }}: <span class="font-mono text-white/80">CNAME</span> {{ __('vers') }} <span class="font-mono text-white/80">g2d-dz.com</span>
                         </div>
                     </div>
 
@@ -246,10 +246,10 @@
                           class="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3">
                         @csrf
                         <div>
-                            <label class="block text-sm font-semibold text-white/70 mb-1">Ajouter un domaine</label>
+                            <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Ajouter un domaine') }}</label>
                             <input name="domain"
                                    value="{{ old('domain') }}"
-                                   placeholder="www.boutika.com"
+                                   placeholder="{{ __('www.boutika.com') }}"
                                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
                             @error('domain')
                                 <div class="mt-1 text-xs font-semibold text-red-300">{{ $message }}</div>
@@ -259,7 +259,7 @@
                             <button type="submit"
                                     class="w-full lg:w-auto rounded-2xl px-5 py-3 font-extrabold text-white"
                                     style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
-                                Ajouter le domaine
+                                {{ __('Ajouter le domaine') }}
                             </button>
                         </div>
                     </form>
@@ -273,21 +273,21 @@
                                             <div class="font-bold break-all">{{ $domain->domain }}</div>
                                             @if($domain->is_primary)
                                                 <span class="inline-flex items-center rounded-full border border-sky-400/20 bg-sky-500/15 px-2.5 py-1 text-[11px] font-bold text-sky-200">
-                                                    Principal
+                                                    {{ __('Principal') }}
                                                 </span>
                                             @endif
                                             @if($domain->verified_at)
                                                 <span class="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-200">
-                                                    Vérifié
+                                                    {{ __('Vérifié') }}
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-500/15 px-2.5 py-1 text-[11px] font-bold text-amber-200">
-                                                    En attente de visite
+                                                    {{ __('En attente de visite') }}
                                                 </span>
                                             @endif
                                         </div>
                                         <div class="mt-2 text-xs text-white/50">
-                                            Ce domaine ouvrira directement la boutique sans afficher le domaine global de la plateforme.
+                                            {{ __('Ce domaine ouvrira directement la boutique sans afficher le domaine global de la plateforme.') }}
                                         </div>
                                     </div>
 
@@ -297,7 +297,7 @@
                                                 @csrf
                                                 <button type="submit"
                                                         class="rounded-2xl px-4 py-2 text-sm font-extrabold border border-white/10 hover:bg-white/10">
-                                                    Définir principal
+                                                    {{ __('Définir principal') }}
                                                 </button>
                                             </form>
                                         @endif
@@ -307,7 +307,7 @@
                                             @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-2xl px-4 py-2 text-sm font-extrabold border border-red-400/20 bg-red-500/10 text-red-200 hover:bg-red-500/20">
-                                                Supprimer
+                                                {{ __('Supprimer') }}
                                             </button>
                                         </form>
                                     </div>
@@ -315,7 +315,7 @@
                             </div>
                         @empty
                             <div class="rounded-2xl border border-white/10 bg-[var(--admin-card)] p-4 text-sm text-white/60">
-                                Aucun domaine personnalisé pour cette boutique.
+                                {{ __('Aucun domaine personnalisé pour cette boutique.') }}
                             </div>
                         @endforelse
                     </div>
@@ -328,7 +328,7 @@
         <div class="absolute inset-0 bg-black/60" @click="tokenOpen=false"></div>
         <div class="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between">
-                <div class="font-extrabold tracking-wide">Token Boutique</div>
+                <div class="font-extrabold tracking-wide">{{ __('Token Boutique') }}</div>
                 <button type="button" class="text-white/60 hover:text-white" @click="tokenOpen=false">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -340,13 +340,13 @@
                 <button type="button"
                         class="rounded-xl px-4 py-2 font-bold border border-white/10 hover:bg-white/10"
                         @click="navigator.clipboard.writeText(tokenValue)">
-                    Copier
+                    {{ __('Copier') }}
                 </button>
                 <button type="button"
                         class="rounded-xl px-4 py-2 font-bold text-white"
                         style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);"
                         @click="tokenOpen=false">
-                    Fermer
+                    {{ __('Fermer') }}
                 </button>
             </div>
         </div>

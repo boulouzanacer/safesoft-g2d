@@ -20,7 +20,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Référence</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Référence') }}</label>
         <input name="reference"
                value="{{ old('reference', $produit->reference ?? '') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
@@ -28,7 +28,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Désignation</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Désignation') }}</label>
         <input name="designation"
                value="{{ old('designation', $produit->designation ?? '') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
@@ -36,7 +36,7 @@
     </div>
 
     <div class="md:col-span-2">
-        <label class="block text-sm font-semibold text-white/70 mb-1">Description</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Description') }}</label>
         <textarea name="description"
                   rows="5"
                   class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
@@ -44,7 +44,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">PV 1</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('PV 1') }}</label>
         <input name="pv_1"
                type="number"
                step="0.01"
@@ -54,7 +54,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">PV 2</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('PV 2') }}</label>
         <input name="pv_2"
                type="number"
                step="0.01"
@@ -64,7 +64,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">PV 3</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('PV 3') }}</label>
         <input name="pv_3"
                type="number"
                step="0.01"
@@ -74,7 +74,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Stock</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Stock') }}</label>
         <input name="stock"
                type="number"
                min="0"
@@ -84,7 +84,7 @@
     </div>
 
     <div class="md:col-span-2">
-        <label class="block text-sm font-semibold text-white/70 mb-1">Catégorie</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Catégorie') }}</label>
         <input name="categorie"
                value="{{ old('categorie', $produit->categorie ?? '') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--frs-card)] px-4 py-3 outline-none focus:border-[var(--frs-primary)]"
@@ -106,9 +106,9 @@
                        class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
                        @checked($actifDefault)
                        x-model="actif">
-                <span class="text-sm font-semibold text-white/70">Actif</span>
+                <span class="text-sm font-semibold text-white/70">{{ __('Actif') }}</span>
             </label>
-            <div class="text-xs text-white/50">Max 5 images • WebP généré automatiquement</div>
+            <div class="text-xs text-white/50">{{ __('Max 5 images • WebP généré automatiquement') }}</div>
         </div>
 
         <div class="mt-3"
@@ -123,7 +123,7 @@
                        @checked($abonneOnlyDefault)
                        x-model="abonneOnly"
                        :disabled="!actif">
-                <span class="text-sm font-semibold text-white/70">Visible uniquement pour abonnés</span>
+                <span class="text-sm font-semibold text-white/70">{{ __('Visible uniquement pour abonnés') }}</span>
             </label>
         </div>
     </div>
@@ -164,7 +164,7 @@
         $dbEnabled = (bool) ($produit->enable_tier_pricing ?? false);
     @endphp
     <div class="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-amber-200 text-xs">
-        <div class="font-extrabold">Debug palier</div>
+        <div class="font-extrabold">{{ __('Debug palier') }}</div>
         <div class="mt-1 font-mono break-words">
             produit_id={{ $produit->id }} |
             db_enable={{ $dbEnabled ? '1' : '0' }} |
@@ -180,7 +180,14 @@
 <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4"
      id="tierPricingRoot"
      data-enabled="{{ $tierEnabled ? '1' : '0' }}"
-     data-tiers='@json($tierDefaults)'>
+     data-tiers='@json($tierDefaults)'
+     data-error-min-qty="{{ __('Quantité min invalide.') }}"
+     data-error-max-qty="{{ __('Quantité max doit être >= quantité min.') }}"
+     data-error-price="{{ __('Prix invalide.') }}"
+     data-error-open-ended="{{ __('Aucun palier ne peut suivre un palier sans quantité max.') }}"
+     data-error-overlap="{{ __('Chevauchement détecté entre paliers.') }}"
+     data-error-last-max="{{ __('Définissez une quantité max pour le dernier palier avant d’en ajouter un autre.') }}"
+     data-placeholder-max-qty="{{ __('∞') }}">
     <div class="flex items-center justify-between gap-3">
         <label class="flex items-center gap-3 cursor-pointer select-none">
             <input type="checkbox"
@@ -189,17 +196,17 @@
                    value="1"
                    class="h-5 w-5 rounded border-white/20 bg-[var(--frs-card)]"
                    @checked($tierEnabled)>
-            <span class="text-sm font-extrabold text-white/80">Prix par palier</span>
+            <span class="text-sm font-extrabold text-white/80">{{ __('Prix par palier') }}</span>
         </label>
-        <div class="text-xs text-white/50">Illimité • Sans chevauchement • Ignore le tarif client si activé</div>
+        <div class="text-xs text-white/50">{{ __('Illimité • Sans chevauchement • Ignore le tarif client si activé') }}</div>
     </div>
 
     <div class="mt-4" id="tierRowsWrap" style="{{ $tierEnabled ? '' : 'display:none;' }}">
         <div class="grid grid-cols-12 gap-2 text-xs font-bold text-white/60">
-            <div class="col-span-3">Qté min</div>
-            <div class="col-span-3">Qté max</div>
-            <div class="col-span-4">Prix (DA)</div>
-            <div class="col-span-2 text-right">Actions</div>
+            <div class="col-span-3">{{ __('Qté min') }}</div>
+            <div class="col-span-3">{{ __('Qté max') }}</div>
+            <div class="col-span-4">{{ __('Prix (DA)') }}</div>
+            <div class="col-span-2 text-right">{{ __('Actions') }}</div>
         </div>
 
         <div class="mt-2 space-y-2" id="tierRows"></div>
@@ -209,7 +216,7 @@
                     class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-extrabold border border-white/10 bg-[var(--frs-card)] hover:bg-white/5"
                     id="tierAddBtn">
                 <i class="fa-solid fa-plus"></i>
-                Ajouter un palier
+                {{ __('Ajouter un palier') }}
             </button>
             <div class="text-xs text-red-300" id="tierError"></div>
         </div>
@@ -226,6 +233,15 @@
         const rowsEl = document.getElementById('tierRows');
         const addBtn = document.getElementById('tierAddBtn');
         const errorEl = document.getElementById('tierError');
+        const messages = {
+            minQty: root.dataset.errorMinQty || '',
+            maxQty: root.dataset.errorMaxQty || '',
+            invalidPrice: root.dataset.errorPrice || '',
+            openEnded: root.dataset.errorOpenEnded || '',
+            overlap: root.dataset.errorOverlap || '',
+            lastMax: root.dataset.errorLastMax || '',
+            maxQtyPlaceholder: root.dataset.placeholderMaxQty || '',
+        };
 
         const parseBool = (v) => v === true || v === 1 || v === '1';
         const safeNum = (v) => (v === null || v === undefined || v === '') ? null : Number(v);
@@ -266,15 +282,15 @@
 
             for (const r of rows) {
                 if (!Number.isFinite(r.quantity_min) || r.quantity_min < 1) {
-                    setError('Quantité min invalide.');
+                    setError(messages.minQty);
                     return false;
                 }
                 if (r.quantity_max !== null && (!Number.isFinite(r.quantity_max) || r.quantity_max < r.quantity_min)) {
-                    setError('Quantité max doit être >= quantité min.');
+                    setError(messages.maxQty);
                     return false;
                 }
                 if (!Number.isFinite(r.price) || r.price < 0) {
-                    setError('Prix invalide.');
+                    setError(messages.invalidPrice);
                     return false;
                 }
             }
@@ -284,11 +300,11 @@
                 const prev = rows[i - 1];
                 const cur = rows[i];
                 if (prev.quantity_max === null) {
-                    setError('Aucun palier ne peut suivre un palier sans quantité max.');
+                    setError(messages.openEnded);
                     return false;
                 }
                 if (cur.quantity_min <= prev.quantity_max) {
-                    setError('Chevauchement détecté entre paliers.');
+                    setError(messages.overlap);
                     return false;
                 }
             }
@@ -336,7 +352,7 @@
                 const maxInput = document.createElement('input');
                 maxInput.type = 'number';
                 maxInput.min = '1';
-                maxInput.placeholder = '∞';
+                maxInput.placeholder = messages.maxQtyPlaceholder;
                 maxInput.className = 'w-full rounded-xl border border-white/10 bg-[var(--frs-card)] px-3 py-2 outline-none focus:border-[var(--frs-primary)]';
                 maxInput.value = (row.quantity_max === null || row.quantity_max === undefined) ? '' : String(Number(row.quantity_max));
                 maxInput.disabled = !enabled;
@@ -403,7 +419,7 @@
                 const last = tiers[tiers.length - 1];
                 const lastMax = safeNum(last?.quantity_max);
                 if (lastMax === null) {
-                    setError('Définissez une quantité max pour le dernier palier avant d’en ajouter un autre.');
+                    setError(messages.lastMax);
                     return;
                 }
                 tiers.push({ quantity_min: lastMax + 1, quantity_max: null, price: 0 });
@@ -418,19 +434,22 @@
 
 <div class="mt-6">
     <div class="flex items-center justify-between">
-        <div class="font-extrabold tracking-wide">Images</div>
-        <div class="text-xs text-white/50">Glisser-déposer pour l’ordre • ⭐ pour image principale</div>
+        <div class="font-extrabold tracking-wide">{{ __('Images') }}</div>
+        <div class="text-xs text-white/50">{{ __('Glisser-déposer pour l’ordre • ⭐ pour image principale') }}</div>
     </div>
 
     <div class="mt-3 rounded-2xl border border-white/10 bg-black/20 p-4">
         <input id="imagesInput" type="file" name="images[]" multiple accept="image/*" class="block w-full text-sm text-white/80">
-        <div class="mt-3 text-xs text-white/50">Formats: jpg, png, webp • 5MB max par image</div>
+        <div class="mt-3 text-xs text-white/50">{{ __('Formats: jpg, png, webp • 5MB max par image') }}</div>
     </div>
 
     <input type="hidden" name="primary_image" id="primaryImageInput" value="{{ old('primary_image', '') }}">
     <div id="orderInputs"></div>
 
-    <div id="imageList" class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-3">
+    <div id="imageList"
+         class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-3"
+         data-title-primary="{{ __('Définir comme principale') }}"
+         data-title-delete="{{ __('Supprimer') }}">
         @foreach($images as $img)
             <div class="relative rounded-2xl border border-white/10 bg-[var(--frs-card)] overflow-hidden group"
                  data-key="existing:{{ $img->id }}"
@@ -440,14 +459,14 @@
                 <button type="button"
                         class="absolute top-2 left-2 h-9 w-9 rounded-xl bg-black/50 text-white/90 hover:bg-black/70 flex items-center justify-center"
                         onclick="window.__setPrimary('existing:{{ $img->id }}')"
-                        title="Définir comme principale">
+                        title="{{ __('Définir comme principale') }}">
                     <i class="fa-solid fa-star"></i>
                 </button>
 
                 <button type="button"
                         class="absolute top-2 right-2 h-9 w-9 rounded-xl bg-black/50 text-white/90 hover:bg-black/70 flex items-center justify-center"
                         onclick="window.__markDeleteExisting(this, {{ $img->id }})"
-                        title="Supprimer">
+                        title="{{ __('Supprimer') }}">
                     <i class="fa-solid fa-trash"></i>
                 </button>
 
@@ -466,6 +485,10 @@
         const imageList = document.getElementById('imageList');
         const orderInputs = document.getElementById('orderInputs');
         const primaryInput = document.getElementById('primaryImageInput');
+        const imageMessages = {
+            primaryTitle: imageList?.dataset.titlePrimary || '',
+            deleteTitle: imageList?.dataset.titleDelete || '',
+        };
 
         function rebuildOrderInputs() {
             orderInputs.innerHTML = '';
@@ -531,7 +554,7 @@
                 const star = document.createElement('button');
                 star.type = 'button';
                 star.className = 'absolute top-2 left-2 h-9 w-9 rounded-xl bg-black/50 text-white/90 hover:bg-black/70 flex items-center justify-center';
-                star.title = 'Définir comme principale';
+                star.title = imageMessages.primaryTitle;
                 star.innerHTML = '<i class="fa-solid fa-star"></i>';
                 star.addEventListener('click', () => window.__setPrimary(key));
                 card.appendChild(star);
@@ -539,7 +562,7 @@
                 const del = document.createElement('button');
                 del.type = 'button';
                 del.className = 'absolute top-2 right-2 h-9 w-9 rounded-xl bg-black/50 text-white/90 hover:bg-black/70 flex items-center justify-center';
-                del.title = 'Supprimer';
+                del.title = imageMessages.deleteTitle;
                 del.innerHTML = '<i class="fa-solid fa-xmark"></i>';
                 del.addEventListener('click', () => {
                     const next = files.filter((_, i) => i !== idx);

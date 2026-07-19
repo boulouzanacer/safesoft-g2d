@@ -26,7 +26,7 @@
         <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm text-white/60">Total Boutiques</div>
+                    <div class="text-sm text-white/60">{{ __('Total Boutiques') }}</div>
                     <div class="text-3xl font-extrabold mt-1">{{ $nb_fournisseurs }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
@@ -39,9 +39,9 @@
         <a href="{{ url('/admin/clients') }}" class="block rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)] hover:bg-white/5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm text-white/60">Total Clients</div>
+                    <div class="text-sm text-white/60">{{ __('Total Clients') }}</div>
                     <div class="text-3xl font-extrabold mt-1">{{ $nb_clients }}</div>
-                    <div class="mt-2 text-xs text-white/50">Ouvrir la liste clients</div>
+                    <div class="mt-2 text-xs text-white/50">{{ __('Ouvrir la liste clients') }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
                      style="background: linear-gradient(135deg, #22c55e, #16a34a);">
@@ -53,9 +53,9 @@
         <a href="{{ url('/admin/api-keys') }}" class="block rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)] hover:bg-white/5">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm text-white/60">Api Keys actives</div>
+                    <div class="text-sm text-white/60">{{ __('Api Keys actives') }}</div>
                     <div class="text-3xl font-extrabold mt-1">{{ $nb_api_keys_actives }}</div>
-                    <div class="mt-2 text-xs text-white/50">Gérer les accès API</div>
+                    <div class="mt-2 text-xs text-white/50">{{ __('Gérer les accès API') }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
                      style="background: linear-gradient(135deg, #06b6d4, #0284c7);">
@@ -67,7 +67,7 @@
         <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm text-white/60">Commandes du jour</div>
+                    <div class="text-sm text-white/60">{{ __('Commandes du jour') }}</div>
                     <div class="text-3xl font-extrabold mt-1">{{ $nb_commandes }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
@@ -80,7 +80,7 @@
         <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-sm text-white/60">CA Total</div>
+                    <div class="text-sm text-white/60">{{ __('CA Total') }}</div>
                     <div class="keep-ltr text-3xl font-extrabold mt-1">{{ number_format($ca_total, 2, '.', ' ') }}</div>
                 </div>
                 <div class="h-12 w-12 rounded-2xl flex items-center justify-center"
@@ -94,14 +94,14 @@
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div class="xl:col-span-2 rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
             <div class="flex items-center justify-between mb-4">
-                <div class="font-extrabold tracking-wide">Commandes (7 derniers jours)</div>
-                <div class="text-sm text-white/60">Total</div>
+                <div class="font-extrabold tracking-wide">{{ __('Commandes (7 derniers jours)') }}</div>
+                <div class="text-sm text-white/60">{{ __('Total') }}</div>
             </div>
             <canvas id="ordersChart" height="110"></canvas>
         </div>
 
         <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
-            <div class="font-extrabold tracking-wide mb-4">Boutiques récentes</div>
+            <div class="font-extrabold tracking-wide mb-4">{{ __('Boutiques récentes') }}</div>
             <div class="space-y-3">
                 @foreach($fournisseurs_recents as $f)
                     <div class="flex items-center justify-between gap-3">
@@ -110,7 +110,7 @@
                             <div class="text-xs text-white/60 truncate">{{ $f->email }}</div>
                         </div>
                         <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ (int)$f->actif === 1 ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-red-500/15 text-red-300 border border-red-400/20' }}">
-                            {{ (int)$f->actif === 1 ? 'Actif' : 'Inactif' }}
+                            {{ (int)$f->actif === 1 ? __('Actif') : __('Inactif') }}
                         </span>
                     </div>
                 @endforeach
@@ -120,8 +120,8 @@
 
     <div class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)] overflow-hidden">
         <div class="flex items-center justify-between mb-4">
-            <div class="font-extrabold tracking-wide">5 dernières commandes</div>
-            <a href="{{ url('/admin/commandes') }}" class="text-sm text-[var(--admin-primary)] hover:opacity-90">Voir tout</a>
+            <div class="font-extrabold tracking-wide">{{ __('5 dernières commandes') }}</div>
+            <a href="{{ url('/admin/commandes') }}" class="text-sm text-[var(--admin-primary)] hover:opacity-90">{{ __('Voir tout') }}</a>
         </div>
 
         <div class="overflow-x-auto">
@@ -129,11 +129,11 @@
                 <thead class="text-white/60">
                     <tr>
                         <th class="text-left py-3 pr-4 font-semibold">#</th>
-                        <th class="text-left py-3 pr-4 font-semibold">Date</th>
-                        <th class="text-left py-3 pr-4 font-semibold">Client</th>
-                        <th class="text-left py-3 pr-4 font-semibold">Boutique</th>
-                        <th class="text-left py-3 pr-4 font-semibold">Statut</th>
-                        <th class="text-right py-3 font-semibold">Montant</th>
+                        <th class="text-left py-3 pr-4 font-semibold">{{ __('Date') }}</th>
+                        <th class="text-left py-3 pr-4 font-semibold">{{ __('Client') }}</th>
+                        <th class="text-left py-3 pr-4 font-semibold">{{ __('Boutique') }}</th>
+                        <th class="text-left py-3 pr-4 font-semibold">{{ __('Statut') }}</th>
+                        <th class="text-right py-3 font-semibold">{{ __('Montant') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
@@ -165,13 +165,13 @@
                             </td>
                             <td class="py-3 pr-4 text-white/80">{{ $c->frs_nom }}</td>
                             <td class="py-3 pr-4">
-                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ $statut }}</span>
+                                <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $badge }}">{{ __($statut) }}</span>
                             </td>
                             <td class="keep-ltr py-3 text-right font-bold">{{ number_format((float)$c->montant_total, 2, '.', ' ') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center text-white/60">Aucune commande</td>
+                            <td colspan="6" class="py-8 text-center text-white/60">{{ __('Aucune commande') }}</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -182,15 +182,15 @@
     <div id="boutique-categories-section" class="rounded-2xl p-5 border border-white/10 bg-[var(--admin-card)]">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
-                <div class="font-extrabold tracking-wide">Catégories boutiques</div>
-                <div class="text-sm text-white/60">Liste prédéfinie utilisée dans la création des boutiques et dans le site web.</div>
+                <div class="font-extrabold tracking-wide">{{ __('Catégories boutiques') }}</div>
+                <div class="text-sm text-white/60">{{ __('Liste prédéfinie utilisée dans la création des boutiques et dans le site web.') }}</div>
             </div>
             <button type="button"
                     class="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 font-bold text-white"
                     style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);"
                     @click="categoryCreateOpen = true">
                 <i class="fa-solid fa-plus"></i>
-                Nouvelle catégorie
+                {{ __('Nouvelle catégorie') }}
             </button>
         </div>
 
@@ -218,8 +218,8 @@
                         <div class="flex items-center gap-2">
                             <button type="button"
                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10"
-                                    title="Éditer"
-                                    aria-label="Éditer"
+                                    title="{{ __('Éditer') }}"
+                                    aria-label="{{ __('Éditer') }}"
                                     data-category-id="{{ $category->id }}"
                                     data-category-name="{{ e($category->name) }}"
                                     data-category-image-url="{{ $category->image_url }}"
@@ -228,8 +228,8 @@
                             </button>
                             <button type="button"
                                     class="h-9 w-9 inline-flex items-center justify-center rounded-xl text-xs font-bold border border-red-400/20 text-red-300 hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                                    title="{{ (int) $category->fournisseurs_count > 0 ? 'Impossible de supprimer une catégorie déjà utilisée' : 'Supprimer' }}"
-                                    aria-label="Supprimer"
+                                    title="{{ (int) $category->fournisseurs_count > 0 ? __('Impossible de supprimer une catégorie déjà utilisée') : __('Supprimer') }}"
+                                    aria-label="{{ __('Supprimer') }}"
                                     @disabled((int) $category->fournisseurs_count > 0)
                                     data-delete-action="{{ url('/admin/boutique-categories/'.$category->id) }}"
                                     data-category-name="{{ e($category->name) }}"
@@ -241,13 +241,13 @@
                     </div>
                     <div class="mt-4 flex items-center justify-between gap-3">
                         <span class="text-xs font-bold px-2.5 py-1 rounded-full border border-sky-400/20 bg-sky-500/10 text-sky-200">
-                            {{ (int) $category->fournisseurs_count }} boutique(s)
+                            {{ (int) $category->fournisseurs_count }} {{ __('boutique(s)') }}
                         </span>
                     </div>
                 </div>
             @empty
                 <div class="col-span-full rounded-2xl border border-white/10 bg-black/20 p-10 text-center text-white/60">
-                    Aucune catégorie boutique.
+                    {{ __('Aucune catégorie boutique.') }}
                 </div>
             @endforelse
         </div>
@@ -258,8 +258,8 @@
         <div class="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <div class="text-2xl font-extrabold tracking-wide">Nouvelle catégorie</div>
-                    <div class="text-sm text-white/60">Cette catégorie sera disponible dans les boutiques.</div>
+                    <div class="text-2xl font-extrabold tracking-wide">{{ __('Nouvelle catégorie') }}</div>
+                    <div class="text-sm text-white/60">{{ __('Cette catégorie sera disponible dans les boutiques.') }}</div>
                 </div>
                 <button type="button" class="text-white/60 hover:text-white" @click="categoryCreateOpen = false">
                     <i class="fa-solid fa-xmark"></i>
@@ -270,20 +270,20 @@
                 @csrf
                 <input type="hidden" name="modal_context" value="create">
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Nom catégorie</label>
+                    <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Nom catégorie') }}</label>
                     <input type="text"
                            name="name"
                            value="{{ old('name') }}"
                            class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
-                           placeholder="Ex: Cosmétique"
+                           placeholder="{{ __('Ex: Cosmétique') }}"
                            required>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-2">Image catégorie</label>
+                    <label class="block text-sm font-semibold text-white/70 mb-2">{{ __('Image catégorie') }}</label>
                     <div class="flex items-start gap-4">
                         <div class="h-24 w-24 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                             <template x-if="categoryCreateImagePreview">
-                                <img :src="categoryCreateImagePreview" alt="Aperçu catégorie" class="h-full w-full object-cover">
+                                <img :src="categoryCreateImagePreview" alt="{{ __('Aperçu catégorie') }}" class="h-full w-full object-cover">
                             </template>
                             <template x-if="!categoryCreateImagePreview">
                                 <div class="flex h-full w-full items-center justify-center text-white/40">
@@ -297,7 +297,7 @@
                                    accept="image/*"
                                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none file:mr-4 file:rounded-xl file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-white hover:file:bg-white/20"
                                    @change="previewCategoryImage($event, 'create')">
-                            <div class="mt-1 text-xs text-white/50">Optionnel à la création. Tu peux ajouter une image maintenant ou plus tard.</div>
+                            <div class="mt-1 text-xs text-white/50">{{ __('Optionnel à la création. Tu peux ajouter une image maintenant ou plus tard.') }}</div>
                         </div>
                     </div>
                 </div>
@@ -306,12 +306,12 @@
                     <button type="button"
                             class="rounded-2xl px-4 py-3 font-bold border border-white/10 hover:bg-white/10"
                             @click="categoryCreateOpen = false">
-                        Annuler
+                        {{ __('Annuler') }}
                     </button>
                     <button type="submit"
                             class="rounded-2xl px-6 py-3 font-extrabold text-white"
                             style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
-                        Enregistrer
+                        {{ __('Enregistrer') }}
                     </button>
                 </div>
             </form>
@@ -323,8 +323,8 @@
         <div class="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <div class="text-2xl font-extrabold tracking-wide">Modifier catégorie</div>
-                    <div class="text-sm text-white/60">Mettre à jour le nom utilisé dans les filtres publics.</div>
+                    <div class="text-2xl font-extrabold tracking-wide">{{ __('Modifier catégorie') }}</div>
+                    <div class="text-sm text-white/60">{{ __('Mettre à jour le nom utilisé dans les filtres publics.') }}</div>
                 </div>
                 <button type="button" class="text-white/60 hover:text-white" @click="categoryEditOpen = false">
                     <i class="fa-solid fa-xmark"></i>
@@ -337,7 +337,7 @@
                 <input type="hidden" name="modal_context" value="edit">
                 <input type="hidden" name="category_id" :value="categoryEditId">
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-1">Nom catégorie</label>
+                    <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Nom catégorie') }}</label>
                     <input type="text"
                            name="name"
                            x-model="categoryEditName"
@@ -345,11 +345,11 @@
                            required>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-white/70 mb-2">Image catégorie</label>
+                    <label class="block text-sm font-semibold text-white/70 mb-2">{{ __('Image catégorie') }}</label>
                     <div class="flex items-start gap-4">
                         <div class="h-24 w-24 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                             <template x-if="categoryEditImagePreview">
-                                <img :src="categoryEditImagePreview" alt="Aperçu catégorie" class="h-full w-full object-cover">
+                                <img :src="categoryEditImagePreview" alt="{{ __('Aperçu catégorie') }}" class="h-full w-full object-cover">
                             </template>
                             <template x-if="!categoryEditImagePreview">
                                 <div class="flex h-full w-full items-center justify-center text-white/40">
@@ -363,7 +363,7 @@
                                    accept="image/*"
                                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none file:mr-4 file:rounded-xl file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-white hover:file:bg-white/20"
                                    @change="previewCategoryImage($event, 'edit')">
-                            <div class="mt-1 text-xs text-white/50">Optionnel en modification. Tu peux changer uniquement le nom ou remplacer l'image ici.</div>
+                            <div class="mt-1 text-xs text-white/50">{{ __('Optionnel en modification. Tu peux changer uniquement le nom ou remplacer l\'image ici.') }}</div>
                         </div>
                     </div>
                 </div>
@@ -372,12 +372,12 @@
                     <button type="button"
                             class="rounded-2xl px-4 py-3 font-bold border border-white/10 hover:bg-white/10"
                             @click="categoryEditOpen = false">
-                        Annuler
+                        {{ __('Annuler') }}
                     </button>
                     <button type="submit"
                             class="rounded-2xl px-6 py-3 font-extrabold text-white"
                             style="background: linear-gradient(135deg, var(--admin-primary), #0A3D7A);">
-                        Enregistrer
+                        {{ __('Enregistrer') }}
                     </button>
                 </div>
             </form>
@@ -388,18 +388,18 @@
         <div class="absolute inset-0 bg-black/60" @click="categoryDeleteOpen = false"></div>
         <div class="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[var(--admin-card)] p-6">
             <div class="flex items-center justify-between mb-4">
-                <div class="text-2xl font-extrabold tracking-wide">Supprimer catégorie</div>
+                <div class="text-2xl font-extrabold tracking-wide">{{ __('Supprimer catégorie') }}</div>
                 <button type="button" class="text-white/60 hover:text-white" @click="categoryDeleteOpen = false">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
             <div class="text-sm text-white/70">
-                Voulez-vous supprimer la catégorie
+                {{ __('Voulez-vous supprimer la catégorie') }}
                 <span class="font-semibold text-white" x-text="categoryDeleteName"></span> ?
             </div>
             <div class="mt-2 text-xs text-white/50">
-                Suppression autorisée uniquement si aucune boutique n’utilise cette catégorie.
+                {{ __('Suppression autorisée uniquement si aucune boutique n’utilise cette catégorie.') }}
             </div>
 
             <form method="POST" :action="categoryDeleteAction" class="mt-5 flex justify-end gap-2">
@@ -408,13 +408,13 @@
                 <button type="button"
                         class="rounded-2xl px-4 py-3 font-bold border border-white/10 hover:bg-white/10"
                         @click="categoryDeleteOpen = false">
-                    Annuler
+                    {{ __('Annuler') }}
                 </button>
                 <button type="submit"
                         class="rounded-2xl px-4 py-3 font-bold text-white bg-red-600 hover:bg-red-500"
                         :disabled="categoryDeleteCount > 0"
                         :class="categoryDeleteCount > 0 ? 'opacity-50 cursor-not-allowed' : ''">
-                    Supprimer
+                    {{ __('Supprimer') }}
                 </button>
             </form>
         </div>
@@ -431,6 +431,7 @@
 <div class="hidden js-admin-dashboard-config"
      data-chart-labels="{{ e(json_encode($chart_labels)) }}"
      data-chart-series="{{ e(json_encode($chart_series)) }}"
+     data-chart-dataset-label="{{ __('Commandes') }}"
      data-category-base-url="{{ url('/admin/boutique-categories') }}"
      data-category-create-open="{{ old('modal_context', $errors->any() ? 'create' : '') === 'create' ? '1' : '0' }}"
      data-category-edit-open="{{ old('modal_context') === 'edit' ? '1' : '0' }}"
@@ -522,6 +523,7 @@
 
         const chartLabels = JSON.parse(configElement.dataset.chartLabels || '[]');
         const chartSeries = JSON.parse(configElement.dataset.chartSeries || '[]');
+        const chartDatasetLabel = configElement.dataset.chartDatasetLabel || '';
         const ctx = document.getElementById('ordersChart');
 
         if (ctx && typeof window.Chart !== 'undefined') {
@@ -530,7 +532,7 @@
                 data: {
                     labels: chartLabels,
                     datasets: [{
-                        label: 'Commandes',
+                        label: chartDatasetLabel,
                         data: chartSeries,
                         borderColor: '#1E6FD9',
                         backgroundColor: 'rgba(30,111,217,0.15)',

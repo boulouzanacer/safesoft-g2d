@@ -30,7 +30,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Nom</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Nom') }}</label>
         <input name="nom_frs"
                value="{{ old('nom_frs', $frs?->nom_frs ?? '') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
@@ -38,11 +38,11 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Catégorie boutique</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Catégorie boutique') }}</label>
         <select name="boutique_category_id"
                 class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                 required>
-            <option value="">Choisir...</option>
+            <option value="">{{ __('Choisir...') }}</option>
             @foreach(($boutique_categories ?? collect()) as $category)
                 <option value="{{ $category->id }}"
                         @selected((int) old('boutique_category_id', $frs?->boutique_category_id ?? 0) === (int) $category->id)>
@@ -53,7 +53,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Email</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Email') }}</label>
         <input type="email"
                name="email"
                value="{{ old('email', $frs?->email ?? '') }}"
@@ -62,12 +62,12 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Domaine principal (optionnel)</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Domaine principal (optionnel)') }}</label>
         <input name="primary_custom_domain"
                value="{{ $primaryCustomDomain }}"
-               placeholder="www.boutika.com"
+               placeholder="{{ __('www.boutika.com') }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
-        <div class="mt-1 text-xs text-white/50">Exemple: www.boutika.com. Tu peux le gérer aussi plus bas en édition.</div>
+        <div class="mt-1 text-xs text-white/50">{{ __('Exemple: www.boutika.com. Tu peux le gérer aussi plus bas en édition.') }}</div>
         @error('primary_custom_domain')
             <div class="mt-1 text-xs font-semibold text-red-300">{{ $message }}</div>
         @enderror
@@ -76,8 +76,8 @@
     <div class="md:col-span-2">
         <div class="flex items-center justify-between gap-3 mb-2">
             <div>
-                <label class="block text-sm font-semibold text-white/70">Theme storefront</label>
-                <div class="mt-1 text-xs text-white/50">Ce theme sera applique au site public de cette boutique et a son domaine personnalise.</div>
+                <label class="block text-sm font-semibold text-white/70">{{ __('Theme storefront') }}</label>
+                <div class="mt-1 text-xs text-white/50">{{ __('Ce theme sera applique au site public de cette boutique et a son domaine personnalise.') }}</div>
             </div>
         </div>
 
@@ -98,7 +98,7 @@
 
     @if(!isset($isEdit) || !$isEdit)
         <div>
-            <label class="block text-sm font-semibold text-white/70 mb-1">Password</label>
+            <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Password') }}</label>
             <input type="password"
                    name="password"
                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
@@ -106,33 +106,33 @@
         </div>
     @else
         <div>
-            <label class="block text-sm font-semibold text-white/70 mb-1">Nouveau Password (optionnel)</label>
+            <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Nouveau Password (optionnel)') }}</label>
             <input type="password"
                    name="password"
                    class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
-                   placeholder="Laisser vide pour ne pas changer">
+                   placeholder="{{ __('Laisser vide pour ne pas changer') }}">
         </div>
     @endif
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Téléphone</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Téléphone') }}</label>
         <input name="telephone"
                value="{{ old('telephone', $frs?->telephone ?? '') }}"
                class="keep-ltr w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]">
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Date expiration</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Date expiration') }}</label>
         <input type="date"
                name="expires_at"
                value="{{ old('expires_at', $frs?->expires_at?->format('Y-m-d')) }}"
                class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                required>
-        <div class="mt-1 text-xs text-white/50">L admin peut prolonger cette date plus tard pour reactiver l acces.</div>
+        <div class="mt-1 text-xs text-white/50">{{ __('L admin peut prolonger cette date plus tard pour reactiver l acces.') }}</div>
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Logo (optionnel)</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Logo (optionnel)') }}</label>
         <input type="file"
                name="logo"
                accept="image/png,image/jpeg,image/webp"
@@ -147,14 +147,14 @@
                            name="remove_logo"
                            value="1"
                            class="h-5 w-5 rounded border-white/20 bg-[var(--admin-card)]">
-                    <span class="text-sm font-semibold text-white/70">Supprimer</span>
+                    <span class="text-sm font-semibold text-white/70">{{ __('Supprimer') }}</span>
                 </label>
             </div>
         @endif
     </div>
 
     <div class="md:col-span-2">
-        <label class="block text-sm font-semibold text-white/70 mb-1">Adresse</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Adresse') }}</label>
         <textarea name="adresse"
                   rows="3"
                   class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
@@ -162,7 +162,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Latitude (optionnel)</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Latitude (optionnel)') }}</label>
         <input name="latitude"
                value="{{ old('latitude', $frs?->latitude ?? '') }}"
                inputmode="decimal"
@@ -170,7 +170,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Longitude (optionnel)</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Longitude (optionnel)') }}</label>
         <input name="longitude"
                value="{{ old('longitude', $frs?->longitude ?? '') }}"
                inputmode="decimal"
@@ -178,12 +178,12 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Wilaya</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Wilaya') }}</label>
         <select name="id_wilaya"
                 id="{{ $wilayaSelectId }}"
                 class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                 required>
-            <option value="">Choisir...</option>
+            <option value="">{{ __('Choisir...') }}</option>
             @foreach($wilayas as $w)
                 <option value="{{ $w->ID_WILAYA }}"
                         @selected((int)old('id_wilaya', $frs?->id_wilaya ?? 0) === (int)$w->ID_WILAYA)>
@@ -194,12 +194,12 @@
     </div>
 
     <div>
-        <label class="block text-sm font-semibold text-white/70 mb-1">Commune</label>
+        <label class="block text-sm font-semibold text-white/70 mb-1">{{ __('Commune') }}</label>
         <select name="id_commune"
                 id="{{ $communeSelectId }}"
                 class="w-full rounded-2xl border border-white/10 bg-[var(--admin-card)] px-4 py-3 outline-none focus:border-[var(--admin-primary)]"
                 required>
-            <option value="">Choisir...</option>
+            <option value="">{{ __('Choisir...') }}</option>
             @foreach($communes as $c)
                 <option value="{{ $c->ID_COMMUNE }}"
                         @selected((int)old('id_commune', $frs?->id_commune ?? 0) === (int)$c->ID_COMMUNE)>
@@ -216,7 +216,7 @@
                    value="1"
                    class="h-5 w-5 rounded border-white/20 bg-[var(--admin-card)]"
                    @checked((int)old('actif', $frs?->actif ?? 1) === 1)>
-            <span class="text-sm font-semibold text-white/70">Actif</span>
+            <span class="text-sm font-semibold text-white/70">{{ __('Actif') }}</span>
         </label>
     </div>
 </div>
@@ -225,6 +225,8 @@
      data-wilaya-select-id="{{ $wilayaSelectId }}"
      data-commune-select-id="{{ $communeSelectId }}"
      data-selected-commune-id="{{ $selectedCommuneId }}"
+     data-loading-label="{{ __('Chargement...') }}"
+     data-choose-label="{{ __('Choisir...') }}"
      data-base-url="{{ url('/admin/wilayas') }}"></div>
 
 <script>
@@ -237,12 +239,14 @@
         }
 
         wilayaSelect.dataset.locationInit = '1';
+        const loadingLabel = config.loadingLabel || '';
+        const chooseLabel = config.chooseLabel || '';
 
         async function loadCommunes(wilayaId, selectedCommuneId) {
-            communeSelect.innerHTML = '<option value="">Chargement...</option>';
+            communeSelect.innerHTML = '<option value="">' + loadingLabel + '</option>';
 
             if (!wilayaId) {
-                communeSelect.innerHTML = '<option value="">Choisir...</option>';
+                communeSelect.innerHTML = '<option value="">' + chooseLabel + '</option>';
                 return;
             }
 
@@ -254,7 +258,7 @@
             });
 
             const rows = await response.json();
-            communeSelect.innerHTML = '<option value="">Choisir...</option>';
+            communeSelect.innerHTML = '<option value="">' + chooseLabel + '</option>';
 
             rows.forEach(function (row) {
                 const option = document.createElement('option');
@@ -288,6 +292,8 @@
             wilayaSelectId: configElement.dataset.wilayaSelectId || '',
             communeSelectId: configElement.dataset.communeSelectId || '',
             selectedCommuneId: configElement.dataset.selectedCommuneId || '',
+            loadingLabel: configElement.dataset.loadingLabel || '',
+            chooseLabel: configElement.dataset.chooseLabel || '',
             baseUrl: configElement.dataset.baseUrl || '',
         });
     })();
