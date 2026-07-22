@@ -172,14 +172,16 @@
                     var pointerId = null;
                     var startX = 0;
                     var startScrollLeft = 0;
+                    var isPointerDown = false;
                     var isDragging = false;
                     var hasDragged = false;
 
                     var stopDragging = function () {
-                        if (!isDragging) {
+                        if (!isPointerDown && !isDragging) {
                             return;
                         }
 
+                        isPointerDown = false;
                         isDragging = false;
                         pointerId = null;
                         track.classList.remove('is-dragging');
@@ -201,14 +203,14 @@
                         pointerId = event.pointerId;
                         startX = event.clientX;
                         startScrollLeft = track.scrollLeft;
-                        isDragging = true;
+                        isPointerDown = true;
+                        isDragging = false;
                         hasDragged = false;
-                        track.classList.add('is-dragging');
                         track.setPointerCapture(event.pointerId);
                     });
 
                     track.addEventListener('pointermove', function (event) {
-                        if (!isDragging || pointerId !== event.pointerId) {
+                        if (!isPointerDown || pointerId !== event.pointerId) {
                             return;
                         }
 
@@ -218,6 +220,11 @@
                         }
 
                         if (hasDragged) {
+                            if (!isDragging) {
+                                isDragging = true;
+                                track.classList.add('is-dragging');
+                            }
+
                             track.scrollLeft = startScrollLeft - deltaX;
                         }
                     });
