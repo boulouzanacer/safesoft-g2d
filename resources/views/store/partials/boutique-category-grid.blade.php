@@ -169,7 +169,6 @@
                         return Math.max(Math.round(track.clientWidth * 0.78), 220);
                     };
 
-                    var pointerId = null;
                     var startX = 0;
                     var startScrollLeft = 0;
                     var isPointerDown = false;
@@ -183,7 +182,6 @@
 
                         isPointerDown = false;
                         isDragging = false;
-                        pointerId = null;
                         track.classList.remove('is-dragging');
                     };
 
@@ -195,22 +193,20 @@
                         track.scrollBy({ left: getStep() * directionFactor, behavior: 'smooth' });
                     });
 
-                    track.addEventListener('pointerdown', function (event) {
-                        if (event.pointerType === 'mouse' && event.button !== 0) {
+                    track.addEventListener('mousedown', function (event) {
+                        if (event.button !== 0) {
                             return;
                         }
 
-                        pointerId = event.pointerId;
                         startX = event.clientX;
                         startScrollLeft = track.scrollLeft;
                         isPointerDown = true;
                         isDragging = false;
                         hasDragged = false;
-                        track.setPointerCapture(event.pointerId);
                     });
 
-                    track.addEventListener('pointermove', function (event) {
-                        if (!isPointerDown || pointerId !== event.pointerId) {
+                    window.addEventListener('mousemove', function (event) {
+                        if (!isPointerDown) {
                             return;
                         }
 
@@ -225,18 +221,20 @@
                                 track.classList.add('is-dragging');
                             }
 
+                            event.preventDefault();
                             track.scrollLeft = startScrollLeft - deltaX;
                         }
                     });
 
-                    track.addEventListener('pointerup', function (event) {
-                        if (pointerId === event.pointerId) {
+                    window.addEventListener('mouseup', stopDragging);
+                    track.addEventListener('mouseleave', function () {
+                        if (isDragging) {
                             stopDragging();
                         }
                     });
-
-                    track.addEventListener('pointercancel', stopDragging);
-                    track.addEventListener('lostpointercapture', stopDragging);
+                    track.addEventListener('dragstart', function (event) {
+                        event.preventDefault();
+                    });
 
                     track.addEventListener('click', function (event) {
                         if (!hasDragged) {
