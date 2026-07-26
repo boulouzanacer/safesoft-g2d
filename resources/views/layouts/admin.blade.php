@@ -202,6 +202,13 @@
                 <span>{{ __('Paramètres') }}</span>
             </a>
 
+            <a href="{{ url('/admin/base-de-donnees') }}"
+               class="flex items-center gap-3 rounded-xl px-4 py-3 border border-transparent {{ request()->is('admin/base-de-donnees*') ? 'border-[var(--admin-primary)] bg-[color:rgba(30,111,217,0.12)]' : '' }}"
+               :class="dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'">
+                <i class="fa-solid fa-database w-5 text-[var(--admin-primary)]"></i>
+                <span>{{ __('Base de données') }}</span>
+            </a>
+
             <form method="POST" action="{{ url('/admin/logout') }}" class="pt-2">
                 @csrf
                 <button type="submit"

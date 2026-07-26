@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\ApiKeyController;
 use App\Http\Controllers\Admin\BoutiqueCategoryController;
+use App\Http\Controllers\Admin\DatabaseToolsController;
 use App\Http\Controllers\Admin\PlatformSettingsController;
 use App\Http\Controllers\Auth\ClientAuthController;
 use App\Http\Controllers\Auth\FrsAuthController;
@@ -105,6 +106,9 @@ Route::prefix('admin')->middleware('auth.admin')->group(function () {
 
     Route::get('/parametres', [PlatformSettingsController::class, 'edit']);
     Route::post('/parametres/logo', [PlatformSettingsController::class, 'update']);
+    Route::get('/base-de-donnees', [DatabaseToolsController::class, 'index']);
+    Route::post('/base-de-donnees/unlock', [DatabaseToolsController::class, 'unlock']);
+    Route::post('/base-de-donnees/reset', [DatabaseToolsController::class, 'resetTables']);
 
     Route::get('/profil', function () {
         return view('admin.profil', ['title' => 'Profil']);
