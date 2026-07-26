@@ -1030,8 +1030,6 @@ class StoreController extends Controller
                     'prix_unitaire' => $prixUnitaire,
                     'sous_total' => $lineTotal,
                 ];
-
-                $pdb->update(['stock' => (int) $pdb->stock - $qty]);
             }
 
             $orderClientResult = $this->resolveOrderClient($client, (int) $frs->id);
