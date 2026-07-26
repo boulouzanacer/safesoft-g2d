@@ -40,11 +40,11 @@
             <div class="store-muted text-sm">{{ $boutiques->total() }} {{ __('boutique(s)') }}</div>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+        <div class="flex gap-3 overflow-x-auto overflow-y-hidden pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             @forelse($boutiques as $boutique)
                 @include('store.partials.boutique-card', ['boutique' => $boutique])
             @empty
-                <div class="store-panel col-span-full p-10 text-center store-muted">
+                <div class="store-panel min-w-full p-10 text-center store-muted">
                     {{ __('Aucune boutique trouvée.') }}
                 </div>
             @endforelse

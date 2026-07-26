@@ -7,7 +7,7 @@
 
 @if($boutique)
     <a href="{{ $boutiqueUrl }}"
-       class="store-panel group block p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(37,99,235,0.16)]">
+       class="store-panel group block w-[220px] min-w-[220px] p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(37,99,235,0.16)]">
         <div class="flex items-start gap-2.5">
             @if(($boutique->logo_url ?? '') !== '')
                 <img src="{{ $boutique->logo_url }}"
