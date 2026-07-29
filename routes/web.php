@@ -25,6 +25,9 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\StoreController;
 
 Route::get('/', [StoreController::class, 'index']);
+Route::get('/documentation/api', function () {
+    return view('documentation.api', ['title' => 'Documentation API PME']);
+});
 Route::get('/boutiques', [StoreController::class, 'boutiques']);
 Route::get('/boutiques/{id}', [StoreController::class, 'boutique']);
 Route::get('/produits', [StoreController::class, 'produits']);
