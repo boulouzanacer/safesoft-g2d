@@ -1,7 +1,7 @@
 @php
     $boutique = $boutique ?? null;
-    $boutiqueUrl = ($boutique && ($boutique->storefront_url ?? '') !== '')
-        ? $boutique->storefront_url
+    $boutiqueUrl = ($boutique && ($boutique->preferred_storefront_url ?? '') !== '')
+        ? $boutique->preferred_storefront_url
         : ($boutique ? url('/boutiques/'.$boutique->id) : '#');
 @endphp
 

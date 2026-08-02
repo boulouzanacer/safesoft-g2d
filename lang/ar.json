@@ -524,4 +524,6 @@
     ,"Pour les appels PME protégés, utilisez la base URL ci-dessous avec Authorization: Bearer <boutique_token>. Pour la création publique de boutique, utilisez X-API-KEY sur les endpoints prévus.": "بالنسبة لطلبات PME المحمية، استخدم الـ Base URL أدناه مع Authorization: Bearer <boutique_token>. ولإنشاء المتجر بشكل عام، استخدم X-API-KEY على الـ endpoints المخصصة."
     ,"Base URL PME": "رابط PME الأساسي"
     ,"Base URL publique": "الرابط العام الأساسي"
+    ,"Connectez-vous pour continuer sur cette boutique.": "سجّل الدخول للمتابعة داخل هذا المتجر."
+    ,"Créez votre compte pour commander directement depuis cette boutique.": "أنشئ حسابك للطلب مباشرة من هذا المتجر."
 }

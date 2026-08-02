@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Commune;
+use App\Models\Fournisseur;
 use App\Models\Wilaya;
 use App\Services\ClientBoutiqueManager;
 use Illuminate\Contracts\View\View;
@@ -22,9 +23,113 @@ class ClientAuthController extends Controller
     {
     }
 
-    public function showLogin(): View
+    private function requestStorefrontDomainBoutique(Request $request): ?Fournisseur
     {
-        return view('auth.client-login', ['title' => 'Connexion']);
+        $boutique = $request->attributes->get('custom_storefront_boutique');
+
+        return $boutique instanceof Fournisseur ? $boutique : null;
+    }
+
+    private function storefrontBoutiqueFromSession(Request $request): ?Fournisseur
+    {
+        $frsId = (int) $request->session()->get('storefront_frs_id', 0);
+        if ($frsId <= 0) {
+            return null;
+        }
+
+        return Fournisseur::query()
+            ->with('boutiqueCategory:id,name')
+            ->where('id', $frsId)
+            ->where('actif', 1)
+            ->whereNull('deleted_at')
+            ->first([
+                'id',
+                'nom_frs',
+                'storefront_slug',
+                'storefront_theme',
+                'boutique_category_id',
+                'logo_path',
+                'telephone',
+                'adresse',
+                'id_wilaya',
+                'id_commune',
+                'latitude',
+                'longitude',
+            ]);
+    }
+
+    private function boutiqueStorefrontHomeUrl(Fournisseur $boutique, string $mode): string
+    {
+        if ($mode === 'domain') {
+            return url('/');
+        }
+
+        return trim((string) ($boutique->storefront_url ?? '')) !== ''
+            ? $boutique->storefront_url
+            : url('/boutiques/'.$boutique->id);
+    }
+
+    private function storefrontState(Request $request): array
+    {
+        $domainBoutique = $this->requestStorefrontDomainBoutique($request);
+        if ($domainBoutique) {
+            return [
+                'boutique' => $domainBoutique,
+                'mode' => 'domain',
+                'home_url' => $this->boutiqueStorefrontHomeUrl($domainBoutique, 'domain'),
+            ];
+        }
+
+        $sessionBoutique = $this->storefrontBoutiqueFromSession($request);
+        if ($sessionBoutique) {
+            return [
+                'boutique' => $sessionBoutique,
+                'mode' => 'slug',
+                'home_url' => $this->boutiqueStorefrontHomeUrl($sessionBoutique, 'slug'),
+            ];
+        }
+
+        return [
+            'boutique' => null,
+            'mode' => null,
+            'home_url' => '',
+        ];
+    }
+
+    private function storefrontViewData(Request $request, string $title): array
+    {
+        $state = $this->storefrontState($request);
+        $boutique = $state['boutique'];
+        $mode = $state['mode'];
+
+        return [
+            'title' => $title,
+            'storefront_mode' => $boutique !== null,
+            'storefront_mode_type' => $mode,
+            'custom_domain_mode' => $mode === 'domain',
+            'storefront_boutique' => $boutique,
+            'storefront_home_url' => (string) $state['home_url'],
+            'store_theme_boutique' => $boutique,
+            'theme_boutique' => $boutique,
+            'header_brand_boutique' => $boutique,
+            'header_brand_url' => $boutique ? $this->boutiqueStorefrontHomeUrl($boutique, (string) $mode) : '',
+            'storefront_theme_key' => $boutique?->storefrontThemeKey() ?? Fournisseur::DEFAULT_STOREFRONT_THEME,
+            'storefront_theme_config' => $boutique?->storefrontThemeConfig() ?? Fournisseur::storefrontThemeOptions()[Fournisseur::DEFAULT_STOREFRONT_THEME],
+        ];
+    }
+
+    private function storefrontRedirectUrl(Request $request): string
+    {
+        $state = $this->storefrontState($request);
+
+        return trim((string) ($state['home_url'] ?? '')) !== ''
+            ? (string) $state['home_url']
+            : '/';
+    }
+
+    public function showLogin(Request $request): View
+    {
+        return view('auth.client-login', $this->storefrontViewData($request, 'Connexion'));
     }
 
     public function login(Request $request): RedirectResponse
@@ -67,10 +172,10 @@ class ClientAuthController extends Controller
             'client_id' => $client->id,
         ]);
 
-        return redirect()->intended('/');
+        return redirect()->intended($this->storefrontRedirectUrl($request));
     }
 
-    public function showRegister(): View
+    public function showRegister(Request $request): View
     {
         $wilayas = Wilaya::query()->orderBy('ID_WILAYA')->get(['ID_WILAYA', 'WILAYA']);
         $defaultWilaya = (int) ($wilayas->first()?->ID_WILAYA ?? 1);
@@ -79,8 +184,7 @@ class ClientAuthController extends Controller
             ->orderBy('COMMUNE')
             ->get(['ID_COMMUNE', 'COMMUNE', 'ID_WILAYA']);
 
-        return view('auth.client-register', [
-            'title' => 'Créer un compte',
+        return view('auth.client-register', $this->storefrontViewData($request, 'Créer un compte') + [
             'wilayas' => $wilayas,
             'communes' => $communes,
             'default_wilaya' => $defaultWilaya,
@@ -199,7 +303,7 @@ class ClientAuthController extends Controller
             'client_id' => $client->id,
         ]);
 
-        return redirect()->to('/')->with('success', 'Email vérifié. Bienvenue.');
+        return redirect()->to($this->storefrontRedirectUrl($request))->with('success', 'Email vérifié. Bienvenue.');
     }
 
     public function resendEmailCode(Request $request): RedirectResponse
@@ -317,10 +421,12 @@ class ClientAuthController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
+        $redirectUrl = $this->storefrontRedirectUrl($request);
+
         $request->session()->forget(['role', 'client_id']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->to('/');
+        return redirect()->to($redirectUrl);
     }
 }

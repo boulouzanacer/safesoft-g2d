@@ -46,6 +46,7 @@ class Fournisseur extends Authenticatable
     protected $appends = [
         'logo_url',
         'storefront_url',
+        'preferred_storefront_url',
     ];
 
     protected $hidden = [
@@ -80,6 +81,38 @@ class Fournisseur extends Authenticatable
         $slug = trim((string) ($this->storefront_slug ?? ''));
 
         return $slug === '' ? '' : route('storefront.boutique', ['slug' => $slug]);
+    }
+
+    public function getPreferredStorefrontUrlAttribute(): string
+    {
+        $customDomain = $this->preferredCustomDomainHost();
+
+        if ($customDomain !== '') {
+            return 'https://'.$customDomain;
+        }
+
+        return $this->getStorefrontUrlAttribute();
+    }
+
+    private function preferredCustomDomainHost(): string
+    {
+        if ($this->relationLoaded('customDomains')) {
+            $domain = $this->customDomains
+                ->filter(fn ($item) => (bool) ($item->is_active ?? false))
+                ->sortBy([
+                    fn ($item) => (bool) ($item->is_primary ?? false) ? 0 : 1,
+                    fn ($item) => (string) ($item->domain ?? ''),
+                ])
+                ->first();
+
+            return trim((string) ($domain->domain ?? ''));
+        }
+
+        return trim((string) $this->customDomains()
+            ->where('is_active', 1)
+            ->orderByDesc('is_primary')
+            ->orderBy('domain')
+            ->value('domain'));
     }
 
     public static function storefrontThemeOptions(): array
@@ -393,6 +426,7 @@ class Fournisseur extends Authenticatable
     {
         return $this->hasMany(CustomDomain::class, 'fournisseur_id', 'id');
     }
+
 
     public function prevendeurs(): HasMany
     {

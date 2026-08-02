@@ -3,7 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __($title ?? 'Boutique') }} - {{ config('branding.platform_name') }}</title>
+    @php($headBrandBoutique = $header_brand_boutique ?? ($store_theme_boutique ?? ($storefront_boutique ?? null)))
+    @php($headBrandName = trim((string) ($headBrandBoutique->nom_frs ?? '')) !== '' ? trim((string) $headBrandBoutique->nom_frs) : config('branding.platform_name'))
+    @php($headTitleSuffix = (bool) ($storefront_mode ?? false) ? $headBrandName : config('branding.platform_name'))
+    <title>{{ __($title ?? 'Boutique') }} - {{ $headTitleSuffix }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -363,7 +366,7 @@
 
     <footer class="store-footer border-t">
         <div class="store-muted max-w-7xl mx-auto px-4 py-6 text-sm">
-            © {{ date('Y') }} {{ config('branding.platform_name') }}
+            © {{ date('Y') }} {{ $isStorefrontMode ? $brandName : config('branding.platform_name') }}
         </div>
     </footer>
 </div>

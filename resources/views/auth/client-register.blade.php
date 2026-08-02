@@ -3,6 +3,26 @@
 @section('content')
 <div class="max-w-2xl mx-auto">
     <div class="rounded-2xl border border-slate-200 bg-[var(--store-card)] p-6">
+        @if(($storefront_boutique ?? null))
+            <div class="mb-5 rounded-2xl border border-[color:var(--store-border)] bg-[var(--store-card-soft)] p-4">
+                <div class="flex items-center gap-3">
+                    @if(($storefront_boutique->logo_url ?? '') !== '')
+                        <img src="{{ $storefront_boutique->logo_url }}"
+                             alt="{{ $storefront_boutique->nom_frs }}"
+                             class="h-12 w-12 rounded-2xl border border-[color:var(--store-border)] bg-white object-cover">
+                    @else
+                        <div class="store-logo-fallback flex h-12 w-12 items-center justify-center rounded-2xl font-extrabold text-white">
+                            {{ strtoupper(mb_substr($storefront_boutique->nom_frs ?? 'B', 0, 1)) }}
+                        </div>
+                    @endif
+                    <div class="min-w-0">
+                        <div class="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--store-primary)]">{{ __('Boutique') }}</div>
+                        <div class="truncate text-lg font-black text-[color:var(--store-text)]">{{ $storefront_boutique->nom_frs }}</div>
+                        <div class="mt-1 text-sm text-slate-600">{{ __('Créez votre compte pour commander directement depuis cette boutique.') }}</div>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="text-2xl font-extrabold tracking-wide">{{ __('Créer un compte') }}</div>
         <div class="mt-1 text-sm text-slate-600">{{ __('Compte client simple (abonnement géré par l\'administration).') }}</div>
 

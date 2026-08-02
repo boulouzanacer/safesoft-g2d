@@ -384,7 +384,13 @@ class StoreController extends Controller
         $abonneFournisseurIds = $this->abonneFournisseurIds($client);
 
         return Fournisseur::query()
-            ->with('boutiqueCategory:id,name')
+            ->with([
+                'boutiqueCategory:id,name',
+                'customDomains' => fn ($query) => $query
+                    ->where('is_active', 1)
+                    ->orderByDesc('is_primary')
+                    ->orderBy('domain'),
+            ])
             ->where('actif', 1)
             ->whereNull('deleted_at')
             ->where(function ($sub) use ($abonneFournisseurIds) {
