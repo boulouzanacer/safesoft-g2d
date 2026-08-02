@@ -7,7 +7,7 @@
 
 @if($boutique)
     <a href="{{ $boutiqueUrl }}"
-       class="store-panel group block w-[220px] min-w-[220px] p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(37,99,235,0.16)]">
+       class="store-panel group block w-[236px] min-w-[236px] p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(37,99,235,0.16)]">
         <div class="flex items-start gap-2.5">
             @if(($boutique->logo_url ?? '') !== '')
                 <img src="{{ $boutique->logo_url }}"
@@ -20,13 +20,16 @@
             @endif
 
             <div class="min-w-0 flex-1">
-                <div class="flex items-start justify-between gap-2">
+                <div class="space-y-1.5">
                     <div class="min-w-0">
-                        <div class="truncate text-sm font-extrabold leading-5 text-[color:var(--store-text)]">{{ $boutique->nom_frs }}</div>
+                        <div title="{{ $boutique->nom_frs }}"
+                             class="overflow-hidden break-words text-sm font-extrabold leading-5 text-[color:var(--store-text)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] min-h-[2.5rem]">
+                            {{ $boutique->nom_frs }}
+                        </div>
                         <div class="store-muted mt-0.5 text-[11px] leading-4">{{ __('Boutique') }}</div>
                     </div>
                     @if(($boutique->boutiqueCategory?->name ?? '') !== '')
-                        <span class="store-badge inline-flex max-w-[8rem] items-center truncate rounded-full px-2 py-0.5 text-[10px] font-bold">
+                        <span class="store-badge inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-[10px] font-bold">
                             {{ $boutique->boutiqueCategory->name }}
                         </span>
                     @endif
