@@ -388,6 +388,7 @@ class StoreController extends Controller
                 'boutiqueCategory:id,name',
                 'customDomains' => fn ($query) => $query
                     ->where('is_active', 1)
+                    ->whereNotNull('verified_at')
                     ->orderByDesc('is_primary')
                     ->orderBy('domain'),
             ])

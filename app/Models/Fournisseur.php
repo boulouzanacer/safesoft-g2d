@@ -99,6 +99,7 @@ class Fournisseur extends Authenticatable
         if ($this->relationLoaded('customDomains')) {
             $domain = $this->customDomains
                 ->filter(fn ($item) => (bool) ($item->is_active ?? false))
+                ->filter(fn ($item) => $item->verified_at !== null)
                 ->sortBy([
                     fn ($item) => (bool) ($item->is_primary ?? false) ? 0 : 1,
                     fn ($item) => (string) ($item->domain ?? ''),
@@ -110,6 +111,7 @@ class Fournisseur extends Authenticatable
 
         return trim((string) $this->customDomains()
             ->where('is_active', 1)
+            ->whereNotNull('verified_at')
             ->orderByDesc('is_primary')
             ->orderBy('domain')
             ->value('domain'));
